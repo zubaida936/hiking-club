@@ -15,5 +15,9 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             AdminUserSeeder::class,
         ]);
+
+        if (app()->isLocal()) {
+            $this->call(DemoEventSeeder::class);
+        }
     }
 }

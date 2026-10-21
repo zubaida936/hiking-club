@@ -30,6 +30,17 @@ Everything you can open while testing. Start the stack first: `docker compose up
 | Staff & roles — list | http://localhost:8080/admin/staff | Super Admin |
 | Staff & roles — new user | http://localhost:8080/admin/staff/create | Super Admin |
 | Staff & roles — edit user | http://localhost:8080/admin/staff/{id}/edit (use the Edit link in the list) | Super Admin |
+| Events — list | http://localhost:8080/admin/events | Super Admin, Admin |
+| Events — upcoming only | http://localhost:8080/admin/events?when=upcoming | Super Admin, Admin |
+| Events — new event | http://localhost:8080/admin/events/create | Super Admin, Admin |
+| Events — edit / publish / cancel / duplicate | http://localhost:8080/admin/events/{id}/edit (click an event title) | Super Admin, Admin |
+
+Uploaded images are served from `http://localhost:8080/storage/...` (files live in `storage/app/public`).
+
+## Demo data
+
+`docker compose exec app php artisan migrate:fresh --seed` creates 6 sample events (published, draft,
+cancelled, past and X events) so every screen has something to show. Re-run it to reset them.
 
 ## GitHub
 
@@ -50,6 +61,8 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Docker environment & CI/CD | https://app.clickup.com/t/z8q7hbmpk2 |
 | Project setup & database | https://app.clickup.com/t/z8q7hbmped |
 | CMS admin auth & roles | https://app.clickup.com/t/z8q7hbmpfn |
+| CMS events management | https://app.clickup.com/t/z8q7hbmpfp |
+| Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands
 
@@ -60,4 +73,5 @@ docker compose ps                                         # what is running
 docker compose exec app php artisan test                  # automated tests
 docker compose exec app php artisan migrate:fresh --seed  # reset dev data to a clean state
 docker compose logs -f app                                # follow app logs
+docker compose exec app php artisan events:recalculate-difficulty  # after changing config/difficulty.php
 ```

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Domain\Events\Difficulty\DifficultyCalculator;
 use App\Domain\Identity\Enums\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(DifficultyCalculator::class, fn () => DifficultyCalculator::fromConfig());
     }
 
     /**

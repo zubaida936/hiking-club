@@ -4,6 +4,7 @@
     // Each module registers its entry here; items whose route does not exist yet are hidden.
     $items = [
         ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard', 'can' => Permission::AccessAdmin],
+        ['label' => 'Events', 'route' => 'admin.events.index', 'active' => 'admin.events.*', 'can' => Permission::ManageEvents],
         ['label' => 'Staff & roles', 'route' => 'admin.staff.index', 'active' => 'admin.staff.*', 'can' => Permission::ManageStaff],
     ];
 @endphp

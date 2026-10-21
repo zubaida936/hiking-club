@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\StaffUserController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,4 +24,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('staff', StaffUserController::class)
         ->except('show')
         ->parameters(['staff' => 'user']);
+
+    Route::resource('events', EventController::class)->except('show');
+    Route::controller(EventController::class)->prefix('events/{event}')->name('events.')->group(function () {
+        Route::post('publish', 'publish')->name('publish');
+        Route::post('unpublish', 'unpublish')->name('unpublish');
+        Route::post('cancel', 'cancel')->name('cancel');
+        Route::post('duplicate', 'duplicate')->name('duplicate');
+    });
 });
