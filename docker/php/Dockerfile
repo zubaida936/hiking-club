@@ -33,10 +33,11 @@ RUN install-php-extensions xdebug \
     && apk add --no-cache git unzip
 
 COPY docker/php/conf.d/dev.ini /usr/local/etc/php/conf.d/zz-dev.ini
+COPY docker/php/dev-fpm.conf /usr/local/etc/php-fpm.d/zz-dev.conf
 COPY --chmod=755 docker/php/dev-entrypoint.sh /usr/local/bin/dev-entrypoint
 
 ENTRYPOINT ["dev-entrypoint"]
-CMD ["php-fpm"]
+CMD ["php-fpm", "--allow-to-run-as-root"]
 
 ############################
 # Build front-end assets
