@@ -23,4 +23,4 @@ Public site + custom CMS (`/admin`). Feature backlog lives in ClickUp, folder "H
 ## Workflow rules
 - One branch per feature: `feature/<short-name>`. Commit locally; **never push to GitHub without asking the user first**.
 - Every feature ships with Pest tests; CI (Pint, Larastan level 6, tests, Docker build) must be green.
-- After each feature, add its manual test cases to the matching ClickUp task.
+- After each feature, add its manual test cases to the matching ClickUp task and add its new pages/links to TESTING.md.

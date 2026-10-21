@@ -26,6 +26,8 @@ docker compose exec app php artisan migrate --seed
 The `node` service runs the Vite dev server with hot reload. For a production asset build:
 `docker compose run --rm node npm run build`.
 
+See [TESTING.md](TESTING.md) for every link and login available while testing.
+
 ## Quality checks
 
 ```bash
