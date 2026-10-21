@@ -75,6 +75,19 @@ services:
       interval: 5s
       retries: 10
 
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "${PMA_PORT:-8081}:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
   mailpit:
     image: axllent/mailpit:latest
     ports:

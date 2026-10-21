@@ -4,7 +4,7 @@ Laravel 13 + MySQL 8.4 + Redis, everything runs in Docker (no PHP on the host).
 Public site + custom CMS (`/admin`). Feature backlog lives in ClickUp, folder "Hiking Club Website".
 
 ## Commands (always through Docker)
-- `docker compose up -d` — start the stack (site: http://localhost:8080, CMS: /admin, Mailpit: :8025)
+- `docker compose up -d` — start the stack (site: http://localhost:8080, CMS: /admin, Mailpit: :8025, phpMyAdmin: :8081)
 - `docker compose exec app php artisan test` — test suite (uses the `hiking_testing` DB)
 - `docker compose exec app vendor/bin/pint` — format; `vendor/bin/phpstan analyse` — static analysis
 - `docker compose exec app php artisan migrate --seed`

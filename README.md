@@ -20,6 +20,7 @@ docker compose exec app php artisan migrate --seed
 | Website | http://localhost:8080 |
 | CMS | http://localhost:8080/admin (seeded: `admin@hiking.test` / `password`) |
 | Mailpit (outgoing mail) | http://localhost:8025 |
+| phpMyAdmin | http://localhost:8081 (auto-login as root) |
 | MySQL (from host) | `127.0.0.1:33060` |
 
 The `node` service runs the Vite dev server with hot reload. For a production asset build:
