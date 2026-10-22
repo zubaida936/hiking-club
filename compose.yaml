@@ -9,6 +9,9 @@ x-app: &app
   image: hiking-app:dev
   volumes:
     - .:/var/www/html
+    # Keep dependencies inside the Docker VM: reading thousands of files through the
+    # Windows bind mount made every request take seconds.
+    - vendor:/var/www/html/vendor
   depends_on:
     mysql:
       condition: service_healthy
@@ -44,6 +47,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app
+      - node-modules:/app/node_modules
     command: sh -c "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0"
     ports:
       - "${VITE_PORT:-5173}:5173"
@@ -96,3 +100,5 @@ services:
 volumes:
   mysql-data:
   redis-data:
+  vendor:
+  node-modules:
