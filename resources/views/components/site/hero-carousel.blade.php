@@ -16,7 +16,10 @@
              x-transition:enter="transition-opacity duration-700" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
              class="relative flex min-h-[70vh] items-center" role="group" aria-roledescription="slide" aria-label="{{ $i + 1 }} of {{ count($slides) }}">
             @if ($slide['image'])
-                <img src="{{ asset($slide['image']) }}" alt="" class="absolute inset-0 -z-10 size-full object-cover">
+                {{-- First slide is the largest above-the-fold image: load it first; the rest lazily. --}}
+                <img src="{{ asset($slide['image']) }}" alt="" width="1920" height="1080" decoding="async"
+                     @if ($i === 0) fetchpriority="high" @else loading="lazy" @endif
+                     class="absolute inset-0 -z-10 size-full object-cover">
                 <div class="absolute inset-0 -z-10 bg-brand-900/60"></div>
             @else
                 <div @class([

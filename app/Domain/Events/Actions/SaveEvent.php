@@ -8,6 +8,7 @@ use App\Domain\Events\Difficulty\DifficultyCalculator;
 use App\Domain\Events\Enums\EventStatus;
 use App\Models\Event;
 use App\Models\User;
+use App\Support\ImageOptimizer;
 use App\Support\UniqueSlug;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -54,7 +55,7 @@ final class SaveEvent
         ]);
 
         if ($data->coverImage) {
-            $event->cover_image_path = $data->coverImage->store(self::IMAGE_DIR, 'public') ?: null;
+            $event->cover_image_path = ImageOptimizer::storeJpeg($data->coverImage, self::IMAGE_DIR);
         } elseif ($data->removeCoverImage) {
             $event->cover_image_path = null;
         }

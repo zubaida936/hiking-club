@@ -1,4 +1,4 @@
-<x-site.layout :title="$title">
+<x-site.layout :title="$title" :noindex="true">
     <section class="bg-brand-800 py-20 text-center text-white">
         <h1 class="font-display text-4xl font-bold uppercase tracking-wide sm:text-5xl">{{ $title }}</h1>
     </section>

@@ -4,7 +4,8 @@
 <article class="mx-auto grid max-w-5xl overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-slate-200 md:grid-cols-2">
     <div class="relative min-h-60 bg-linear-to-br from-brand-800 to-brand-500">
         @if ($event->coverImageUrl())
-            <img src="{{ $event->coverImageUrl() }}" alt="{{ $event->title }}" class="absolute inset-0 size-full object-cover">
+            <img src="{{ $event->coverImageUrl() }}" alt="{{ $event->title }}" width="1200" height="800" loading="lazy" decoding="async"
+                 class="absolute inset-0 size-full object-cover">
         @else
             <svg class="absolute inset-x-0 bottom-0 h-2/3 w-full text-black/20" viewBox="0 0 400 200" preserveAspectRatio="none" fill="currentColor" aria-hidden="true">
                 <path d="M0 200 90 70l60 60 80-110 90 120 80-60v120z"/>

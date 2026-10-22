@@ -45,6 +45,16 @@ A green WhatsApp button floats in the bottom-right corner of every public page a
 `SITE_WHATSAPP` with a pre-filled message (`config/site.php` → `contact.whatsapp_message`). Leave
 `SITE_WHATSAPP` empty to hide it, together with the WhatsApp links in the footer and on the homepage.
 
+### SEO & analytics
+
+| What | Link / where |
+|---|---|
+| Sitemap | http://localhost:8080/sitemap.xml (real pages only; events appear once the event page exists) |
+| robots.txt | http://localhost:8080/robots.txt (blocks everything except when `APP_ENV=production`) |
+| Default share image | http://localhost:8080/images/og-default.jpg (placeholder, 1200×630) |
+| Share preview check | view page source and look for `og:` tags, or paste the live URL into https://www.opengraph.xyz once deployed |
+| Analytics | set `GOOGLE_ANALYTICS_ID=G-...` in `.env` + `php artisan config:clear`; never loaded in the CMS |
+
 ### Newsletter (Next Destination Alerts)
 
 | What | Where |
@@ -116,6 +126,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Next-event announcement bar | https://app.clickup.com/t/z8q7hbmpef |
 | Newsletter signup | https://app.clickup.com/t/z8q7hbmpej |
 | Floating WhatsApp button | https://app.clickup.com/t/z8q7hbmpek |
+| SEO, performance & analytics | https://app.clickup.com/t/z8q7hbmpem |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

@@ -1,5 +1,26 @@
-@php($contact = config('site.contact'))
-@php($social = config('site.social'))
+@php
+    $contact = config('site.contact');
+    $social = config('site.social');
+
+    // Structured data so search engines know the club's name, links and contact.
+    $organization = [
+        '@context' => 'https://schema.org',
+        '@type' => 'SportsClub',
+        'name' => config('app.name'),
+        'url' => route('home'),
+        'description' => config('site.description'),
+        'image' => asset(config('site.share_image')),
+        'email' => $contact['email'],
+        'telephone' => $contact['phone'],
+        'address' => ['@type' => 'PostalAddress', 'addressLocality' => $contact['address']],
+        'sameAs' => array_column(array_values(\App\Support\SocialLinks::all()), 1),
+    ];
+@endphp
+
+@push('head')
+    {{-- JSON_HEX_TAG escapes "<", so no value can close the script tag. --}}
+    <script type="application/ld+json">{!! json_encode($organization, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>
+@endpush
 
 <x-site.layout>
     <h1 class="sr-only">{{ config('app.name') }}</h1>
@@ -130,11 +151,13 @@
                 <p class="font-display font-semibold uppercase tracking-wide text-brand-800">Email</p>
                 <p class="mt-2 break-all text-slate-600">{{ $contact['email'] }}</p>
             </a>
-            <a href="https://instagram.com/{{ $social['instagram'] }}" target="_blank" rel="noopener"
-               class="rounded-2xl p-6 text-center ring-1 ring-slate-200 hover:ring-brand-500">
-                <p class="font-display font-semibold uppercase tracking-wide text-brand-800">Instagram</p>
-                <p class="mt-2 text-slate-600">{{ '@'.$social['instagram'] }}</p>
-            </a>
+            @isset(\App\Support\SocialLinks::all()['instagram'])
+                <a href="{{ \App\Support\SocialLinks::all()['instagram'][1] }}" target="_blank" rel="noopener"
+                   class="rounded-2xl p-6 text-center ring-1 ring-slate-200 hover:ring-brand-500">
+                    <p class="font-display font-semibold uppercase tracking-wide text-brand-800">Instagram</p>
+                    <p class="mt-2 text-slate-600">{{ '@'.ltrim($social['instagram'], '@') }}</p>
+                </a>
+            @endisset
         </div>
         <p class="mt-8 text-center">
             <a href="{{ route('contact') }}" class="font-display font-semibold uppercase tracking-wide text-brand-600 hover:text-brand-800">

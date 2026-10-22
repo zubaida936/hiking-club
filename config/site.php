@@ -12,6 +12,22 @@ return [
 
     'tagline' => 'Trails, summits and good company, every weekend.',
 
+    /*
+    | SEO defaults, used when a page doesn't set its own description / share image.
+    | The share image should be 1200×630 JPEG or PNG (path under public/).
+    */
+    // Keep it under 160 characters: search results cut longer text.
+    'description' => 'Guided hikes across Lebanon for every level: weekend day hikes, snowshoe trips and X Events. '
+        .'Transport, guides and a friendly crew included.',
+    'share_image' => 'images/og-default.jpg',
+
+    /*
+    | Google Analytics 4 measurement ID (G-XXXXXXX). Empty = no analytics script at all.
+    */
+    'analytics' => [
+        'ga4_id' => env('GOOGLE_ANALYTICS_ID'),
+    ],
+
     'about' => 'We are a community of hikers exploring the mountains, valleys and cedar forests of Lebanon. '
         .'Every week we organise guided hikes for every level, from easy nature walks to demanding summit days, '
         .'with transport, experienced guides and a crew that looks after each other on the trail.',
