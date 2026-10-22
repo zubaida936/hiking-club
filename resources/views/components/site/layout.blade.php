@@ -1,4 +1,5 @@
-@props(['title' => null])
+{{-- $whatsapp: pre-filled WhatsApp message for this page (e.g. an event page names the event). --}}
+@props(['title' => null, 'whatsapp' => null])
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
@@ -18,5 +19,7 @@
     </main>
 
     <x-site.footer />
+
+    <x-site.whatsapp-button :message="$whatsapp" />
 </body>
 </html>

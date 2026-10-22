@@ -1,6 +1,7 @@
 @php
     $contact = config('site.contact');
     $social = config('site.social');
+    $whatsapp = \App\Support\WhatsApp::link();
 
     // network => [label, profile URL]; accounts left empty in config are not shown.
     $socialLinks = array_filter([
@@ -8,7 +9,7 @@
         'instagram' => $social['instagram'] ? ['Instagram', "https://www.instagram.com/{$social['instagram']}"] : null,
         'tiktok' => $social['tiktok'] ? ['TikTok', "https://www.tiktok.com/@{$social['tiktok']}"] : null,
         'youtube' => $social['youtube'] ? ['YouTube', "https://www.youtube.com/@{$social['youtube']}"] : null,
-        'whatsapp' => $contact['whatsapp'] ? ['WhatsApp', "https://wa.me/{$contact['whatsapp']}"] : null,
+        'whatsapp' => $whatsapp ? ['WhatsApp', $whatsapp] : null,
     ]);
 
     // Site map from the shared menu: plain items under "Explore" (About and Contact

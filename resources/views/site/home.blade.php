@@ -119,11 +119,13 @@
     <section id="contact" class="mx-auto max-w-5xl px-4 py-20 sm:px-6">
         <x-site.section-heading eyebrow="Questions?">Get in touch</x-site.section-heading>
         <div class="mt-10 grid gap-6 sm:grid-cols-3">
-            <a href="https://wa.me/{{ $contact['whatsapp'] }}" target="_blank" rel="noopener"
-               class="rounded-2xl p-6 text-center ring-1 ring-slate-200 hover:ring-brand-500">
-                <p class="font-display font-semibold uppercase tracking-wide text-brand-800">WhatsApp</p>
-                <p class="mt-2 text-slate-600">{{ $contact['phone'] }}</p>
-            </a>
+            @if ($whatsapp = \App\Support\WhatsApp::link(config('site.contact.whatsapp_message')))
+                <a href="{{ $whatsapp }}" target="_blank" rel="noopener"
+                   class="rounded-2xl p-6 text-center ring-1 ring-slate-200 hover:ring-brand-500">
+                    <p class="font-display font-semibold uppercase tracking-wide text-brand-800">WhatsApp</p>
+                    <p class="mt-2 text-slate-600">{{ $contact['phone'] }}</p>
+                </a>
+            @endif
             <a href="mailto:{{ $contact['email'] }}" class="rounded-2xl p-6 text-center ring-1 ring-slate-200 hover:ring-brand-500">
                 <p class="font-display font-semibold uppercase tracking-wide text-brand-800">Email</p>
                 <p class="mt-2 break-all text-slate-600">{{ $contact['email'] }}</p>

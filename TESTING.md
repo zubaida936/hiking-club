@@ -41,6 +41,10 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 | Cart (cart icon) | http://localhost:8080/cart | Coming soon |
 | Privacy Policy (footer) | http://localhost:8080/privacy-policy | Coming soon |
 
+A green WhatsApp button floats in the bottom-right corner of every public page and opens a chat with
+`SITE_WHATSAPP` with a pre-filled message (`config/site.php` → `contact.whatsapp_message`). Leave
+`SITE_WHATSAPP` empty to hide it, together with the WhatsApp links in the footer and on the homepage.
+
 ### Newsletter (Next Destination Alerts)
 
 | What | Where |
@@ -111,6 +115,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Footer | https://app.clickup.com/t/z8q7hbmpeg |
 | Next-event announcement bar | https://app.clickup.com/t/z8q7hbmpef |
 | Newsletter signup | https://app.clickup.com/t/z8q7hbmpej |
+| Floating WhatsApp button | https://app.clickup.com/t/z8q7hbmpek |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

@@ -91,7 +91,7 @@ it('shows the contact details from config', function () {
 
     $this->get('/')
         ->assertSee('+961 70 123 456')
-        ->assertSee('href="https://wa.me/96170123456"', false)
+        ->assertSee('href="https://wa.me/96170123456?text=', false)
         ->assertSee('href="mailto:club@example.com"', false)
         ->assertSee('@our.club');
 });

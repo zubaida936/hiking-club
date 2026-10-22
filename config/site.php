@@ -69,7 +69,9 @@ return [
     'contact' => [
         'address' => env('SITE_ADDRESS', 'Beirut, Lebanon'),
         'phone' => env('SITE_PHONE', '+961 00 000 000'),
-        'whatsapp' => env('SITE_WHATSAPP', '96100000000'), // digits only, used for wa.me links
+        'whatsapp' => env('SITE_WHATSAPP', '96100000000'), // international number, digits only; empty hides WhatsApp links
+        // Pre-filled text of the floating WhatsApp button (event pages pass their own).
+        'whatsapp_message' => 'Hi! I have a question about your hikes.',
         'email' => env('SITE_EMAIL', 'hello@hiking.test'),
     ],
 
