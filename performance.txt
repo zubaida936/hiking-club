@@ -33,6 +33,41 @@ Measurements
 
 Formatting, static analysis and all 84 tests pass. Commit: 18c6821 on main.
 
+How it was measured
+-------------------
+Run these from the project root in PowerShell, with the stack up
+(docker compose up -d).
+
+1. Page response times (each URL requested 3 times; the first request warms
+   the caches, so look at the 2nd and 3rd numbers):
+
+   foreach ($u in 'http://localhost:8080/up','http://localhost:8080/','http://localhost:8080/admin/login','http://localhost:5173/resources/css/admin.css') {
+       $ms = 1..3 | % { (Measure-Command { try { Invoke-WebRequest $u -UseBasicParsing -TimeoutSec 90 | Out-Null } catch {} }).TotalMilliseconds }
+       "{0,-48} {1}" -f $u, (($ms | % { '{0:N0} ms' -f $_ }) -join ' / ')
+   }
+
+   /up is Laravel's health check: it does almost nothing, so its time is
+   close to the pure cost of booting the framework.
+
+2. Laravel boot time vs. CPU time (shows whether PHP is working or waiting on
+   files). Before the fix: real 5.26 s but user 0.11 s, i.e. almost all
+   waiting on disk:
+
+   docker compose exec -T app sh -c 'time php artisan --version'
+
+3. Number of dependency files PHP and Vite have to read:
+
+   docker compose exec -T app sh -c 'find vendor -type f | wc -l'
+   docker compose exec -T node sh -c 'find node_modules -type f | wc -l'
+
+4. CPU/memory per container (rules out a busy or out-of-memory container):
+
+   docker stats --no-stream
+
+5. Test suite duration (printed at the end as "Duration"):
+
+   docker compose exec app php artisan test --compact
+
 Things to know
 --------------
 - First stylesheet load: each time the node container starts, the first
