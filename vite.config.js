@@ -36,7 +36,11 @@ export default defineConfig({
             host: 'localhost',
         },
         watch: {
-            ignored: ['**/storage/framework/views/**'],
+            // File-change events from the Windows drive don't reach the Docker VM,
+            // so poll; otherwise new Tailwind classes and Blade edits need a restart.
+            usePolling: true,
+            interval: 1000,
+            ignored: ['**/storage/**', '**/vendor/**', '**/public/build/**'],
         },
     },
 });
