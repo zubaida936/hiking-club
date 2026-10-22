@@ -17,6 +17,12 @@ export default defineConfig({
                 bunny('Instrument Sans', {
                     weights: [400, 500, 600],
                 }),
+                bunny('Jost', {
+                    weights: [500, 600, 700],
+                }),
+                bunny('Roboto', {
+                    weights: [400, 500, 700],
+                }),
             ],
         }),
         tailwindcss(),

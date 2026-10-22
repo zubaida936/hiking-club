@@ -1,9 +1,30 @@
 @import 'tailwindcss';
 
+@source '../views/site/**/*.blade.php';
+@source '../views/components/site/**/*.blade.php';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
 
+/*
+ * Brand tokens. Club colours are not final yet (see ClickUp "Decide tech stack, hosting & branding"):
+ * change the values here and the whole public site follows.
+ */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Jost', 'Roboto', ui-sans-serif, system-ui, sans-serif;
+
+    --color-brand-50: #eef7f1;
+    --color-brand-100: #d5ebdc;
+    --color-brand-500: #2f7d52;
+    --color-brand-600: #24653f;
+    --color-brand-700: #1c4f32;
+    --color-brand-800: #163d27;
+    --color-brand-900: #0f2a1b;
+
+    --color-accent-400: #f5a83b;
+    --color-accent-500: #ee8f12;
+    --color-accent-600: #cc730a;
+}
+
+[x-cloak] {
+    display: none !important;
 }

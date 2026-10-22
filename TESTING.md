@@ -15,11 +15,32 @@ Everything you can open while testing. Start the stack first: `docker compose up
 
 | Tool | Link | Use it for |
 |---|---|---|
-| Website | http://localhost:8080 | Public site (placeholder page for now) |
+| Website | http://localhost:8080 | Public site |
 | CMS | http://localhost:8080/admin | Back office |
 | phpMyAdmin | http://localhost:8081 | Inspect the `hiking` database (`hiking_testing` is for automated tests only — ignore it) |
 | Mailpit | http://localhost:8025 | Every email the app sends in development lands here |
 | Health check | http://localhost:8080/up | Should show "Application up" |
+
+## Public site pages
+
+Every header link works. Pages marked *coming soon* show a placeholder until their feature ships.
+
+| Page | Link | Status |
+|---|---|---|
+| Home | http://localhost:8080/ | Temporary hero (full homepage is its own task) |
+| About | http://localhost:8080/about | Coming soon |
+| Events | http://localhost:8080/events | Coming soon |
+| X Events | http://localhost:8080/x-events | Coming soon |
+| Shop | http://localhost:8080/shop | Coming soon |
+| Rank System | http://localhost:8080/rank-system | Coming soon |
+| Contact | http://localhost:8080/contact | Coming soon |
+| Hiker's Guide → Difficulty Calculator | http://localhost:8080/difficulty-calculator | Coming soon |
+| Hiker's Guide → Equipment Guide | http://localhost:8080/equipment | Coming soon |
+| Hiker's Guide → Guides | http://localhost:8080/guides | Coming soon |
+| My account (person icon) | http://localhost:8080/account | Coming soon |
+| Cart (cart icon) | http://localhost:8080/cart | Coming soon |
+
+To check the mobile menu, make the browser narrower than 1024 px (or press F12 → device toolbar).
 
 ## CMS pages
 
@@ -62,6 +83,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Project setup & database | https://app.clickup.com/t/z8q7hbmped |
 | CMS admin auth & roles | https://app.clickup.com/t/z8q7hbmpfn |
 | CMS events management | https://app.clickup.com/t/z8q7hbmpfp |
+| Header & navigation | https://app.clickup.com/t/z8q7hbmpee |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands
