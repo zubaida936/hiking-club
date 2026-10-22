@@ -71,20 +71,47 @@
         </div>
     </section>
 
-    {{-- Newsletter (placeholder until the newsletter signup task) --}}
-    <section id="newsletter" class="bg-brand-700 px-4 py-16 text-white sm:px-6">
+    {{-- Newsletter --}}
+    <section id="newsletter" class="scroll-mt-24 bg-brand-700 px-4 py-16 text-white sm:px-6">
         <div class="mx-auto max-w-2xl text-center">
             <x-site.section-heading eyebrow="Next destination alerts" :dark="true">Never miss a hike</x-site.section-heading>
-            <p class="mt-4 text-white/80">Get an email as soon as new hikes are announced.</p>
-            <form class="mt-8 flex flex-col gap-3 sm:flex-row" onsubmit="return false" aria-describedby="newsletter-soon">
-                <label for="newsletter-email" class="sr-only">Email address</label>
-                <input id="newsletter-email" type="email" placeholder="you@example.com" disabled
-                       class="flex-1 rounded-full border-0 bg-white/90 px-5 py-3 text-slate-800 placeholder:text-slate-400 disabled:cursor-not-allowed">
-                <button type="submit" disabled class="rounded-full bg-accent-500 px-6 py-3 font-display font-bold uppercase tracking-wide opacity-60 disabled:cursor-not-allowed">
-                    Subscribe
-                </button>
-            </form>
-            <p id="newsletter-soon" class="mt-3 text-sm text-white/70">Sign-up opens soon.</p>
+            <p class="mt-4 text-white/80">Be the first to know when new hikes are announced. Leave your email, your phone number, or both.</p>
+
+            @if (session('newsletter'))
+                <p class="mt-8 rounded-2xl bg-white/15 px-5 py-4 font-medium" role="status">{{ session('newsletter') }}</p>
+            @else
+                <form method="POST" action="{{ route('newsletter.subscribe') }}" class="mt-8 text-left" novalidate>
+                    @csrf
+                    <div class="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+                        <div>
+                            <label for="newsletter-email" class="sr-only">Email address</label>
+                            <input id="newsletter-email" name="email" type="email" value="{{ old('email') }}" placeholder="you@example.com" autocomplete="email"
+                                   @error('email') aria-invalid="true" aria-describedby="newsletter-error" @enderror
+                                   class="w-full rounded-full border-0 bg-white px-5 py-3 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-accent-400">
+                        </div>
+                        <div>
+                            <label for="newsletter-phone" class="sr-only">Phone number (optional)</label>
+                            <input id="newsletter-phone" name="phone" type="tel" value="{{ old('phone') }}" placeholder="+961 70 123 456" autocomplete="tel"
+                                   @error('phone') aria-invalid="true" aria-describedby="newsletter-error" @enderror
+                                   class="w-full rounded-full border-0 bg-white px-5 py-3 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-accent-400">
+                        </div>
+                        <button type="submit" class="rounded-full bg-accent-500 px-6 py-3 font-display font-bold uppercase tracking-wide hover:bg-accent-600">
+                            Subscribe
+                        </button>
+                    </div>
+                    {{-- Honeypot: hidden from people, bots fill it in --}}
+                    <div class="hidden" aria-hidden="true">
+                        <label for="newsletter-website">Website</label>
+                        <input id="newsletter-website" name="website" type="text" tabindex="-1" autocomplete="off">
+                    </div>
+                    @if ($errors->hasAny(['email', 'phone', 'website']))
+                        <p id="newsletter-error" class="mt-3 text-center text-sm font-medium text-accent-400" role="alert">
+                            {{ $errors->first('email') ?: ($errors->first('phone') ?: 'Something went wrong, please try again.') }}
+                        </p>
+                    @endif
+                    <p class="mt-3 text-center text-sm text-white/70">We'll only use these to tell you about new hikes. Unsubscribe any time.</p>
+                </form>
+            @endif
         </div>
     </section>
 

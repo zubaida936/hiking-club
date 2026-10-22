@@ -75,10 +75,12 @@ it('shows the leaderboard placeholder with progress links', function () {
         ->assertSee('href="'.route('rank-system').'"', false);
 });
 
-it('keeps the newsletter form disabled until sign-up exists', function () {
+it('has a working newsletter form', function () {
     $this->get('/')
-        ->assertSee('Sign-up opens soon.')
-        ->assertSee('id="newsletter-email" type="email" placeholder="you@example.com" disabled', false);
+        ->assertSee('action="'.route('newsletter.subscribe').'"', false)
+        ->assertSee('name="email"', false)
+        ->assertSee('name="phone"', false)
+        ->assertDontSee('Sign-up opens soon.');
 });
 
 it('shows the contact details from config', function () {

@@ -41,6 +41,20 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 | Cart (cart icon) | http://localhost:8080/cart | Coming soon |
 | Privacy Policy (footer) | http://localhost:8080/privacy-policy | Coming soon |
 
+### Newsletter (Next Destination Alerts)
+
+| What | Where |
+|---|---|
+| Sign-up form | http://localhost:8080/#newsletter (email, phone, or both) |
+| Confirmation and announcement emails | Mailpit, http://localhost:8025 |
+| Confirm link | in the "Confirm your Next Destination Alerts" email → `/newsletter/confirm/{token}` |
+| Unsubscribe page | link at the bottom of a "New hike" email → `/newsletter/unsubscribe/{token}` |
+| Subscribers list | phpMyAdmin → `hiking` → `subscribers` (no CMS screen yet) |
+
+Announcements go out when an upcoming event is published for the first time, to confirmed email
+subscribers only. Emails are sent by the `queue` container: after pulling new code run
+`docker compose restart queue`, or emails may use old templates.
+
 An orange bar above the header announces the next published upcoming event on every public page
 ("View Event" opens Events until the event detail page exists); it disappears when nothing is coming up.
 
@@ -96,6 +110,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Homepage | https://app.clickup.com/t/z8q7hbmpeh |
 | Footer | https://app.clickup.com/t/z8q7hbmpeg |
 | Next-event announcement bar | https://app.clickup.com/t/z8q7hbmpef |
+| Newsletter signup | https://app.clickup.com/t/z8q7hbmpej |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

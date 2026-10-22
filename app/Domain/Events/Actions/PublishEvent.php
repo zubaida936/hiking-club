@@ -3,6 +3,7 @@
 namespace App\Domain\Events\Actions;
 
 use App\Domain\Events\Enums\EventStatus;
+use App\Domain\Events\Events\EventPublished;
 use App\Domain\Events\Exceptions\EventException;
 use App\Models\Event;
 use App\Models\User;
@@ -20,11 +21,15 @@ final class PublishEvent
             throw EventException::needsMeetingPointToPublish();
         }
 
+        $firstTime = $event->published_at === null;
+
         $event->update([
             'status' => EventStatus::Published,
             'published_at' => $event->published_at ?? now(),
             'updated_by' => $actor->id,
         ]);
+
+        EventPublished::dispatch($event, $firstTime);
 
         return $event;
     }
