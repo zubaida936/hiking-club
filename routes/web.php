@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\Site\HomeController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'site.home')->name('home');
+Route::get('/', HomeController::class)->name('home');
 
 // Placeholder pages so every header link works today. Each feature replaces its own line
 // with a real controller route (keep the route name: the header links by name).

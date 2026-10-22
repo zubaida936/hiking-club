@@ -27,7 +27,7 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 
 | Page | Link | Status |
 |---|---|---|
-| Home | http://localhost:8080/ | Temporary hero (full homepage is its own task) |
+| Home | http://localhost:8080/ | Hero carousel, About, Next Challenge, X Events, contact. Leaderboard and newsletter are placeholders; texts/contact details are placeholders in `config/site.php` |
 | About | http://localhost:8080/about | Coming soon |
 | Events | http://localhost:8080/events | Coming soon |
 | X Events | http://localhost:8080/x-events | Coming soon |
@@ -84,6 +84,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | CMS admin auth & roles | https://app.clickup.com/t/z8q7hbmpfn |
 | CMS events management | https://app.clickup.com/t/z8q7hbmpfp |
 | Header & navigation | https://app.clickup.com/t/z8q7hbmpee |
+| Homepage | https://app.clickup.com/t/z8q7hbmpeh |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands
