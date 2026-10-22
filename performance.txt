@@ -1,0 +1,46 @@
+CMS / site performance fix (2026-10-22)
+=======================================
+
+Result
+------
+Pages that took about 4 s now load in about 120 ms.
+
+Why it was slow
+---------------
+Docker on Windows runs inside a Linux virtual machine (WSL2), but the project
+lives on the Windows drive (C:\Dev\...). Every page load made PHP read hundreds
+of library files from vendor/ across that boundary, which is very slow. Booting
+Laravel took 5.3 s, and only 0.1 s of that was actual work. The Vite dev server
+had the same problem with node_modules/.
+
+The fix
+-------
+- vendor/ and node_modules/ are now stored in Docker volumes inside the Linux
+  machine (compose.yaml). Your own code still comes from C:\Dev, so edits show
+  up live as before.
+- The PHP container installs the libraries automatically the first time it
+  starts (docker/php/dev-entrypoint.sh). A lock stops app, queue and scheduler
+  from all installing at once.
+- PHP now caches file-path lookups (docker/php/conf.d/dev.ini).
+
+Measurements
+------------
+                              Before     After
+  Public home page            4.3 s      ~0.13 s
+  CMS login page              1.9 s      ~0.12 s
+  CMS stylesheet from Vite    38 s       ~0.05 s
+  Full test suite             48 s       17 s
+
+Formatting, static analysis and all 84 tests pass. Commit: 18c6821 on main.
+
+Things to know
+--------------
+- First stylesheet load: each time the node container starts, the first
+  stylesheet load still takes about 30 s while Tailwind builds it. After that
+  it is instant.
+- Editor autocomplete: the vendor/ folder visible on Windows is now an old copy
+  that the app no longer uses. If your editor's PHP autocomplete relies on it,
+  it won't see new packages until they are copied out of the container.
+- Further speed-up: the biggest remaining gain would be moving the project into
+  the WSL Linux filesystem (for example \\wsl$\Ubuntu\home\...), so your own
+  code doesn't cross that boundary either.
