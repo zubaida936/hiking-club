@@ -19,7 +19,7 @@ class DashboardController extends Controller
                 'Staff users' => User::staff()->count(),
                 'Active staff' => User::staff()->where('is_active', true)->count(),
             ],
-            'nextEvent' => Event::published()->upcoming()->orderBy('starts_on')->first(),
+            'nextEvent' => Event::nextUpcoming(),
         ]);
     }
 }

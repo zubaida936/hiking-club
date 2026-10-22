@@ -11,10 +11,7 @@ class HomeController extends Controller
     public function __invoke(): View
     {
         return view('site.home', [
-            'nextEvent' => Event::published()->upcoming()
-                ->orderBy('starts_on')->orderBy('id')
-                ->with('meetingPoints')
-                ->first(),
+            'nextEvent' => Event::nextUpcoming(),
         ]);
     }
 }

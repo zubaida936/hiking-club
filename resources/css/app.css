@@ -2,8 +2,7 @@
 
 @source '../views/site/**/*.blade.php';
 @source '../views/components/site/**/*.blade.php';
-@source '../../app/Domain/Events/Enums/DifficultyLevel.php';
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../app/Domain/Events/Enums/DifficultyLevel.php';@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 /*
  * Brand tokens. Club colours are not final yet (see ClickUp "Decide tech stack, hosting & branding"):

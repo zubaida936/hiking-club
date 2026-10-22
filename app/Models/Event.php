@@ -132,6 +132,14 @@ class Event extends Model
             ->orWhere('location', 'like', "%{$term}%")));
     }
 
+    /**
+     * The next published event that hasn't happened yet (today counts).
+     */
+    public static function nextUpcoming(): ?self
+    {
+        return static::published()->upcoming()->orderBy('starts_on')->orderBy('id')->first();
+    }
+
     public function isUpcoming(): bool
     {
         return $this->starts_on->isToday() || $this->starts_on->isFuture();

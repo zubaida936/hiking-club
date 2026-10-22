@@ -41,6 +41,9 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 | Cart (cart icon) | http://localhost:8080/cart | Coming soon |
 | Privacy Policy (footer) | http://localhost:8080/privacy-policy | Coming soon |
 
+An orange bar above the header announces the next published upcoming event on every public page
+("View Event" opens Events until the event detail page exists); it disappears when nothing is coming up.
+
 The footer (contact details, social links, site map, copyright) is on every public page. Its address, phone,
 email and social handles are placeholders in `config/site.php`, or set them in `.env` with `SITE_ADDRESS`,
 `SITE_PHONE`, `SITE_WHATSAPP`, `SITE_EMAIL`, `SITE_FACEBOOK`, `SITE_INSTAGRAM`, `SITE_TIKTOK`, `SITE_YOUTUBE`
@@ -92,6 +95,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Header & navigation | https://app.clickup.com/t/z8q7hbmpee |
 | Homepage | https://app.clickup.com/t/z8q7hbmpeh |
 | Footer | https://app.clickup.com/t/z8q7hbmpeg |
+| Next-event announcement bar | https://app.clickup.com/t/z8q7hbmpef |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

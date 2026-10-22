@@ -10,6 +10,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="flex min-h-screen flex-col bg-white font-sans text-slate-800 antialiased">
+    <x-site.announcement-bar />
     <x-site.header />
 
     <main class="flex-1">
