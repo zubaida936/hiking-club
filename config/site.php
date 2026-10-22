@@ -47,12 +47,40 @@ return [
         ],
     ],
 
+    /*
+    | Main menu, used by the header and the footer site map. Items link by route
+    | name; 'active' is the route pattern that highlights the item in the header.
+    */
+    'menu' => [
+        ['label' => 'Home', 'route' => 'home', 'active' => 'home'],
+        ['label' => 'About', 'route' => 'about', 'active' => 'about'],
+        ['label' => 'Events', 'route' => 'events.index', 'active' => 'events.*'],
+        ['label' => 'X Events', 'route' => 'x-events', 'active' => 'x-events*'],
+        ['label' => 'Shop', 'route' => 'shop.index', 'active' => 'shop.*'],
+        ['label' => 'Rank System', 'route' => 'rank-system', 'active' => 'rank-system'],
+        ['label' => "Hiker's Guide", 'active' => 'guide.*', 'children' => [
+            ['label' => 'Difficulty Calculator', 'route' => 'guide.difficulty'],
+            ['label' => 'Equipment Guide', 'route' => 'guide.equipment'],
+            ['label' => 'Guides', 'route' => 'guide.articles'],
+        ]],
+        ['label' => 'Contact', 'route' => 'contact', 'active' => 'contact'],
+    ],
+
     'contact' => [
+        'address' => env('SITE_ADDRESS', 'Beirut, Lebanon'),
         'phone' => env('SITE_PHONE', '+961 00 000 000'),
         'whatsapp' => env('SITE_WHATSAPP', '96100000000'), // digits only, used for wa.me links
         'email' => env('SITE_EMAIL', 'hello@hiking.test'),
-        'instagram' => env('SITE_INSTAGRAM', 'hikingclub'),
+    ],
+
+    /*
+    | Social account handles (without @). Leave one empty to hide its link.
+    */
+    'social' => [
         'facebook' => env('SITE_FACEBOOK', 'hikingclub'),
+        'instagram' => env('SITE_INSTAGRAM', 'hikingclub'),
+        'tiktok' => env('SITE_TIKTOK', 'hikingclub'),
+        'youtube' => env('SITE_YOUTUBE', 'hikingclub'),
     ],
 
 ];

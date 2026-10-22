@@ -39,6 +39,12 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 | Hiker's Guide → Guides | http://localhost:8080/guides | Coming soon |
 | My account (person icon) | http://localhost:8080/account | Coming soon |
 | Cart (cart icon) | http://localhost:8080/cart | Coming soon |
+| Privacy Policy (footer) | http://localhost:8080/privacy-policy | Coming soon |
+
+The footer (contact details, social links, site map, copyright) is on every public page. Its address, phone,
+email and social handles are placeholders in `config/site.php`, or set them in `.env` with `SITE_ADDRESS`,
+`SITE_PHONE`, `SITE_WHATSAPP`, `SITE_EMAIL`, `SITE_FACEBOOK`, `SITE_INSTAGRAM`, `SITE_TIKTOK`, `SITE_YOUTUBE`
+(leave a social one empty to hide it).
 
 To check the mobile menu, make the browser narrower than 1024 px (or press F12 → device toolbar).
 
@@ -85,6 +91,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | CMS events management | https://app.clickup.com/t/z8q7hbmpfp |
 | Header & navigation | https://app.clickup.com/t/z8q7hbmpee |
 | Homepage | https://app.clickup.com/t/z8q7hbmpeh |
+| Footer | https://app.clickup.com/t/z8q7hbmpeg |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

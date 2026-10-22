@@ -19,6 +19,7 @@ $placeholders = [
     'guides' => ['guide.articles', 'Guides'],
     'account' => ['account', 'My Account'],
     'cart' => ['cart', 'Cart'],
+    'privacy-policy' => ['legal.privacy', 'Privacy Policy'],
 ];
 
 foreach ($placeholders as $uri => [$name, $title]) {

@@ -15,5 +15,7 @@
     <main class="flex-1">
         {{ $slot }}
     </main>
+
+    <x-site.footer />
 </body>
 </html>

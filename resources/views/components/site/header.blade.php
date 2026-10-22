@@ -1,20 +1,4 @@
-@php
-    // Items link by route name; 'active' is the route pattern that highlights the item.
-    $items = [
-        ['label' => 'Home', 'route' => 'home', 'active' => 'home'],
-        ['label' => 'About', 'route' => 'about', 'active' => 'about'],
-        ['label' => 'Events', 'route' => 'events.index', 'active' => 'events.*'],
-        ['label' => 'X Events', 'route' => 'x-events', 'active' => 'x-events*'],
-        ['label' => 'Shop', 'route' => 'shop.index', 'active' => 'shop.*'],
-        ['label' => 'Rank System', 'route' => 'rank-system', 'active' => 'rank-system'],
-        ['label' => "Hiker's Guide", 'active' => 'guide.*', 'children' => [
-            ['label' => 'Difficulty Calculator', 'route' => 'guide.difficulty'],
-            ['label' => 'Equipment Guide', 'route' => 'guide.equipment'],
-            ['label' => 'Guides', 'route' => 'guide.articles'],
-        ]],
-        ['label' => 'Contact', 'route' => 'contact', 'active' => 'contact'],
-    ];
-@endphp
+@php($items = config('site.menu'))
 
 <header class="sticky top-0 z-40 bg-brand-900 text-white shadow" x-data="{ mobileOpen: false }" @keydown.escape.window="mobileOpen = false">
     <div class="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:h-20">

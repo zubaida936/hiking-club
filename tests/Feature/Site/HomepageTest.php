@@ -82,13 +82,10 @@ it('keeps the newsletter form disabled until sign-up exists', function () {
 });
 
 it('shows the contact details from config', function () {
-    config()->set('site.contact', [
-        'phone' => '+961 70 123 456',
-        'whatsapp' => '96170123456',
-        'email' => 'club@example.com',
-        'instagram' => 'our.club',
-        'facebook' => 'ourclub',
-    ]);
+    config()->set('site.contact.phone', '+961 70 123 456');
+    config()->set('site.contact.whatsapp', '96170123456');
+    config()->set('site.contact.email', 'club@example.com');
+    config()->set('site.social.instagram', 'our.club');
 
     $this->get('/')
         ->assertSee('+961 70 123 456')

@@ -1,4 +1,5 @@
 @php($contact = config('site.contact'))
+@php($social = config('site.social'))
 
 <x-site.layout>
     <h1 class="sr-only">{{ config('app.name') }}</h1>
@@ -100,10 +101,10 @@
                 <p class="font-display font-semibold uppercase tracking-wide text-brand-800">Email</p>
                 <p class="mt-2 break-all text-slate-600">{{ $contact['email'] }}</p>
             </a>
-            <a href="https://instagram.com/{{ $contact['instagram'] }}" target="_blank" rel="noopener"
+            <a href="https://instagram.com/{{ $social['instagram'] }}" target="_blank" rel="noopener"
                class="rounded-2xl p-6 text-center ring-1 ring-slate-200 hover:ring-brand-500">
                 <p class="font-display font-semibold uppercase tracking-wide text-brand-800">Instagram</p>
-                <p class="mt-2 text-slate-600">{{ '@'.$contact['instagram'] }}</p>
+                <p class="mt-2 text-slate-600">{{ '@'.$social['instagram'] }}</p>
             </a>
         </div>
         <p class="mt-8 text-center">
