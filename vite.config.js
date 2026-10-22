@@ -22,6 +22,13 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
+        // Vite listens on 0.0.0.0 inside the node container, but the browser must
+        // load assets from localhost (browsers block requests to 0.0.0.0).
+        host: '0.0.0.0',
+        origin: 'http://localhost:5173',
+        hmr: {
+            host: 'localhost',
+        },
         watch: {
             ignored: ['**/storage/framework/views/**'],
         },
