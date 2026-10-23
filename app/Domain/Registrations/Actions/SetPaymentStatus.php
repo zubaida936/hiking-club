@@ -2,6 +2,7 @@
 
 namespace App\Domain\Registrations\Actions;
 
+use App\Domain\Registrations\Events\RegistrationChanged;
 use App\Domain\Registrations\Exceptions\RegistrationException;
 use App\Models\EventRegistration;
 use App\Models\User;
@@ -21,5 +22,7 @@ final class SetPaymentStatus
             'paid_at' => $paid ? ($registration->paid_at ?? now()) : null,
             'updated_by' => $actor->id,
         ]);
+
+        RegistrationChanged::dispatch($registration);
     }
 }

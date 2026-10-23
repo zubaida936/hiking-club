@@ -9,11 +9,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $event_id
+ * @property ?int $hiker_id
+ * @property ?int $referred_by_hiker_id
  * @property string $reference
  * @property string $token
  * @property RegistrationStatus $status
@@ -81,6 +84,30 @@ class EventRegistration extends Model
     public function isPending(): bool
     {
         return $this->status === RegistrationStatus::Pending;
+    }
+
+    /**
+     * @return BelongsTo<Hiker, $this>
+     */
+    public function hiker(): BelongsTo
+    {
+        return $this->belongsTo(Hiker::class);
+    }
+
+    /**
+     * @return BelongsTo<Hiker, $this>
+     */
+    public function referrer(): BelongsTo
+    {
+        return $this->belongsTo(Hiker::class, 'referred_by_hiker_id');
+    }
+
+    /**
+     * @return HasMany<PointTransaction, $this>
+     */
+    public function pointTransactions(): HasMany
+    {
+        return $this->hasMany(PointTransaction::class);
     }
 
     /**

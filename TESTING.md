@@ -117,10 +117,19 @@ To check the mobile menu, make the browser narrower than 1024 px (or press F12 �
 | Registrations — events overview | http://localhost:8080/admin/registrations (Upcoming / Past tabs: seats, approvals, waitlist, paid, attended) | Super Admin, Admin, Guide |
 | Registrations — one event | click an event there, or "Manage registrations" on the event edit screen → `/admin/events/{id}/registrations`: filter by pickup point / status / search, approve, edit, cancel, mark paid, attendance, WhatsApp list, Export CSV | Admin: everything · Guide: view, WhatsApp list, CSV, attendance |
 | Registrations — edit a booking | "Edit" on a row → `/admin/registrations/{id}/edit` | Super Admin, Admin |
+| Points — hikers by points | http://localhost:8080/admin/points (search by name or phone) | Super Admin, Admin |
+| Points — one hiker | click a hiker → history (every line with reason), bookings, "Adjust points" form | Super Admin, Admin |
 
 To try the Guide view of registrations, create a user with the Guide role in Staff & roles and log in as them.
 Attendance buttons appear from the hike day (Lebanon time): to test them now, set an event's date to today in the CMS.
 Cancelling a booking emails the hiker (Mailpit) and gives the seat to the first person on the waitlist.
+
+**Points:** a hiker is one phone number; all their bookings and points belong to them. Points are added when a
+confirmed booking is marked **Attended** (and paid, unless the hike is free): Level 1/2/3/4 = 8/14/22/35, +4 for
+booking 5+ days before the hike day, +10 to the friend whose number a new hiker gave ("Invited by") once that
+hiker completes a first hike. Clearing attendance, marking unpaid or cancelling adds a reversing line. Values are in
+`config/points.php`; after changing them run `docker compose exec app php artisan points:sync`. Demo data: the two
+past hikes have 12 checked-in demo hikers (e.g. Rima Haddad).
 
 Uploaded images are served from `http://localhost:8080/storage/...` (files live in `storage/app/public`).
 
@@ -171,6 +180,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Seat capacity, waitlist & sold-out status | https://app.clickup.com/t/z8q7hbmpeu |
 | Meeting points & pickup times | https://app.clickup.com/t/z8q7hbmper |
 | Manage registrations & attendance | https://app.clickup.com/t/z8q7hbmpfq |
+| Points engine | https://app.clickup.com/t/z8q7hbmpf3 |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

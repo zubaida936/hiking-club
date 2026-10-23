@@ -251,6 +251,18 @@
                         <dd class="text-right font-semibold">{{ $event->difficulty_level->label() }}</dd>
                     </div>
                     @if ($upcoming)
+                        @php($points = app(\App\Domain\Loyalty\PointsRules::class))
+                        <div class="flex justify-between gap-4">
+                            <dt class="text-slate-500">Points</dt>
+                            <dd class="text-right font-semibold text-accent-600">
+                                +{{ $points->hikePoints($event) }}
+                                @if ($points->earlyBookingOpen($event))
+                                    <span class="block text-xs font-normal text-slate-500">+{{ config('points.early_booking.points') }} if you book now ({{ config('points.early_booking.days') }}+ days ahead)</span>
+                                @endif
+                            </dd>
+                        </div>
+                    @endif
+                    @if ($upcoming)
                         <div class="flex justify-between gap-4">
                             <dt class="text-slate-500">Seats left</dt>
                             <dd @class(['text-right font-semibold', 'text-red-600' => $event->seatsLeft() <= 5])>

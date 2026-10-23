@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\PointsController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\StaffUserController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('unpublish', 'unpublish')->name('unpublish');
         Route::post('cancel', 'cancel')->name('cancel');
         Route::post('duplicate', 'duplicate')->name('duplicate');
+    });
+
+    Route::controller(PointsController::class)->prefix('points')->name('points.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{hiker}', 'show')->name('show');
+        Route::post('{hiker}/adjust', 'adjust')->name('adjust');
     });
 
     Route::controller(RegistrationController::class)->group(function () {

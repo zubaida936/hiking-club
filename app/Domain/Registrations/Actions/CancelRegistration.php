@@ -3,6 +3,7 @@
 namespace App\Domain\Registrations\Actions;
 
 use App\Domain\Registrations\Enums\RegistrationStatus;
+use App\Domain\Registrations\Events\RegistrationChanged;
 use App\Domain\Registrations\Exceptions\RegistrationException;
 use App\Mail\RegistrationCancelledMail;
 use App\Models\EventRegistration;
@@ -31,6 +32,8 @@ final class CancelRegistration
             'cancellation_reason' => $reason,
             'updated_by' => $actor->id,
         ]);
+
+        RegistrationChanged::dispatch($registration);
 
         if ($notify && $registration->email !== null) {
             Mail::to($registration->email)->queue(new RegistrationCancelledMail($registration));

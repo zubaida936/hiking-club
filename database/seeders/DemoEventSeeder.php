@@ -4,10 +4,13 @@ namespace Database\Seeders;
 
 use App\Domain\Events\Difficulty\DifficultyCalculator;
 use App\Domain\Events\Enums\EventStatus;
+use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Models\PointTransaction;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 
 /**
@@ -16,6 +19,11 @@ use Illuminate\Support\Str;
  */
 class DemoEventSeeder extends Seeder
 {
+    private const DEMO_HIKERS = [
+        'Rima Haddad', 'Karim Saad', 'Nour Khoury', 'Elie Frem', 'Maya Aoun', 'Jad Nassar',
+        'Lea Daher', 'Omar Itani', 'Sara Matar', 'Hadi Rizk', 'Yara Salem', 'Fadi Chamoun',
+    ];
+
     public function run(DifficultyCalculator $calculator): void
     {
         $pickups = [
@@ -72,6 +80,7 @@ class DemoEventSeeder extends Seeder
 
             // Bookings on the upcoming published hikes: one almost full, the X event full
             // (awaiting approvals) with two people on the waitlist.
+            PointTransaction::whereIn('event_registration_id', $event->registrations()->select('id'))->delete();
             $event->registrations()->delete();
             if ($status === EventStatus::Published && $inDays > 0) {
                 $pickup = fn ($s) => ['pickup_point' => $pickups[$s->index % 4]['name'], 'pickup_time' => $pickups[$s->index % 4]['pickup_time']];
@@ -86,8 +95,26 @@ class DemoEventSeeder extends Seeder
                 if ($xtreme) {
                     EventRegistration::factory()->count(2)->state(['status' => RegistrationStatus::Waitlisted])->sequence($pickup)->for($event)->create();
                 }
+            } elseif ($status === EventStatus::Published) {
+                // Past hikes: the same demo hikers, paid and checked in (every 6th a no-show), so points add up.
+                foreach (self::DEMO_HIKERS as $i => $name) {
+                    EventRegistration::factory()->for($event)->create([
+                        'name' => $name,
+                        'phone' => sprintf('+9617000%04d', $i + 1),
+                        'pickup_point' => $pickups[$i % 4]['name'],
+                        'pickup_time' => $pickups[$i % 4]['pickup_time'],
+                        'paid_at' => now(),
+                        'attendance' => $i % 6 === 5 ? Attendance::NoShow : Attendance::Attended,
+                        'attendance_marked_at' => now(),
+                        // Half of them booked well ahead (early-booking bonus).
+                        'created_at' => $event->starts_on->copy()->subDays($i % 2 === 0 ? 10 : 2),
+                    ]);
+                }
             }
         }
+
+        // Award the points for the checked-in demo bookings.
+        Artisan::call('points:sync');
     }
 
     /**

@@ -2,12 +2,14 @@
 
 namespace App\Domain\Registrations\Actions;
 
+use App\Domain\Members\Actions\ResolveHiker;
 use App\Domain\Registrations\Data\RegistrationData;
 use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Domain\Registrations\Exceptions\RegistrationException;
 use App\Mail\RegistrationConfirmationMail;
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Models\Hiker;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -24,6 +26,8 @@ final class RegisterForEvent
      * No 0/O or 1/I, so references read back clearly over the phone.
      */
     private const REFERENCE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+    public function __construct(private readonly ResolveHiker $resolveHiker) {}
 
     public function handle(Event $event, RegistrationData $data): EventRegistration
     {
@@ -48,8 +52,13 @@ final class RegisterForEvent
             };
 
             $pickup = $data->meetingPointId !== null ? $event->meetingPoints()->find($data->meetingPointId) : null;
+            $hiker = $this->resolveHiker->handle($data->phone, $data->name, $data->email);
+            // Unknown numbers are ignored: only existing hikers can earn the referral bonus.
+            $referrerId = $data->referrerPhone !== null ? Hiker::where('phone', $data->referrerPhone)->value('id') : null;
 
             return $event->registrations()->create([
+                'hiker_id' => $hiker->id,
+                'referred_by_hiker_id' => $referrerId !== $hiker->id ? $referrerId : null,
                 'reference' => $this->uniqueReference(),
                 'token' => Str::random(64),
                 'status' => $status,

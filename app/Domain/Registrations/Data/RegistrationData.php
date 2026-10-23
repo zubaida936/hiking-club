@@ -16,5 +16,6 @@ final readonly class RegistrationData
         public string $emergencyContactPhone,
         public ?string $notes,
         public bool $levelAcknowledged,
+        public ?string $referrerPhone = null,
     ) {}
 }

@@ -90,6 +90,9 @@
                     @error('notes') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                 </div>
 
+                <x-site.field name="referrer_phone" label="Invited by a friend? Their phone number" type="tel" :optional="true" placeholder="+961 70 123 456"
+                              :hint="'They earn '.config('points.referral').' points once you complete your first hike with us.'" />
+
                 <div class="space-y-4">
                     @if ($event->requiresLevelAcknowledgement())
                         <div class="rounded-xl border border-amber-300 bg-amber-50 p-5">

@@ -3,6 +3,7 @@
 namespace App\Domain\Registrations\Actions;
 
 use App\Domain\Registrations\Enums\RegistrationStatus;
+use App\Domain\Registrations\Events\RegistrationChanged;
 use App\Domain\Registrations\Exceptions\RegistrationException;
 use App\Mail\RegistrationConfirmationMail;
 use App\Models\EventRegistration;
@@ -21,6 +22,7 @@ final class ApproveRegistration
         }
 
         $registration->update(['status' => RegistrationStatus::Confirmed, 'updated_by' => $actor->id]);
+        RegistrationChanged::dispatch($registration);
 
         if ($registration->email !== null) {
             Mail::to($registration->email)->queue(new RegistrationConfirmationMail($registration));

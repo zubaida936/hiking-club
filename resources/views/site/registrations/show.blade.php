@@ -46,6 +46,11 @@
         </dl>
 
         <p class="mt-6 text-slate-600">{{ config('site.booking.payment_note') }}</p>
+        @unless ($registration->isCancelled())
+            <p class="mt-2 text-slate-600">
+                You earn <strong class="text-accent-600">{{ app(\App\Domain\Loyalty\PointsRules::class)->hikePoints($event) }} points</strong> when you complete this hike{{ config('points.paid_only') && $event->fee_cents > 0 ? ' (paid bookings only)' : '' }}.
+            </p>
+        @endunless
         <p class="mt-2 text-slate-600">
             @if ($registration->email)
                 We've sent a confirmation to <strong>{{ $registration->email }}</strong>.

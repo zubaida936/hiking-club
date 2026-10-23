@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Domain\Loyalty\Actions\AdjustPoints;
+use App\Http\Controllers\Controller;
+use App\Models\Hiker;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
+
+class PointsController extends Controller
+{
+    /**
+     * Hikers by points, most first.
+     */
+    public function index(Request $request): View
+    {
+        Gate::authorize('viewAny', Hiker::class);
+
+        $search = $request->string('q')->trim()->toString();
+        $digits = (string) preg_replace('/\D/', '', $search);
+
+        $hikers = Hiker::query()
+            ->withPointTotals()
+            ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q
+                ->where('name', 'like', "%{$search}%")
+                ->when(strlen($digits) >= 3, fn ($q) => $q->orWhere('phone', 'like', "%{$digits}%"))))
+            ->orderByDesc('total_points')
+            ->orderBy('name')
+            ->paginate(config('cms.per_page'))
+            ->withQueryString();
+
+        return view('admin.points.index', ['hikers' => $hikers]);
+    }
+
+    public function show(Hiker $hiker): View
+    {
+        Gate::authorize('viewAny', Hiker::class);
+
+        $hiker->loadSum('pointTransactions as total_points', 'points');
+
+        return view('admin.points.show', [
+            'hiker' => $hiker,
+            'transactions' => $hiker->pointTransactions()->with(['registration.event', 'creator'])->latest('id')->get(),
+            'bookings' => $hiker->registrations()->with('event')->latest('id')->get(),
+        ]);
+    }
+
+    public function adjust(Request $request, Hiker $hiker, AdjustPoints $action): RedirectResponse
+    {
+        Gate::authorize('adjustPoints', $hiker);
+
+        $validated = $request->validate([
+            'points' => ['required', 'integer', 'not_in:0', 'between:-1000,1000'],
+            'reason' => ['required', 'string', 'max:200'],
+        ], ['points.not_in' => 'Enter a number of points other than 0.']);
+
+        $action->handle($hiker, (int) $validated['points'], $validated['reason'], $request->user());
+
+        return back()->with('success', 'Points adjusted.');
+    }
+}

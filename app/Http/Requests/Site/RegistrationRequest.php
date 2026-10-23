@@ -36,6 +36,7 @@ class RegistrationRequest extends FormRequest
             'emergency_contact_name' => ['required', 'string', 'max:120'],
             'emergency_contact_phone' => ['required', 'string', 'regex:'.Phone::PATTERN, 'different:phone'],
             'notes' => ['nullable', 'string', 'max:500'],
+            'referrer_phone' => ['nullable', 'string', 'regex:'.Phone::PATTERN, 'different:phone'],
             'level_acknowledged' => [$event->requiresLevelAcknowledgement() ? 'accepted' : 'nullable'],
             'terms' => ['accepted'],
             // Honeypot: hidden from people, bots fill it in.
@@ -64,6 +65,8 @@ class RegistrationRequest extends FormRequest
             'phone.regex' => 'Enter a valid phone number, e.g. +961 70 123 456.',
             'emergency_contact_phone.regex' => 'Enter a valid phone number, e.g. +961 3 123 456.',
             'emergency_contact_phone.different' => 'Your emergency contact needs a different phone number than yours.',
+            'referrer_phone.regex' => 'Enter a valid phone number, e.g. +961 70 123 456.',
+            'referrer_phone.different' => 'Enter the phone number of the friend who invited you, not yours.',
             'meeting_point_id.required' => 'Choose where we pick you up.',
             'level_acknowledged.accepted' => 'Please confirm that you meet the level requirements for this hike.',
             'terms.accepted' => 'Please accept the terms to book your seat.',
@@ -83,6 +86,7 @@ class RegistrationRequest extends FormRequest
             emergencyContactPhone: (string) Phone::normalize($this->input('emergency_contact_phone')),
             notes: $this->filled('notes') ? $this->string('notes')->trim()->toString() : null,
             levelAcknowledged: $this->boolean('level_acknowledged'),
+            referrerPhone: Phone::normalize($this->input('referrer_phone')),
         );
     }
 

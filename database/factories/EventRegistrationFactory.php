@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Models\Hiker;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -30,6 +31,19 @@ class EventRegistrationFactory extends Factory
             'notes' => null,
             'terms_accepted_at' => now(),
         ];
+    }
+
+    /**
+     * Link each booking to the hiker with its phone number, as the booking flow does.
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (EventRegistration $registration) {
+            if ($registration->hiker_id === null) {
+                $hiker = Hiker::firstOrCreate(['phone' => $registration->phone], ['name' => $registration->name, 'email' => $registration->email]);
+                $registration->update(['hiker_id' => $hiker->id]);
+            }
+        });
     }
 
     public function pending(): static
