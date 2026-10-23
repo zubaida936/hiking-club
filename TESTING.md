@@ -33,7 +33,7 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 | About | http://localhost:8080/about | Coming soon |
 | Events | http://localhost:8080/events | Upcoming events (soonest first) and Past events with Load More; filter by level or month, e.g. http://localhost:8080/events?level=2 or http://localhost:8080/events?month=2026-11 |
 | Event detail | http://localhost:8080/events/horch-ehden-nature-reserve (or click "View Details" on any card) | Everything about one hike: level, effort, distance, elevation, fee, seats left, itinerary, meeting points, included / what to bring, technical details, route map + GPX download, WhatsApp inquiry. Cancelled example: http://localhost:8080/events/hadath-el-jebbe-to-tannourine-el-tahta. Drafts return 404 |
-| X Events | http://localhost:8080/x-events | Coming soon |
+| X Events | http://localhost:8080/x-events | Landing page (requirements, 3 steps, upcoming X events) and the application form http://localhost:8080/x-events/apply. Only approved hikers (or Elite) can book X events, logged in: see docs/x-events.md |
 | Shop | http://localhost:8080/shop | Coming soon |
 | Rank System | http://localhost:8080/rank-system | Coming soon |
 | Contact | http://localhost:8080/contact | Coming soon |
@@ -142,6 +142,7 @@ To check the mobile menu, make the browser narrower than 1024 px (or press F12 �
 | Registrations — edit a booking | "Edit" on a row → `/admin/registrations/{id}/edit` | Super Admin, Admin |
 | Members | http://localhost:8080/admin/members: every hiker (one per phone) with rank, points, hikes, last booking and account status; filter by account; "Invite to activate" / "Password link" (copy or Send on WhatsApp), Deactivate / Reactivate | Super Admin, Admin |
 | Rewards used | http://localhost:8080/admin/members/rewards: every reward used (booking, discount, hand-over notes, given back), filter by reward | Super Admin, Admin |
+| X applications | http://localhost:8080/admin/x-applications: review queue (waiting first), every answer, internal notes, Approve / Reject, "Send access link" (WhatsApp), Revoke access. Demo data has 2 waiting | Super Admin, Admin |
 | Points — hikers by rank | http://localhost:8080/admin/points (rank, tier, points, hikes, km; search by name or phone) | Super Admin, Admin |
 | Points — one hiker | click a hiker → history (every line with reason), bookings, rewards (uses, "Mark handed over" for gift card / winter bonus), "Adjust points" form | Super Admin, Admin |
 
@@ -218,6 +219,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Rewards per tier & redemption | https://app.clickup.com/t/z8q7hbmpf5 |
 | Manage members, points & rewards | https://app.clickup.com/t/z8q7hbmpfr |
 | Difficulty Calculator page | https://app.clickup.com/t/z8q7hbmpez |
+| X Events (landing, application form, review, manage) | https://app.clickup.com/t/z8q7hbmpf9 · https://app.clickup.com/t/z8q7hbmpfa · https://app.clickup.com/t/z8q7hbmpfb · https://app.clickup.com/t/z8q7hbmpft |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\PointsController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\StaffUserController;
+use App\Http\Controllers\Admin\XApplicationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,6 +35,16 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('unpublish', 'unpublish')->name('unpublish');
         Route::post('cancel', 'cancel')->name('cancel');
         Route::post('duplicate', 'duplicate')->name('duplicate');
+    });
+
+    Route::controller(XApplicationController::class)->prefix('x-applications')->name('x-applications.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{application}', 'show')->name('show');
+        Route::post('{application}/approve', 'approve')->name('approve');
+        Route::post('{application}/reject', 'reject')->name('reject');
+        Route::post('{application}/revoke', 'revoke')->name('revoke');
+        Route::post('{application}/note', 'note')->name('note');
+        Route::post('{application}/access-link', 'accessLink')->name('access-link');
     });
 
     Route::controller(MemberController::class)->prefix('members')->name('members.')->group(function () {

@@ -6,6 +6,7 @@ use App\Domain\Registrations\Actions\RegisterForEvent;
 use App\Domain\Registrations\Exceptions\RegistrationException;
 use App\Domain\Rewards\Exceptions\RewardException;
 use App\Domain\Rewards\HikerRewards;
+use App\Domain\XEvents\XAccess;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Site\RegistrationRequest;
 use App\Models\Event;
@@ -17,7 +18,7 @@ use Illuminate\View\View;
 
 class RegistrationController extends Controller
 {
-    public function create(Request $request, Event $event, HikerRewards $rewards): View
+    public function create(Request $request, Event $event, HikerRewards $rewards, XAccess $xAccess): View
     {
         abort_unless($event->isVisibleOnSite(), 404);
 
@@ -29,6 +30,8 @@ class RegistrationController extends Controller
             // Logged-in members get their details filled in, and can use a reward.
             'member' => $member,
             'rewards' => $member ? $rewards->discountsFor($member, $event) : [],
+            // X events: only approved hikers (or Elite) see the form.
+            'xLocked' => $event->is_xtreme && ! $xAccess->allows($member),
         ]);
     }
 

@@ -16,7 +16,18 @@
     </section>
 
     <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-        @unless ($open)
+        @if ($open && $xLocked)
+            <div class="rounded-2xl bg-red-50 p-8 text-center" role="status">
+                <p class="text-lg font-semibold text-red-900">X Events are for approved hikers.</p>
+                <p class="mt-2 text-red-900/80">Apply once: after a short review, you can book every X event.</p>
+                <div class="mt-6 flex flex-wrap justify-center gap-3">
+                    <a href="{{ route('x-events.apply') }}" class="rounded-full bg-red-600 px-6 py-3 font-display font-bold uppercase tracking-wide text-white hover:bg-red-700">Apply for X Events</a>
+                    @guest
+                        <a href="{{ route('login') }}" class="rounded-full border border-red-600 px-6 py-3 font-display font-bold uppercase tracking-wide text-red-700 hover:bg-red-100">Already approved? Log in</a>
+                    @endguest
+                </div>
+            </div>
+        @elseif (! $open)
             <div class="rounded-2xl bg-brand-50 p-8 text-center" role="status">
                 <p class="text-lg font-semibold text-brand-900">
                     {{ $event->isOpenForRegistration() ? 'Sorry, this hike is fully booked.' : 'Registration for this hike is closed.' }}
@@ -37,7 +48,7 @@
                     Bookings close {{ $event->registrationDeadline()->setTimezone(config('site.timezone'))->format('D j M \a\t H:i') }} (Lebanon time).
                 @endif
                 @if ($event->is_xtreme)
-                    This is an X Event: an organizer reviews every registration before confirming the seat.
+                    X Event: you have access as an approved hiker. Our guides can still reassess bookings for each event.
                 @endif
             </p>
 
@@ -174,9 +185,9 @@
                 </div>
 
                 <button type="submit" class="w-full rounded-full bg-accent-500 px-8 py-4 font-display text-lg font-bold uppercase tracking-wide text-white hover:bg-accent-600 sm:w-auto">
-                    {{ $waitlist ? 'Join the waitlist' : ($event->is_xtreme ? 'Send my registration' : 'Book my seat') }}
+                    {{ $waitlist ? 'Join the waitlist' : 'Book my seat' }}
                 </button>
             </form>
-        @endunless
+        @endif
     </div>
 </x-site.layout>

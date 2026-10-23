@@ -173,8 +173,8 @@ describe('online payment (test gateway)', function () {
     });
 
     it('waits for the seat to be confirmed and refuses paid bookings', function () {
-        $this->event->update(['is_xtreme' => true]);
-        $pending = bookWith($this->event, 'online');
+        // A booking still awaiting an organizer's approval.
+        $pending = EventRegistration::factory()->pending()->for($this->event)->create(['payment_method' => 'online']);
 
         $this->get(route('registrations.show', $pending))->assertSee("You'll pay once your seat is confirmed.", false);
         $this->post(route('registrations.pay', $pending))

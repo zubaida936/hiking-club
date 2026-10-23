@@ -6,6 +6,8 @@ use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Mail\RegistrationConfirmationMail;
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Models\Hiker;
+use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 
 beforeEach(function () {
@@ -122,17 +124,24 @@ describe('booking', function () {
         Mail::assertNothingQueued();
     });
 
-    it('holds a pending seat on X events until an organizer approves', function () {
+    it('only lets hikers approved for X Events book X events', function () {
         $this->event->update(['is_xtreme' => true]);
 
-        $this->post(route('events.register.store', $this->event), bookingPayload($this->event));
+        $this->get(route('events.register', $this->event))
+            ->assertSee('X Events are for approved hikers.')
+            ->assertSee(route('x-events.apply'))
+            ->assertDontSee('Book my seat');
+        $this->post(route('events.register.store', $this->event), bookingPayload($this->event))
+            ->assertSessionHas('error', 'X Events are for approved hikers: apply first, or log in if you are already approved.');
+        expect(EventRegistration::count())->toBe(0);
 
-        $registration = EventRegistration::sole();
-        expect($registration->status)->toBe(RegistrationStatus::Pending);
-        $this->get(route('registrations.show', $registration))
-            ->assertSee('Registration received')
-            ->assertSee('An organizer will review your registration');
-        $this->get(route('events.show', $this->event))->assertSee('19 of 20');
+        $user = User::factory()->create(['phone' => '+96170123456']);
+        $user->assignRole(Role::Member->value);
+        Hiker::factory()->create(['phone' => '+96170123456', 'user_id' => $user->id, 'x_approved_at' => now()]);
+
+        $this->actingAs($user)->post(route('events.register.store', $this->event), bookingPayload($this->event))
+            ->assertSessionHasNoErrors();
+        expect(EventRegistration::sole()->status)->toBe(RegistrationStatus::Confirmed);
     });
 
     it('validates the form', function (array $overrides, string $field) {

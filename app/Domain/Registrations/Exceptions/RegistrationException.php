@@ -29,6 +29,11 @@ final class RegistrationException extends DomainException
         return new self('Please confirm that you meet the level requirements for this hike.');
     }
 
+    public static function xApprovalRequired(): self
+    {
+        return new self('X Events are for approved hikers: apply first, or log in if you are already approved.');
+    }
+
     public static function phoneTaken(): self
     {
         return new self('Another booking for this hike already uses this phone number.');

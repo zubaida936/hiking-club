@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * A person who books hikes, identified by phone number. Owns bookings and points.
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property ?string $email
  * @property ?int $user_id
  * @property bool $show_on_leaderboard
+ * @property ?Carbon $x_approved_at approved for X Events
  */
 class Hiker extends Model
 {
@@ -36,7 +38,20 @@ class Hiker extends Model
 
     protected function casts(): array
     {
-        return ['show_on_leaderboard' => 'boolean'];
+        return ['show_on_leaderboard' => 'boolean', 'x_approved_at' => 'datetime'];
+    }
+
+    /**
+     * @return HasMany<XApplication, $this>
+     */
+    public function xApplications(): HasMany
+    {
+        return $this->hasMany(XApplication::class);
+    }
+
+    public function latestXApplication(): ?XApplication
+    {
+        return $this->xApplications()->latest('id')->first();
     }
 
     /**

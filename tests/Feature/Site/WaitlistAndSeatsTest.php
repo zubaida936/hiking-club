@@ -117,7 +117,7 @@ describe('waitlist', function () {
         Mail::assertQueued(RegistrationConfirmationMail::class, 2);
     });
 
-    it('promotes from the CMS save and keeps X event hikers pending', function () {
+    it('promotes from the CMS save, X event hikers included (they are approved)', function () {
         $this->event->update(['is_xtreme' => true]);
         fillUp($this->event);
         $waiting = EventRegistration::factory()->waitlisted()->for($this->event)->create();
@@ -129,7 +129,7 @@ describe('waitlist', function () {
             'fee' => '30', 'capacity' => '3', 'is_xtreme' => '1', 'waitlist_enabled' => '1',
         ])->assertSessionHasNoErrors();
 
-        expect($waiting->fresh()->status)->toBe(RegistrationStatus::Pending);
+        expect($waiting->fresh()->status)->toBe(RegistrationStatus::Confirmed);
     });
 
     it('does not promote anyone for past or cancelled hikes', function (array $state) {

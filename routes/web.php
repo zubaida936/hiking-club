@@ -14,12 +14,20 @@ use App\Http\Controllers\Site\PaymentController;
 use App\Http\Controllers\Site\RegistrationController;
 use App\Http\Controllers\Site\SeoController;
 use App\Http\Controllers\Site\TestPaymentController;
+use App\Http\Controllers\Site\XEventsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('events', [EventController::class, 'index'])->name('events.index');
 Route::get('leaderboard', LeaderboardController::class)->name('leaderboard');
 Route::get('difficulty-calculator', DifficultyCalculatorController::class)->name('guide.difficulty');
+
+Route::controller(XEventsController::class)->prefix('x-events')->group(function () {
+    Route::get('/', 'index')->name('x-events');
+    Route::get('apply', 'create')->name('x-events.apply');
+    Route::post('apply', 'store')->middleware('throttle:5,1')->name('x-events.apply.store');
+    Route::get('apply/sent', 'applied')->name('x-events.applied');
+});
 Route::get('events/{event:slug}', [EventController::class, 'show'])->name('events.show');
 
 Route::controller(RegistrationController::class)->group(function () {
@@ -90,7 +98,6 @@ Route::controller(NewsletterController::class)->prefix('newsletter')->name('news
 // with a real controller route (keep the route name: the header links by name).
 $placeholders = [
     'about' => ['about', 'About'],
-    'x-events' => ['x-events', 'X Events'],
     'shop' => ['shop.index', 'Shop'],
     'rank-system' => ['rank-system', 'Rank System'],
     'contact' => ['contact', 'Contact'],

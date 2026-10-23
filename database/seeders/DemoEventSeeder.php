@@ -8,7 +8,9 @@ use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Models\Hiker;
 use App\Models\PointTransaction;
+use App\Models\XApplication;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
@@ -115,6 +117,16 @@ class DemoEventSeeder extends Seeder
 
         // Award the points for the checked-in demo bookings.
         Artisan::call('points:sync');
+
+        // X Events applications waiting in the CMS review queue (two demo hikers).
+        foreach (array_slice(self::DEMO_HIKERS, 0, 2) as $i => $name) {
+            XApplication::where('phone', sprintf('+9617000%04d', $i + 1))->delete();
+            XApplication::factory()->create([
+                'hiker_id' => Hiker::where('phone', sprintf('+9617000%04d', $i + 1))->value('id'),
+                'name' => $name,
+                'phone' => sprintf('+9617000%04d', $i + 1),
+            ]);
+        }
     }
 
     /**

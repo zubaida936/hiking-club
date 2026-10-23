@@ -10,6 +10,7 @@ use App\Domain\Rewards\Exceptions\RewardException;
 use App\Domain\Rewards\HikerRewards;
 use App\Domain\Rewards\Reward;
 use App\Domain\Rewards\RewardCatalog;
+use App\Domain\XEvents\XAccess;
 use App\Mail\RegistrationConfirmationMail;
 use App\Models\Event;
 use App\Models\EventRegistration;
@@ -20,8 +21,8 @@ use Illuminate\Support\Str;
 
 /**
  * Books a seat on an event. The event row is locked while seats are counted,
- * so two people can never take the last seat. X events need an organizer's
- * approval: their bookings hold a seat as "pending". When the event is full
+ * so two people can never take the last seat. X events are only for logged-in
+ * hikers approved for X Events (or Elite members). When the event is full
  * and has a waitlist, the visitor joins the waitlist instead.
  */
 final class RegisterForEvent
@@ -35,6 +36,7 @@ final class RegisterForEvent
         private readonly ResolveHiker $resolveHiker,
         private readonly RewardCatalog $catalog,
         private readonly HikerRewards $rewards,
+        private readonly XAccess $xAccess,
     ) {}
 
     public function handle(Event $event, RegistrationData $data): EventRegistration
@@ -59,12 +61,14 @@ final class RegisterForEvent
             $referrerId = $data->referrerPhone !== null ? Hiker::where('phone', $data->referrerPhone)->value('id') : null;
             // Rank perks and rewards only for the logged-in member's own booking.
             $ownBooking = $data->memberHikerId !== null && $data->memberHikerId === $hiker->id;
+            // X events: only approved hikers (or Elite members), booking for themselves while logged in.
+            if ($event->is_xtreme && ! ($ownBooking && $this->xAccess->allows($hiker))) {
+                throw RegistrationException::xApprovalRequired();
+            }
             $reward = $this->chooseReward($data, $event, $hiker, $ownBooking);
 
             $status = match (true) {
-                ! $event->isSoldOut() => $event->is_xtreme && ! ($ownBooking && $this->rewards->has($hiker, Reward::XTREME))
-                    ? RegistrationStatus::Pending
-                    : RegistrationStatus::Confirmed,
+                ! $event->isSoldOut() => RegistrationStatus::Confirmed,
                 $event->waitlist_enabled => RegistrationStatus::Waitlisted,
                 default => throw RegistrationException::soldOut(),
             };

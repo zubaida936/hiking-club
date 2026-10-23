@@ -273,7 +273,10 @@
                 </dl>
 
                 @if ($event->is_xtreme && $upcoming)
-                    <p class="mt-6 rounded-lg bg-red-50 p-3 text-sm text-red-800">X Event: only approved hikers can register.</p>
+                    <p class="mt-6 rounded-lg bg-red-50 p-3 text-sm text-red-800">
+                        X Event: only approved hikers can register.
+                        <a href="{{ route('x-events') }}" class="font-semibold underline">How to get access</a>
+                    </p>
                 @endif
 
                 @if ($event->isOpenForRegistration() && ! $event->isSoldOut())

@@ -36,7 +36,7 @@ final class FillFreedSeats
                 ->get();
 
             foreach ($waiting as $registration) {
-                $registration->update(['status' => $event->is_xtreme ? RegistrationStatus::Pending : RegistrationStatus::Confirmed]);
+                $registration->update(['status' => RegistrationStatus::Confirmed]);
             }
 
             return $waiting->all();

@@ -43,8 +43,9 @@ Update this file when one is settled. Last reviewed: 2026-10-23.
   hikes (attended), free or paid.
 - **Waitlist promotion** happens when an organizer raises the capacity or cancels a booking; there is no automatic
   expiry for unpaid bookings.
-- **X event approval** of bookings is per booking in CMS → Registrations; the X application process itself is in
-  "X Events application form" / "Manage X applications".
+- **X Events** work as in [docs/x-events.md](x-events.md): apply once, review in the CMS, then approved (or Elite)
+  members book and are confirmed directly. To confirm: requirement texts, gear list, ages, and whether approved hikers
+  still need per-event confirmation.
 - **Account help without SMS:** hikers who lost their booking reference, or have no email for a password reset, ask
   on WhatsApp; organizers send them an **invite link** (7 days) or a **password link** (24 hours, works once) from
   CMS → Members, with a "Send on WhatsApp" button. An SMS/WhatsApp provider would let hikers do this themselves.
