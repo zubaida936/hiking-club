@@ -20,7 +20,7 @@ class TestPaymentController extends Controller
     {
         $this->ensureEnabled($payment);
 
-        return view('site.payments.test', ['payment' => $payment->load('registration.event')]);
+        return view('site.payments.test', ['payment' => $payment->load(['registration.event', 'order'])]);
     }
 
     public function simulate(Request $request, Payment $payment, TestGateway $gateway): RedirectResponse

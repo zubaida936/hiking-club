@@ -53,6 +53,12 @@ Update this file when one is settled. Last reviewed: 2026-10-23.
   on WhatsApp; organizers send them an **invite link** (7 days) or a **password link** (24 hours, works once) from
   CMS → Members, with a "Send on WhatsApp" button. An SMS/WhatsApp provider would let hikers do this themselves.
 
+- **Shop** works as in [docs/shop.md](shop.md). To confirm by the club: delivery fee (flat $4 placeholder, one
+  price for all of Lebanon) and delivery areas/times, pickup arrangement and texts (`config/shop.php`), who receives
+  "new order" emails (`SHOP_NOTIFY_EMAIL`), the real products and photos, and the shop terms. Cancelled paid orders
+  are refunded by hand ("Refund due"). Stock is not held while items sit in a cart, only once the order is placed;
+  unpaid orders don't expire, so staff cancel them by hand to free the stock. No shop discounts / rank rewards yet.
+
 ## Local development notes
 
 - The local `.env` has `PAYMENT_ONLINE_GATEWAY=test` (online payments via the simulator, see docs/payments.md) and can

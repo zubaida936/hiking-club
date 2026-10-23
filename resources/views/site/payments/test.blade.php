@@ -3,7 +3,11 @@
         This is the <strong>test gateway</strong>: no real money moves. A real provider (Whish Money, OMT Pay, a bank) replaces this page.
     </p>
     <p class="mt-6">
-        {{ $payment->registration->event->title }} · booking {{ $payment->registration->reference }}<br>
+        @if ($payment->order)
+            Shop order {{ $payment->order->reference }}<br>
+        @else
+            {{ $payment->registration->event->title }} · booking {{ $payment->registration->reference }}<br>
+        @endif
         <strong class="text-2xl text-brand-900">{{ $payment->formattedAmount() }} {{ $payment->currency }}</strong>
     </p>
     <form method="POST" action="{{ route('payments.test.simulate', $payment->external_id) }}" class="mt-8 flex justify-center gap-3">

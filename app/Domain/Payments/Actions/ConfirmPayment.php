@@ -46,6 +46,18 @@ final class ConfirmPayment
                 return null;
             }
 
+            // A shop order payment.
+            if ($payment->order_id !== null) {
+                $order = $payment->order;
+                $order->update([
+                    'paid_at' => $order->paid_at ?? now(),
+                    'payment_method' => PaymentMethod::Online,
+                    'payment_reference' => $result['reference'],
+                ]);
+
+                return null;
+            }
+
             $registration = $payment->registration;
             $registration->update([
                 'paid_at' => $registration->paid_at ?? now(),

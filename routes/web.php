@@ -5,6 +5,8 @@ use App\Http\Controllers\Site\Auth\ActivationController;
 use App\Http\Controllers\Site\Auth\InviteController;
 use App\Http\Controllers\Site\Auth\MemberSessionController;
 use App\Http\Controllers\Site\Auth\PasswordResetController;
+use App\Http\Controllers\Site\CartController;
+use App\Http\Controllers\Site\CheckoutController;
 use App\Http\Controllers\Site\DifficultyCalculatorController;
 use App\Http\Controllers\Site\EventController;
 use App\Http\Controllers\Site\HomeController;
@@ -13,6 +15,7 @@ use App\Http\Controllers\Site\NewsletterController;
 use App\Http\Controllers\Site\PaymentController;
 use App\Http\Controllers\Site\RegistrationController;
 use App\Http\Controllers\Site\SeoController;
+use App\Http\Controllers\Site\ShopController;
 use App\Http\Controllers\Site\TestPaymentController;
 use App\Http\Controllers\Site\XEventsController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +24,24 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('events', [EventController::class, 'index'])->name('events.index');
 Route::get('leaderboard', LeaderboardController::class)->name('leaderboard');
 Route::get('difficulty-calculator', DifficultyCalculatorController::class)->name('guide.difficulty');
+
+Route::get('shop', [ShopController::class, 'index'])->name('shop.index');
+Route::get('shop/{product:slug}', [ShopController::class, 'show'])->name('shop.show');
+
+Route::controller(CartController::class)->group(function () {
+    Route::get('cart', 'show')->name('cart');
+    Route::post('cart/add', 'add')->middleware('throttle:30,1')->name('cart.add');
+    Route::post('cart', 'update')->name('cart.update');
+    Route::post('cart/remove/{variant}', 'remove')->name('cart.remove');
+});
+
+Route::controller(CheckoutController::class)->group(function () {
+    Route::get('checkout', 'create')->name('checkout');
+    Route::post('checkout', 'store')->middleware('throttle:5,1')->name('checkout.store');
+    Route::get('orders/{order}', 'show')->name('orders.show');
+    Route::post('orders/{order}/pay', 'pay')->middleware('throttle:10,1')->name('orders.pay');
+    Route::post('orders/{order}/transfer', 'transfer')->middleware('throttle:10,1')->name('orders.transfer');
+});
 
 Route::controller(XEventsController::class)->prefix('x-events')->group(function () {
     Route::get('/', 'index')->name('x-events');
@@ -98,12 +119,10 @@ Route::controller(NewsletterController::class)->prefix('newsletter')->name('news
 // with a real controller route (keep the route name: the header links by name).
 $placeholders = [
     'about' => ['about', 'About'],
-    'shop' => ['shop.index', 'Shop'],
     'rank-system' => ['rank-system', 'Rank System'],
     'contact' => ['contact', 'Contact'],
     'equipment' => ['guide.equipment', 'Equipment Guide'],
     'guides' => ['guide.articles', 'Guides'],
-    'cart' => ['cart', 'Cart'],
     'privacy-policy' => ['legal.privacy', 'Privacy Policy'],
 ];
 

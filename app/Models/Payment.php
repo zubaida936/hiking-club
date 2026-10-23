@@ -11,7 +11,8 @@ use Illuminate\Support\Carbon;
  * One online payment attempt for a booking.
  *
  * @property int $id
- * @property int $event_registration_id
+ * @property ?int $event_registration_id set for a booking payment
+ * @property ?int $order_id set for a shop order payment
  * @property string $gateway
  * @property string $external_id
  * @property ?string $gateway_reference
@@ -45,6 +46,14 @@ class Payment extends Model
     public function registration(): BelongsTo
     {
         return $this->belongsTo(EventRegistration::class, 'event_registration_id');
+    }
+
+    /**
+     * @return BelongsTo<Order, $this>
+     */
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 
     public function formattedAmount(): string

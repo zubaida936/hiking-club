@@ -48,7 +48,9 @@ class PaymentController extends Controller
     {
         $status = $action->handle($payment);
 
-        return redirect()->route('registrations.show', $payment->registration)->with(...match ($status) {
+        $back = $payment->order_id !== null ? route('orders.show', $payment->order) : route('registrations.show', $payment->registration);
+
+        return redirect()->to($back)->with(...match ($status) {
             PaymentStatus::Succeeded => ['status', 'Payment received. Thank you!'],
             PaymentStatus::Failed => ['error', 'The payment did not go through. You can try again or choose another way to pay.'],
             PaymentStatus::Pending => ['status', "We're waiting for the payment provider to confirm your payment. This page will show it once it's done."],

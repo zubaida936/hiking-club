@@ -15,6 +15,7 @@ use App\Mail\RegistrationConfirmationMail;
 use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\Hiker;
+use App\Support\ReferenceCode;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -27,11 +28,6 @@ use Illuminate\Support\Str;
  */
 final class RegisterForEvent
 {
-    /**
-     * No 0/O or 1/I, so references read back clearly over the phone.
-     */
-    private const REFERENCE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-
     public function __construct(
         private readonly ResolveHiker $resolveHiker,
         private readonly RewardCatalog $catalog,
@@ -78,7 +74,7 @@ final class RegisterForEvent
             $registration = $event->registrations()->create([
                 'hiker_id' => $hiker->id,
                 'referred_by_hiker_id' => $referrerId !== $hiker->id ? $referrerId : null,
-                'reference' => $this->uniqueReference(),
+                'reference' => ReferenceCode::unique(EventRegistration::class),
                 'token' => Str::random(64),
                 'status' => $status,
                 'name' => $data->name,
@@ -137,17 +133,5 @@ final class RegisterForEvent
         }
 
         return $reward;
-    }
-
-    private function uniqueReference(): string
-    {
-        do {
-            $reference = '';
-            for ($i = 0; $i < 8; $i++) {
-                $reference .= self::REFERENCE_ALPHABET[random_int(0, strlen(self::REFERENCE_ALPHABET) - 1)];
-            }
-        } while (EventRegistration::where('reference', $reference)->exists());
-
-        return $reference;
     }
 }

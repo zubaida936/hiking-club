@@ -6,6 +6,8 @@
         ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard', 'can' => Permission::AccessAdmin],
         ['label' => 'Events', 'route' => 'admin.events.index', 'active' => ['admin.events.index', 'admin.events.create', 'admin.events.edit'], 'can' => Permission::ManageEvents],
         ['label' => 'Registrations', 'route' => 'admin.registrations.index', 'active' => ['admin.registrations.*', 'admin.events.registrations*'], 'can' => Permission::ViewRegistrations],
+        ['label' => 'Shop orders', 'route' => 'admin.orders.index', 'active' => 'admin.orders.*', 'can' => Permission::ManageShop],
+        ['label' => 'Shop products', 'route' => 'admin.products.index', 'active' => ['admin.products.*', 'admin.product-categories.*'], 'can' => Permission::ManageShop],
         ['label' => 'X applications', 'route' => 'admin.x-applications.index', 'active' => 'admin.x-applications.*', 'can' => Permission::ReviewApplications],
         ['label' => 'Members', 'route' => 'admin.members.index', 'active' => ['admin.members.index'], 'can' => Permission::ManageMembers],
         ['label' => 'Points', 'route' => 'admin.points.index', 'active' => 'admin.points.*', 'can' => Permission::ManageLoyalty],

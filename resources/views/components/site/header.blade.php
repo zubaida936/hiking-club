@@ -51,10 +51,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.12a7.5 7.5 0 0 1 15 0A17.93 17.93 0 0 1 12 21.75c-2.68 0-5.22-.59-7.5-1.63Z"/>
                 </svg>
             </a>
-            <a href="{{ route('cart') }}" class="rounded-full p-2 hover:bg-white/10" aria-label="Cart">
+            @php($cartCount = app(\App\Domain\Shop\Cart::class)->count())
+            <a href="{{ route('cart') }}" class="relative rounded-full p-2 hover:bg-white/10" aria-label="Cart{{ $cartCount ? ' ('.$cartCount.' '.Str::plural('item', $cartCount).')' : '' }}">
                 <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.39c.51 0 .95.34 1.09.84l.38 1.44m0 0L6.75 12h10.5l2.25-6.72H5.11ZM7.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm9 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM6.75 12 6 15h12"/>
                 </svg>
+                @if ($cartCount)
+                    <span class="absolute -right-0.5 -top-0.5 flex min-w-5 items-center justify-center rounded-full bg-accent-500 px-1 text-xs font-bold text-white" aria-hidden="true">{{ $cartCount }}</span>
+                @endif
             </a>
             <a href="{{ route('events.index') }}"
                class="ml-2 hidden rounded-full bg-accent-500 px-5 py-2.5 font-display text-sm font-bold uppercase tracking-wide text-white hover:bg-accent-600 sm:inline-block">

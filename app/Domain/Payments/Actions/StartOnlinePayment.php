@@ -7,6 +7,7 @@ use App\Domain\Payments\Enums\PaymentStatus;
 use App\Domain\Payments\Exceptions\PaymentException;
 use App\Domain\Payments\Gateways\Gateways;
 use App\Models\EventRegistration;
+use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Support\Str;
 
@@ -44,6 +45,38 @@ final class StartOnlinePayment
         $url = $this->gateways->active()->startCheckout($payment, route('payments.return', $payment->external_id));
         $payment->update(['checkout_url' => $url]);
         $registration->update(['payment_method' => PaymentMethod::Online]);
+
+        return $url;
+    }
+
+    /**
+     * Same for a shop order.
+     *
+     * @throws PaymentException
+     */
+    public function forOrder(Order $order): string
+    {
+        if (! PaymentMethod::Online->isAvailable()) {
+            throw PaymentException::onlineUnavailable();
+        }
+        if ($order->paid_at !== null) {
+            throw PaymentException::alreadyPaid();
+        }
+        if (! $order->awaitsPayment()) {
+            throw PaymentException::notPayable();
+        }
+
+        $payment = $order->payments()->create([
+            'gateway' => (string) config('payments.online_gateway'),
+            'external_id' => (string) Str::uuid(),
+            'amount_cents' => $order->total_cents,
+            'currency' => config('payments.currency'),
+            'status' => PaymentStatus::Pending,
+        ]);
+
+        $url = $this->gateways->active()->startCheckout($payment, route('payments.return', $payment->external_id));
+        $payment->update(['checkout_url' => $url]);
+        $order->update(['payment_method' => PaymentMethod::Online]);
 
         return $url;
     }

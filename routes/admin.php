@@ -4,7 +4,10 @@ use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\MemberController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PointsController;
+use App\Http\Controllers\Admin\ProductCategoryController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\StaffUserController;
 use App\Http\Controllers\Admin\XApplicationController;
@@ -35,6 +38,22 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('unpublish', 'unpublish')->name('unpublish');
         Route::post('cancel', 'cancel')->name('cancel');
         Route::post('duplicate', 'duplicate')->name('duplicate');
+    });
+
+    Route::resource('products', ProductController::class)->except('show');
+    Route::controller(ProductCategoryController::class)->prefix('product-categories')->name('product-categories.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::put('{category}', 'update')->name('update');
+        Route::delete('{category}', 'destroy')->name('destroy');
+    });
+    // {order:id}: the public order page uses the secret token as route key.
+    Route::controller(OrderController::class)->prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{order:id}', 'show')->name('show');
+        Route::post('{order:id}/status', 'status')->name('status');
+        Route::post('{order:id}/cancel', 'cancel')->name('cancel');
+        Route::post('{order:id}/payment', 'payment')->name('payment');
     });
 
     Route::controller(XApplicationController::class)->prefix('x-applications')->name('x-applications.')->group(function () {

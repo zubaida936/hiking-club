@@ -34,13 +34,14 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 | Events | http://localhost:8080/events | Upcoming events (soonest first) and Past events with Load More; filter by level or month, e.g. http://localhost:8080/events?level=2 or http://localhost:8080/events?month=2026-11 |
 | Event detail | http://localhost:8080/events/horch-ehden-nature-reserve (or click "View Details" on any card) | Everything about one hike: level, effort, distance, elevation, fee, seats left, itinerary, meeting points, included / what to bring, technical details, route map + GPX download, WhatsApp inquiry. Cancelled example: http://localhost:8080/events/hadath-el-jebbe-to-tannourine-el-tahta. Drafts return 404 |
 | X Events | http://localhost:8080/x-events | Landing page (requirements, 3 steps, upcoming X events) and the application form http://localhost:8080/x-events/apply. Only approved hikers (or Elite) can book X events, logged in: see docs/x-events.md |
-| Shop | http://localhost:8080/shop | Coming soon |
+| Shop | http://localhost:8080/shop | Products with price / sale / stock badges, category filter, e.g. http://localhost:8080/shop?category=footwear. Product page (sizes, photos, Add to cart): http://localhost:8080/shop/club-t-shirt (demo data, see docs/shop.md) |
+| Checkout | http://localhost:8080/checkout (from the cart) | Pickup or delivery (+$4), payment method, terms → order page `/orders/{secret}` with payment instructions / "Pay now" and the order status |
 | Rank System | http://localhost:8080/rank-system | Coming soon |
 | Contact | http://localhost:8080/contact | Coming soon |
 | Hiker's Guide → Difficulty Calculator | http://localhost:8080/difficulty-calculator | Enter km, elevation gain (and loss): live effort score, level, description and points; formula, level table and limitations; upcoming hikes of that level. Shareable, e.g. http://localhost:8080/difficulty-calculator?km=8&gain=220&loss=320 |
 | Hiker's Guide → Equipment Guide | http://localhost:8080/equipment | Coming soon |
 | Hiker's Guide → Guides | http://localhost:8080/guides | Coming soon |
-| Cart (cart icon) | http://localhost:8080/cart | Coming soon |
+| Cart (cart icon) | http://localhost:8080/cart | Lines with size, quantity (update / remove), subtotal; the header icon shows the item count |
 | Privacy Policy (footer) | http://localhost:8080/privacy-policy | Coming soon |
 
 A green WhatsApp button floats in the bottom-right corner of every public page and opens a chat with
@@ -143,6 +144,8 @@ To check the mobile menu, make the browser narrower than 1024 px (or press F12 �
 | Members | http://localhost:8080/admin/members: every hiker (one per phone) with rank, points, hikes, last booking and account status; filter by account; "Invite to activate" / "Password link" (copy or Send on WhatsApp), Deactivate / Reactivate | Super Admin, Admin |
 | Rewards used | http://localhost:8080/admin/members/rewards: every reward used (booking, discount, hand-over notes, given back), filter by reward | Super Admin, Admin |
 | X applications | http://localhost:8080/admin/x-applications: review queue (waiting first), every answer, internal notes, Approve / Reject, "Send access link" (WhatsApp), Revoke access. Demo data has 2 waiting | Super Admin, Admin |
+| Shop products | http://localhost:8080/admin/products: list with stock (red when low), search / category filter, "+ New product" (sizes and stock, price, sale price, tags, photos, show in shop), Edit, Delete; "Categories" → http://localhost:8080/admin/product-categories | Super Admin, Admin |
+| Shop orders | http://localhost:8080/admin/orders: filter by status, search name / phone / reference; an order → items, customer + WhatsApp link, delivery, steps (Being prepared → Ready → Completed), Mark paid / unpaid, Cancel (reason, email, stock back; paid → "Refund due") | Super Admin, Admin |
 | Points — hikers by rank | http://localhost:8080/admin/points (rank, tier, points, hikes, km; search by name or phone) | Super Admin, Admin |
 | Points — one hiker | click a hiker → history (every line with reason), bookings, rewards (uses, "Mark handed over" for gift card / winter bonus), "Adjust points" form | Super Admin, Admin |
 
@@ -170,6 +173,8 @@ Uploaded images are served from `http://localhost:8080/storage/...` (files live 
 cancelled, past and X events) so every screen has something to show. Each demo event has a sample route
 map but no GPX file to download; upload a real `.gpx` in the CMS (Route section) to test the download.
 Re-run it to reset them. After pulling this feature run `docker compose exec app php artisan migrate`.
+It also adds 6 shop products without photos (`DemoShopSeeder`, skipped when products exist; run it alone with
+`docker compose exec app php artisan db:seed --class=DemoShopSeeder`).
 
 The demo data has only 2 past events, so the Events page shows no "Load More" button. To get one, add
 8 random published past events:
@@ -222,6 +227,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Difficulty Calculator page | https://app.clickup.com/t/z8q7hbmpez |
 | X Events (landing, application form, review, manage) | https://app.clickup.com/t/z8q7hbmpf9 · https://app.clickup.com/t/z8q7hbmpfa · https://app.clickup.com/t/z8q7hbmpfb · https://app.clickup.com/t/z8q7hbmpft |
 | Event reminders & notifications | https://app.clickup.com/t/z8q7hbmpex |
+| Shop (listing, product page, cart & checkout, payments & orders, CMS) | https://app.clickup.com/t/z8q7hbmpfc · https://app.clickup.com/t/z8q7hbmpfd · https://app.clickup.com/t/z8q7hbmpfe · https://app.clickup.com/t/z8q7hbmpff · https://app.clickup.com/t/z8q7hbmpfu |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

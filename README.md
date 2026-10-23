@@ -57,6 +57,7 @@ Recommended: protect `main` and require the CI checks to pass before merging.
 - [docs/payments.md](docs/payments.md): how hikers pay, testing online payments with the test gateway, going live with Whish Money / OMT.
 - [docs/rewards.md](docs/rewards.md): what each rank unlocks and how rewards are used.
 - [docs/x-events.md](docs/x-events.md): applying, reviewing and booking X Events.
+- [docs/shop.md](docs/shop.md): products, stock, cart, checkout, order steps and how to test the shop.
 - [docs/open-decisions.md](docs/open-decisions.md): decisions the club still has to take, placeholders to replace, known gaps.
 
 ## Architecture
