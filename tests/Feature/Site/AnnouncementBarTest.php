@@ -10,7 +10,7 @@ function announcementBar(string $uri = '/'): ?string
 }
 
 it('announces the next published upcoming event with a link', function () {
-    Event::factory()->published()->create(['title' => 'Qadisha Valley Descent', 'starts_on' => '2026-11-07']);
+    $next = Event::factory()->published()->create(['title' => 'Qadisha Valley Descent', 'starts_on' => '2026-11-07']);
     Event::factory()->published()->create(['title' => 'Later Hike', 'starts_on' => '2026-12-01']);
     Event::factory()->create(['title' => 'Draft Hike', 'starts_on' => '2026-10-30']);
     Event::factory()->published()->cancelled()->create(['title' => 'Cancelled Hike', 'starts_on' => '2026-10-29']);
@@ -23,7 +23,7 @@ it('announces the next published upcoming event with a link', function () {
         ->toContain('Qadisha Valley Descent')
         ->toContain('Sat 7 Nov')
         ->toContain('View Event')
-        ->toContain('href="'.route('events.index').'"')
+        ->toContain('href="'.route('events.show', $next).'"')
         ->not->toContain('Later Hike')
         ->not->toContain('Draft Hike')
         ->not->toContain('Cancelled Hike')

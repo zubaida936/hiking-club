@@ -53,6 +53,9 @@ class DemoEventSeeder extends Seeder
                 'capacity' => 30,
                 'included' => ['Transportation', 'Reserve entrance', 'Guiding', 'Hiking assistants'],
                 'what_to_bring' => ['Hiking shoes', '2L water', 'Lunch & snacks', 'Rain jacket'],
+                'itinerary' => ['06:00 First pickup', '09:00 Start of the hike', '12:30 Lunch break with a view', '15:30 End of the hike', 'Drive back to the meeting points'],
+                // Demo map only (no GPX file): a small loop near the start area.
+                'route_points' => $this->demoRoute($km),
                 'is_xtreme' => $xtreme,
                 'status' => $status,
                 'published_at' => $status === EventStatus::Draft ? null : now(),
@@ -65,5 +68,23 @@ class DemoEventSeeder extends Seeder
                 $event->meetingPoints()->create($p + ['position' => $i]);
             }
         }
+    }
+
+    /**
+     * A wavy line of roughly $km kilometres in the North Lebanon mountains.
+     *
+     * @return list<array{float, float}>
+     */
+    private function demoRoute(float $km): array
+    {
+        $points = [];
+        $steps = 60;
+
+        for ($i = 0; $i <= $steps; $i++) {
+            $t = $i / $steps;
+            $points[] = [round(34.29 + 0.01 * sin($t * 3 * M_PI), 5), round(35.95 + $t * $km * 0.0085, 5)];
+        }
+
+        return $points;
     }
 }

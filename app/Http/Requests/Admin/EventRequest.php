@@ -4,9 +4,12 @@ namespace App\Http\Requests\Admin;
 
 use App\Domain\Events\Data\EventData;
 use App\Domain\Events\Data\MeetingPointData;
+use App\Domain\Events\Gpx\GpxReader;
 use App\Models\Event;
 use Carbon\CarbonImmutable;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
 
 class EventRequest extends FormRequest
@@ -35,9 +38,17 @@ class EventRequest extends FormRequest
             'capacity' => ['required', 'integer', 'min:1', 'max:1000'],
             'included' => ['nullable', 'string', 'max:2000'],
             'what_to_bring' => ['nullable', 'string', 'max:2000'],
+            'itinerary' => ['nullable', 'string', 'max:3000'],
             'is_xtreme' => ['boolean'],
             'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', 'dimensions:min_width=800,min_height=400'],
             'remove_cover_image' => ['boolean'],
+            'photo_credit' => ['nullable', 'string', 'max:120'],
+            'gpx_file' => ['nullable', 'file', 'extensions:gpx', 'max:5120', function (string $attribute, mixed $file, Closure $fail) {
+                if ($file instanceof UploadedFile && app(GpxReader::class)->points((string) $file->get()) === []) {
+                    $fail('The GPX file has no track or route points we can read.');
+                }
+            }],
+            'remove_gpx' => ['boolean'],
             'meeting_points' => ['nullable', 'array', 'max:10'],
             'meeting_points.*.name' => ['required', 'string', 'max:120'],
             'meeting_points.*.pickup_time' => ['required', 'date_format:H:i'],
@@ -55,6 +66,7 @@ class EventRequest extends FormRequest
             'elevation_gain_m' => 'elevation gain',
             'elevation_loss_m' => 'elevation loss',
             'duration_hours' => 'duration',
+            'gpx_file' => 'GPX file',
             'meeting_points.*.name' => 'meeting point name',
             'meeting_points.*.pickup_time' => 'pickup time',
         ];
@@ -74,6 +86,7 @@ class EventRequest extends FormRequest
         $this->merge([
             'is_xtreme' => $this->boolean('is_xtreme'),
             'remove_cover_image' => $this->boolean('remove_cover_image'),
+            'remove_gpx' => $this->boolean('remove_gpx'),
             'meeting_points' => $points,
             'slug' => $this->filled('slug') ? strtolower(trim($this->string('slug')->toString())) : null,
         ]);
@@ -97,13 +110,17 @@ class EventRequest extends FormRequest
             capacity: $this->integer('capacity'),
             included: $this->lines('included'),
             whatToBring: $this->lines('what_to_bring'),
+            itinerary: $this->lines('itinerary', unique: false),
             isXtreme: $this->boolean('is_xtreme'),
             meetingPoints: array_map(
                 fn (array $p) => new MeetingPointData(trim($p['name']), $p['pickup_time']),
                 $this->validated('meeting_points') ?? [],
             ),
+            photoCredit: $this->filled('photo_credit') ? $this->string('photo_credit')->trim()->toString() : null,
             coverImage: $this->file('cover_image'),
             removeCoverImage: $this->boolean('remove_cover_image'),
+            gpxFile: $this->file('gpx_file'),
+            removeGpx: $this->boolean('remove_gpx'),
         );
     }
 
@@ -112,12 +129,12 @@ class EventRequest extends FormRequest
      *
      * @return list<string>
      */
-    private function lines(string $key): array
+    private function lines(string $key, bool $unique = true): array
     {
         return collect(preg_split('/\R/', $this->string($key)->toString()) ?: [])
             ->map(fn (string $line) => trim($line))
             ->filter()
-            ->unique()
+            ->when($unique, fn ($lines) => $lines->unique())
             ->values()
             ->all();
     }

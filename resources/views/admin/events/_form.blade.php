@@ -53,6 +53,25 @@
                 <span class="rounded-full px-2 py-0.5 text-xs font-medium" :class="levelClasses" x-text="level.label"></span>
                 <span class="text-xs text-slate-400">Updated automatically from distance and elevation.</span>
             </div>
+
+            <div class="mt-4">
+                <label for="gpx_file" class="block text-sm font-medium text-slate-700">GPX track</label>
+                @if ($event->gpx_path)
+                    <p class="mt-1 text-sm text-slate-600">
+                        Current track: <a href="{{ $event->gpxUrl() }}" download class="text-emerald-700 hover:underline">download</a>
+                        ({{ count($event->route_points ?? []) }} map points)
+                    </p>
+                @endif
+                <input type="file" id="gpx_file" name="gpx_file" accept=".gpx"
+                       class="mt-1 block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm">
+                <p class="mt-1 text-xs text-slate-500">Optional. Hikers see the route on a map and can download the file. Max 5 MB.</p>
+                @error('gpx_file') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                @if ($event->gpx_path)
+                    <label class="mt-2 flex items-center gap-2 text-sm text-slate-700">
+                        <input type="checkbox" name="remove_gpx" value="1" class="rounded border-slate-300"> Remove current track
+                    </label>
+                @endif
+            </div>
         </section>
 
         <section class="rounded-lg bg-white p-6 shadow-sm">
@@ -94,6 +113,10 @@
             <div class="grid gap-4 sm:grid-cols-2">
                 <x-admin.textarea name="included" label="What's included" :value="implode(PHP_EOL, $event->included ?? [])" rows="5" hint="One item per line." />
                 <x-admin.textarea name="what_to_bring" label="What to bring" :value="implode(PHP_EOL, $event->what_to_bring ?? [])" rows="5" hint="One item per line." />
+                <div class="sm:col-span-2">
+                    <x-admin.textarea name="itinerary" label="Itinerary" :value="implode(PHP_EOL, $event->itinerary ?? [])" rows="6"
+                                      hint="One step per line, in order. Start a line with a time to show it on the timeline, e.g. 08:30 Start of the hike" />
+                </div>
             </div>
         </section>
     </div>
@@ -122,6 +145,10 @@
                    class="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm">
             <p class="mt-1 text-xs text-slate-500">JPG, PNG or WebP, at least 800×400, max 5 MB.</p>
             @error('cover_image') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+            <div class="mt-4">
+                <x-admin.input name="photo_credit" label="Photo credit" :value="$event->photo_credit" maxlength="120"
+                               hint="Shown under the photo on the event page, e.g. a photographer's name." />
+            </div>
             @if ($event->cover_image_path)
                 <label class="mt-3 flex items-center gap-2 text-sm text-slate-700">
                     <input type="checkbox" name="remove_cover_image" value="1" x-model="remove" class="rounded border-slate-300"> Remove current image

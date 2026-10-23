@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 /**
  * Copies an event as a new draft (common for recurring routes). The cover
- * image file is copied too, so deleting one event never breaks the other.
+ * image and GPX files are copied too, so deleting one event never breaks the other.
  */
 final class DuplicateEvent
 {
@@ -21,7 +21,7 @@ final class DuplicateEvent
         return DB::transaction(function () use ($source, $actor) {
             $copy = $source->replicate([
                 'slug', 'status', 'published_at', 'cancelled_at', 'cancellation_reason',
-                'cover_image_path', 'created_by', 'updated_by',
+                'cover_image_path', 'gpx_path', 'created_by', 'updated_by',
             ]);
 
             $copy->title = Str::limit($source->title.' (copy)', 150, '');
@@ -29,7 +29,9 @@ final class DuplicateEvent
             $copy->status = EventStatus::Draft;
             $copy->created_by = $actor->id;
             $copy->updated_by = $actor->id;
-            $copy->cover_image_path = $this->copyImage($source->cover_image_path);
+            $copy->cover_image_path = $this->copyFile($source->cover_image_path);
+            $copy->gpx_path = $this->copyFile($source->gpx_path);
+            $copy->route_points = $copy->gpx_path ? $source->route_points : null;
             $copy->save();
 
             foreach ($source->meetingPoints as $point) {
@@ -40,7 +42,7 @@ final class DuplicateEvent
         });
     }
 
-    private function copyImage(?string $path): ?string
+    private function copyFile(?string $path): ?string
     {
         $disk = Storage::disk('public');
 

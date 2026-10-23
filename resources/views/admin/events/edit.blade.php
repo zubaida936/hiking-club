@@ -14,6 +14,10 @@
         </span>
 
         <div class="ml-auto flex flex-wrap gap-2">
+            @if ($event->isVisibleOnSite())
+                <x-admin.button variant="secondary" :href="route('events.show', $event)" target="_blank">View on site</x-admin.button>
+            @endif
+
             @if ($event->status === \App\Domain\Events\Enums\EventStatus::Draft)
                 <form method="POST" action="{{ route('admin.events.publish', $event) }}">@csrf
                     <x-admin.button>Publish</x-admin.button>

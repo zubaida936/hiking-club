@@ -29,5 +29,30 @@ Alpine.data('loadMore', () => ({
     },
 }));
 
+/*
+ * Event route map: draws the GPX track ([lat, lng] pairs) on OpenStreetMap tiles.
+ * Leaflet is loaded on demand so other pages don't download it.
+ */
+Alpine.data('routeMap', (points) => ({
+    ready: false,
+
+    async init() {
+        const [{ default: L }] = await Promise.all([import('leaflet'), import('leaflet/dist/leaflet.css')]);
+
+        const map = L.map(this.$root, { scrollWheelZoom: false });
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 17,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(map);
+
+        const route = L.polyline(points, { color: '#ee8f12', weight: 4 }).addTo(map);
+        L.circleMarker(points[0], { radius: 7, color: '#fff', weight: 2, fillColor: '#2f7d52', fillOpacity: 1 }).bindTooltip('Start').addTo(map);
+        L.circleMarker(points[points.length - 1], { radius: 7, color: '#fff', weight: 2, fillColor: '#b91c1c', fillOpacity: 1 }).bindTooltip('Finish').addTo(map);
+
+        map.fitBounds(route.getBounds(), { padding: [24, 24] });
+        this.ready = true;
+    },
+}));
+
 window.Alpine = Alpine;
 Alpine.start();

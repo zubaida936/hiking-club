@@ -3,7 +3,6 @@
 use App\Domain\Events\Enums\DifficultyLevel;
 use App\Http\Controllers\Site\EventController;
 use App\Models\Event;
-use Illuminate\Support\Facades\Route;
 
 it('lists published upcoming events soonest first with their card details', function () {
     Event::factory()->published()->create(['title' => 'Later Hike', 'starts_on' => now()->addDays(20)->toDateString()]);
@@ -133,13 +132,8 @@ it('ignores invalid filter values instead of failing', function (array $query) {
     'huge page' => [['page' => 999999]],
 ]);
 
-it('links each card to the event page once it exists', function () {
+it('links each card to the event page', function () {
     $event = Event::factory()->published()->create(['slug' => 'qadisha-valley']);
-
-    $this->get(route('events.index'))->assertDontSee('View Details');
-
-    Route::get('events/{event:slug}', fn () => 'event')->name('events.show');
-    Route::getRoutes()->refreshNameLookups();
 
     $this->get(route('events.index'))
         ->assertSee('View Details')

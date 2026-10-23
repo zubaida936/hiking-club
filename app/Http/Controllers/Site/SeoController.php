@@ -26,11 +26,8 @@ class SeoController extends Controller
             }
         }
 
-        // Published events, once the event detail page exists.
-        if (Route::has('events.show')) {
-            foreach (Event::published()->orderByDesc('starts_on')->select(['id', 'slug', 'updated_at'])->lazy() as $event) {
-                $urls[] = ['loc' => route('events.show', $event), 'lastmod' => $event->updated_at?->toAtomString()];
-            }
+        foreach (Event::published()->orderByDesc('starts_on')->select(['id', 'slug', 'updated_at'])->lazy() as $event) {
+            $urls[] = ['loc' => route('events.show', $event), 'lastmod' => $event->updated_at?->toAtomString()];
         }
 
         return response()

@@ -11,7 +11,6 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Route;
 
 class NewEventAnnouncementMail extends Mailable implements ShouldQueue
 {
@@ -36,8 +35,7 @@ class NewEventAnnouncementMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(markdown: 'mail.newsletter.new-event', with: [
-            // The event's own page once it exists; the events list until then.
-            'eventUrl' => Route::has('events.show') ? route('events.show', $this->event) : route('events.index'),
+            'eventUrl' => route('events.show', $this->event),
             'unsubscribeUrl' => $this->unsubscribeUrl(),
         ]);
     }

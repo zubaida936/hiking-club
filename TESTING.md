@@ -30,6 +30,7 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 | Home | http://localhost:8080/ | Hero carousel, About, Next Challenge, X Events, contact. Leaderboard and newsletter are placeholders; texts/contact details are placeholders in `config/site.php` |
 | About | http://localhost:8080/about | Coming soon |
 | Events | http://localhost:8080/events | Upcoming events (soonest first) and Past events with Load More; filter by level or month, e.g. http://localhost:8080/events?level=2 or http://localhost:8080/events?month=2026-11 |
+| Event detail | http://localhost:8080/events/horch-ehden-nature-reserve (or click "View Details" on any card) | Everything about one hike: level, effort, distance, elevation, fee, seats left, itinerary, meeting points, included / what to bring, technical details, route map + GPX download, WhatsApp inquiry. Cancelled example: http://localhost:8080/events/hadath-el-jebbe-to-tannourine-el-tahta. Drafts return 404 |
 | X Events | http://localhost:8080/x-events | Coming soon |
 | Shop | http://localhost:8080/shop | Coming soon |
 | Rank System | http://localhost:8080/rank-system | Coming soon |
@@ -49,7 +50,7 @@ A green WhatsApp button floats in the bottom-right corner of every public page a
 
 | What | Link / where |
 |---|---|
-| Sitemap | http://localhost:8080/sitemap.xml (real pages only; events appear once the event page exists) |
+| Sitemap | http://localhost:8080/sitemap.xml (real pages plus every published event page) |
 | robots.txt | http://localhost:8080/robots.txt (blocks everything except when `APP_ENV=production`) |
 | Default share image | http://localhost:8080/images/og-default.jpg (placeholder, 1200×630) |
 | Share preview check | view page source and look for `og:` tags, or paste the live URL into https://www.opengraph.xyz once deployed |
@@ -70,7 +71,7 @@ subscribers only. Emails are sent by the `queue` container: after pulling new co
 `docker compose restart queue`, or emails may use old templates.
 
 An orange bar above the header announces the next published upcoming event on every public page
-("View Event" opens Events until the event detail page exists); it disappears when nothing is coming up.
+("View Event" opens that event's page); it disappears when nothing is coming up.
 
 The footer (contact details, social links, site map, copyright) is on every public page. Its address, phone,
 email and social handles are placeholders in `config/site.php`, or set them in `.env` with `SITE_ADDRESS`,
@@ -98,7 +99,9 @@ Uploaded images are served from `http://localhost:8080/storage/...` (files live 
 ## Demo data
 
 `docker compose exec app php artisan migrate:fresh --seed` creates 6 sample events (published, draft,
-cancelled, past and X events) so every screen has something to show. Re-run it to reset them.
+cancelled, past and X events) so every screen has something to show. Each demo event has a sample route
+map but no GPX file to download; upload a real `.gpx` in the CMS (Route section) to test the download.
+Re-run it to reset them. After pulling this feature run `docker compose exec app php artisan migrate`.
 
 The demo data has only 2 past events, so the Events page shows no "Load More" button. To get one, add
 8 random published past events:
@@ -135,6 +138,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Floating WhatsApp button | https://app.clickup.com/t/z8q7hbmpek |
 | SEO, performance & analytics | https://app.clickup.com/t/z8q7hbmpem |
 | Events listing page | https://app.clickup.com/t/z8q7hbmpep |
+| Event detail page | https://app.clickup.com/t/z8q7hbmpeq |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

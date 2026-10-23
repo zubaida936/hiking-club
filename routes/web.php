@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('events', [EventController::class, 'index'])->name('events.index');
+Route::get('events/{event:slug}', [EventController::class, 'show'])->name('events.show');
 
 Route::get('sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::get('robots.txt', [SeoController::class, 'robots'])->name('robots');

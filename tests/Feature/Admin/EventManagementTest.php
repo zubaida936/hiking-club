@@ -287,3 +287,90 @@ it('recalculates difficulty for all events via artisan', function () {
 
     expect($event->fresh()->effort_score)->toBe(90);
 });
+
+function gpxUpload(string $name = 'route.gpx'): UploadedFile
+{
+    return UploadedFile::fake()->createWithContent($name, <<<'GPX'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <gpx version="1.1" creator="test" xmlns="http://www.topografix.com/GPX/1/1">
+          <trk><trkseg>
+            <trkpt lat="34.29001" lon="35.95001"><ele>1500</ele></trkpt>
+            <trkpt lat="34.29502" lon="35.96003"><ele>1620</ele></trkpt>
+            <trkpt lat="34.30003" lon="35.97004"><ele>1580</ele></trkpt>
+          </trkseg></trk>
+        </gpx>
+        GPX);
+}
+
+describe('detail page fields', function () {
+    it('saves the itinerary and photo credit', function () {
+        $this->actingAs($this->admin)->post(route('admin.events.store'), eventPayload([
+            'itinerary' => "07:30 Departure\n\n09:00 Start\nLunch\nLunch",
+            'photo_credit' => '  Jane Hiker ',
+        ]))->assertSessionHasNoErrors();
+
+        $event = Event::firstOrFail();
+        expect($event->itinerary)->toBe(['07:30 Departure', '09:00 Start', 'Lunch', 'Lunch'])
+            ->and($event->photo_credit)->toBe('Jane Hiker');
+    });
+
+    it('uploads, replaces and removes the GPX track', function () {
+        $this->actingAs($this->admin)->post(route('admin.events.store'), eventPayload(['gpx_file' => gpxUpload()]))
+            ->assertSessionHasNoErrors();
+        $event = Event::firstOrFail();
+        $first = $event->gpx_path;
+        Storage::disk('public')->assertExists($first);
+        expect($event->route_points)->toBe([[34.29001, 35.95001], [34.29502, 35.96003], [34.30003, 35.97004]]);
+
+        $this->actingAs($this->admin)->put(route('admin.events.update', $event), eventPayload([
+            'slug' => $event->slug,
+            'gpx_file' => gpxUpload('new.gpx'),
+        ]));
+        $second = $event->fresh()->gpx_path;
+        Storage::disk('public')->assertMissing($first);
+        Storage::disk('public')->assertExists($second);
+
+        // Saving without a new file keeps the track.
+        $this->actingAs($this->admin)->put(route('admin.events.update', $event), eventPayload(['slug' => $event->slug]));
+        expect($event->fresh()->gpx_path)->toBe($second);
+
+        $this->actingAs($this->admin)->put(route('admin.events.update', $event), eventPayload([
+            'slug' => $event->slug,
+            'remove_gpx' => '1',
+        ]));
+        expect($event->fresh())->gpx_path->toBeNull()->route_points->toBeNull();
+        Storage::disk('public')->assertMissing($second);
+    });
+
+    it('rejects GPX files without a readable route', function (UploadedFile $file) {
+        $this->actingAs($this->admin)
+            ->post(route('admin.events.store'), eventPayload(['gpx_file' => $file]))
+            ->assertSessionHasErrors('gpx_file');
+
+        expect(Event::count())->toBe(0);
+    })->with([
+        'wrong extension' => fn () => UploadedFile::fake()->create('route.pdf', 10, 'application/pdf'),
+        'not xml' => fn () => UploadedFile::fake()->createWithContent('route.gpx', 'hello'),
+        'no points' => fn () => UploadedFile::fake()->createWithContent('route.gpx', '<gpx><trk><trkseg></trkseg></trk></gpx>'),
+    ]);
+
+    it('copies the GPX track when duplicating', function () {
+        Storage::disk('public')->put('events/gpx/original.gpx', '<gpx/>');
+        $event = Event::factory()->create(['gpx_path' => 'events/gpx/original.gpx', 'route_points' => [[34.1, 35.1], [34.2, 35.2]]]);
+
+        $this->actingAs($this->admin)->post(route('admin.events.duplicate', $event))->assertRedirect();
+
+        $copy = Event::latest('id')->firstOrFail();
+        expect($copy->gpx_path)->not->toBe('events/gpx/original.gpx')
+            ->and($copy->route_points)->toBe([[34.1, 35.1], [34.2, 35.2]]);
+        Storage::disk('public')->assertExists($copy->gpx_path);
+    });
+
+    it('links published events to their public page', function () {
+        $event = Event::factory()->published()->create();
+        $draft = Event::factory()->create();
+
+        $this->actingAs($this->admin)->get(route('admin.events.edit', $event))->assertSee(route('events.show', $event));
+        $this->actingAs($this->admin)->get(route('admin.events.edit', $draft))->assertDontSee('View on site');
+    });
+});

@@ -4,7 +4,6 @@ use App\Domain\Identity\Enums\Role;
 use App\Models\Event;
 use App\Models\Subscriber;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
 
 describe('meta tags', function () {
     it('gives every page a description, canonical URL and share tags', function () {
@@ -77,10 +76,7 @@ describe('sitemap.xml', function () {
             ->assertDontSee(route('about'), false);
     });
 
-    it('lists published events once the event page exists', function () {
-        Route::get('events/{event:slug}', fn () => 'event')->name('events.show');
-        Route::getRoutes()->refreshNameLookups();
-
+    it('lists published events', function () {
         $published = Event::factory()->published()->create(['slug' => 'qadisha-valley']);
         Event::factory()->create(['slug' => 'draft-hike']);
         Event::factory()->cancelled()->create(['slug' => 'cancelled-hike']);

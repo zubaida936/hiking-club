@@ -3,7 +3,6 @@
 namespace App\View\Components\Site;
 
 use App\Models\Event;
-use Illuminate\Support\Facades\Route;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
@@ -37,11 +36,11 @@ class AnnouncementBar extends Component
     }
 
     /**
-     * The event's own page once it exists; the events list until then.
+     * The event's own page.
      */
     public function url(): string
     {
-        return Route::has('events.show') ? route('events.show', $this->event) : route('events.index');
+        return route('events.show', $this->event);
     }
 
     public function render(): View

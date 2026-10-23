@@ -33,7 +33,11 @@ use Illuminate\Support\Facades\Storage;
  * @property int $capacity
  * @property ?list<string> $included
  * @property ?list<string> $what_to_bring
+ * @property ?list<string> $itinerary
  * @property ?string $cover_image_path
+ * @property ?string $photo_credit
+ * @property ?string $gpx_path
+ * @property ?list<array{float, float}> $route_points
  * @property bool $is_xtreme
  * @property EventStatus $status
  * @property ?Carbon $published_at
@@ -67,6 +71,8 @@ class Event extends Model
             'capacity' => 'integer',
             'included' => 'array',
             'what_to_bring' => 'array',
+            'itinerary' => 'array',
+            'route_points' => 'array',
             'is_xtreme' => 'boolean',
             'status' => EventStatus::class,
             'published_at' => 'datetime',
@@ -133,6 +139,19 @@ class Event extends Model
     }
 
     /**
+     * Events with a public page: published ones, plus cancelled ones that were public
+     * before, so shared links explain the cancellation instead of returning a 404.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeVisibleOnSite(Builder $query): void
+    {
+        $query->where(fn (Builder $q) => $q
+            ->where('status', EventStatus::Published)
+            ->orWhere(fn (Builder $q) => $q->where('status', EventStatus::Cancelled)->whereNotNull('published_at')));
+    }
+
+    /**
      * The next published event that hasn't happened yet (today counts).
      */
     public static function nextUpcoming(): ?self
@@ -168,8 +187,59 @@ class Event extends Model
         return rtrim(rtrim(number_format($this->distance_km, 1), '0'), '.').' km';
     }
 
+    public function isCancelled(): bool
+    {
+        return $this->status === EventStatus::Cancelled;
+    }
+
+    /**
+     * Same rule as scopeVisibleOnSite(), for an already loaded event.
+     */
+    public function isVisibleOnSite(): bool
+    {
+        return $this->isPublished() || ($this->isCancelled() && $this->published_at !== null);
+    }
+
+    /**
+     * Seats still available. Bookings don't exist yet, so this is the full capacity
+     * until the booking feature subtracts confirmed registrations.
+     */
+    public function seatsLeft(): int
+    {
+        return $this->capacity;
+    }
+
+    /**
+     * "6 h", "4.5 h"; null when the organizer left the duration empty.
+     */
+    public function formattedDuration(): ?string
+    {
+        return $this->duration_hours ? rtrim(rtrim(number_format($this->duration_hours, 1), '0'), '.').' h' : null;
+    }
+
+    /**
+     * Itinerary lines split into an optional leading time ("07:30", "7.30", "7h30") and the step.
+     *
+     * @return list<array{time: ?string, text: string}>
+     */
+    public function itinerarySteps(): array
+    {
+        return array_map(function (string $line) {
+            if (preg_match('/^(\d{1,2})[:.h](\d{2})\s*[-–—:]?\s*(.+)$/u', $line, $m) && (int) $m[1] < 24 && (int) $m[2] < 60) {
+                return ['time' => sprintf('%02d:%s', $m[1], $m[2]), 'text' => $m[3]];
+            }
+
+            return ['time' => null, 'text' => $line];
+        }, $this->itinerary ?? []);
+    }
+
     public function coverImageUrl(): ?string
     {
         return $this->cover_image_path ? Storage::disk('public')->url($this->cover_image_path) : null;
+    }
+
+    public function gpxUrl(): ?string
+    {
+        return $this->gpx_path ? Storage::disk('public')->url($this->gpx_path) : null;
     }
 }

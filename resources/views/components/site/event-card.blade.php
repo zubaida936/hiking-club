@@ -1,6 +1,5 @@
 @props(['event', 'past' => false])
 
-{{-- "View Details" appears once the event detail page (route events.show) exists. --}}
 <article {{ $attributes->class('flex flex-col overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-slate-200') }}>
     <div class="relative aspect-3/2 bg-linear-to-br from-brand-800 to-brand-500">
         @if ($event->coverImageUrl())
@@ -47,15 +46,13 @@
             </div>
         </dl>
 
-        @if (Route::has('events.show'))
-            <a href="{{ route('events.show', $event) }}"
-               @class([
-                   'mt-5 block rounded-full px-5 py-2.5 text-center font-display text-sm font-bold uppercase tracking-wide',
-                   'bg-accent-500 text-white hover:bg-accent-600' => ! $past,
-                   'border border-brand-600 text-brand-700 hover:bg-brand-50' => $past,
-               ])>
-                View Details<span class="sr-only">: {{ $event->title }}</span>
-            </a>
-        @endif
+        <a href="{{ route('events.show', $event) }}"
+           @class([
+               'mt-5 block rounded-full px-5 py-2.5 text-center font-display text-sm font-bold uppercase tracking-wide',
+               'bg-accent-500 text-white hover:bg-accent-600' => ! $past,
+               'border border-brand-600 text-brand-700 hover:bg-brand-50' => $past,
+           ])>
+            View Details<span class="sr-only">: {{ $event->title }}</span>
+        </a>
     </div>
 </article>

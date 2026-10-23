@@ -10,6 +10,7 @@ final readonly class EventData
     /**
      * @param  list<string>  $included
      * @param  list<string>  $whatToBring
+     * @param  list<string>  $itinerary
      * @param  list<MeetingPointData>  $meetingPoints
      */
     public function __construct(
@@ -28,9 +29,13 @@ final readonly class EventData
         public int $capacity,
         public array $included,
         public array $whatToBring,
+        public array $itinerary,
         public bool $isXtreme,
         public array $meetingPoints,
+        public ?string $photoCredit = null,
         public ?UploadedFile $coverImage = null,
         public bool $removeCoverImage = false,
+        public ?UploadedFile $gpxFile = null,
+        public bool $removeGpx = false,
     ) {}
 }

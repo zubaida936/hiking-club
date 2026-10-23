@@ -1,6 +1,5 @@
 @props(['event'])
 
-{{-- Links to the events page until the event detail page exists. --}}
 <article class="mx-auto grid max-w-5xl overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-slate-200 md:grid-cols-2">
     <div class="relative min-h-60 bg-linear-to-br from-brand-800 to-brand-500">
         @if ($event->coverImageUrl())
@@ -46,7 +45,7 @@
             </div>
         </dl>
 
-        <a href="{{ route('events.index') }}"
+        <a href="{{ route('events.show', $event) }}"
            class="mt-6 inline-block rounded-full bg-accent-500 px-6 py-3 text-center font-display font-bold uppercase tracking-wide text-white hover:bg-accent-600">
             Reserve Your Spot
         </a>

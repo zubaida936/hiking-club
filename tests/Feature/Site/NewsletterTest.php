@@ -210,7 +210,7 @@ describe('new event announcements', function () {
             ->assertSeeInHtml('Bcharre')
             ->assertSeeInHtml('$30')
             ->assertSeeInHtml($event->difficulty_level->label())
-            ->assertSeeInHtml(route('events.index'))
+            ->assertSeeInHtml(route('events.show', $event))
             ->assertSeeInHtml(route('newsletter.unsubscribe', $subscriber->token));
         expect($mail->headers()->text)->toHaveKey('List-Unsubscribe');
     });

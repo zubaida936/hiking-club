@@ -52,6 +52,19 @@ class EventController extends Controller
         ]);
     }
 
+    public function show(Event $event): View
+    {
+        // Drafts (including unpublished events) have no public page.
+        abort_unless($event->isVisibleOnSite(), 404);
+
+        $event->load('meetingPoints');
+
+        return view('site.events.show', [
+            'event' => $event,
+            'whatsappMessage' => "Hi! I have a question about \"{$event->title}\" on {$event->starts_on->format('D, j M Y')}: ".route('events.show', $event),
+        ]);
+    }
+
     /**
      * Months that have at least one published event, newest first, for the month filter.
      *

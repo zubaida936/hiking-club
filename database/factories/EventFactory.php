@@ -45,6 +45,7 @@ class EventFactory extends Factory
             'capacity' => fake()->randomElement([20, 30, 40]),
             'included' => ['Transportation', 'Reserve entrance', 'Guiding', 'Hiking assistants'],
             'what_to_bring' => ['Hiking shoes', '2L water', 'Snacks', 'Rain jacket'],
+            'itinerary' => ['07:30 Departure from Beirut', '09:30 Start of the hike', '12:30 Lunch break', '15:00 End of the hike', 'Drive back to Beirut'],
             'is_xtreme' => false,
             'status' => EventStatus::Draft,
         ];
