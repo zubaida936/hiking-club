@@ -236,17 +236,13 @@ describe('confirmation', function () {
 });
 
 describe('CMS', function () {
-    it('lists the registrations on the event screen', function () {
-        EventRegistration::factory()->for($this->event)->create(['name' => 'Rima Haddad', 'reference' => 'K7F3Q2MZ', 'notes' => 'Vegetarian']);
-        EventRegistration::factory()->cancelled()->for($this->event)->create(['name' => 'Cancelled Person']);
+    it('summarizes the registrations on the event screen', function () {
+        EventRegistration::factory()->for($this->event)->create();
+        EventRegistration::factory()->cancelled()->for($this->event)->create();
 
         $this->actingAs(userWithRole(Role::Admin))
             ->get(route('admin.events.edit', $this->event))
-            ->assertSee('Registrations')
             ->assertSee('1 / 20 seats taken')
-            ->assertSee('Rima Haddad')
-            ->assertSee('K7F3Q2MZ')
-            ->assertSee('Vegetarian')
-            ->assertSee('Cancelled Person');
+            ->assertSee(route('admin.events.registrations', $this->event));
     });
 });

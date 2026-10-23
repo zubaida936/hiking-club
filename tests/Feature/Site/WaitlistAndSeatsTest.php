@@ -147,8 +147,11 @@ describe('waitlist', function () {
         fillUp($this->event);
         EventRegistration::factory()->waitlisted()->for($this->event)->create(['name' => 'Patient Person']);
 
-        $this->actingAs(userWithRole(Role::Admin))->get(route('admin.events.edit', $this->event))
-            ->assertSee('2 / 2 seats taken · 1 on the waitlist')
+        $admin = userWithRole(Role::Admin);
+        $this->actingAs($admin)->get(route('admin.events.edit', $this->event))
+            ->assertSee('2 / 2 seats taken · 1 on the waitlist');
+
+        $this->actingAs($admin)->get(route('admin.events.registrations', $this->event))
             ->assertSee('Patient Person')
             ->assertSee('On the waitlist')
             ->assertSee('#1 in line');

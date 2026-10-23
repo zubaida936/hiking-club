@@ -69,7 +69,7 @@
                             <div class="text-xs text-slate-500">score {{ $event->effort_score }}</div>
                         </td>
                         <td class="px-4 py-3">{{ $event->formattedFee() }}</td>
-                        <td class="px-4 py-3">{{ $event->capacity }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap"><a href="{{ route('admin.events.registrations', $event) }}" class="hover:underline">{{ $event->seatsTaken() }} / {{ $event->capacity }}</a></td>
                         <td class="px-4 py-3"><x-admin.badge :classes="$event->status->badgeClasses()">{{ $event->status->label() }}</x-admin.badge></td>
                         <td class="px-4 py-3 text-right whitespace-nowrap">
                             <a href="{{ route('admin.events.edit', $event) }}" class="font-medium text-emerald-700 hover:underline">Edit</a>

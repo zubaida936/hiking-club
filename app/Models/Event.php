@@ -227,6 +227,14 @@ class Event extends Model
         return max(0, $this->capacity - $this->seatsTaken());
     }
 
+    /**
+     * True from the hike day on, in club time (for check-in / attendance).
+     */
+    public function hikeDayReached(): bool
+    {
+        return today(config('site.timezone'))->toDateString() >= $this->starts_on->toDateString();
+    }
+
     public function isSoldOut(): bool
     {
         return $this->seatsLeft() === 0;

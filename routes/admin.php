@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\StaffUserController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,5 +32,20 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('unpublish', 'unpublish')->name('unpublish');
         Route::post('cancel', 'cancel')->name('cancel');
         Route::post('duplicate', 'duplicate')->name('duplicate');
+    });
+
+    Route::controller(RegistrationController::class)->group(function () {
+        Route::get('registrations', 'index')->name('registrations.index');
+        Route::get('events/{event}/registrations', 'show')->name('events.registrations');
+        Route::get('events/{event}/registrations/export', 'export')->name('events.registrations.export');
+
+        Route::prefix('registrations/{registration}')->name('registrations.')->group(function () {
+            Route::get('edit', 'edit')->name('edit');
+            Route::put('/', 'update')->name('update');
+            Route::post('approve', 'approve')->name('approve');
+            Route::post('cancel', 'cancel')->name('cancel');
+            Route::post('payment', 'payment')->name('payment');
+            Route::post('attendance', 'attendance')->name('attendance');
+        });
     });
 });

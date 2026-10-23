@@ -13,6 +13,7 @@ use App\Domain\Events\Enums\DifficultyLevel;
 use App\Domain\Events\Enums\EventStatus;
 use App\Domain\Events\Exceptions\EventException;
 use App\Domain\Identity\Enums\Permission;
+use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\EventRequest;
 use App\Models\Event;
@@ -33,6 +34,7 @@ class EventController extends Controller
 
         $events = Event::query()
             ->withCount('meetingPoints')
+            ->withSeatCounts()
             ->search($request->string('q')->trim()->toString() ?: null)
             ->when($status, fn ($q) => $q->where('status', $status))
             ->when($level, fn ($q) => $q->where('difficulty_level', $level))
@@ -81,7 +83,7 @@ class EventController extends Controller
         $event->load('meetingPoints', 'creator', 'editor');
 
         if ($request->user()?->can(Permission::ViewRegistrations->value)) {
-            $event->load(['registrations' => fn ($q) => $q->orderBy('created_at')->orderBy('id')]);
+            $event->loadSeatCount()->loadCount(['registrations as waitlisted_count' => fn ($q) => $q->where('status', RegistrationStatus::Waitlisted)]);
         }
 
         return view('admin.events.edit', ['event' => $event, 'calculator' => $difficulty->toArray()]);

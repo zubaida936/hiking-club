@@ -114,7 +114,13 @@ To check the mobile menu, make the browser narrower than 1024 px (or press F12 �
 | Events — upcoming only | http://localhost:8080/admin/events?when=upcoming | Super Admin, Admin |
 | Events — new event | http://localhost:8080/admin/events/create | Super Admin, Admin |
 | Events — edit / publish / cancel / duplicate | http://localhost:8080/admin/events/{id}/edit (click an event title) | Super Admin, Admin |
-| Events — registrations | bottom of the event edit screen (who booked, pickup, emergency contact, notes, status) | Super Admin, Admin |
+| Registrations — events overview | http://localhost:8080/admin/registrations (Upcoming / Past tabs: seats, approvals, waitlist, paid, attended) | Super Admin, Admin, Guide |
+| Registrations — one event | click an event there, or "Manage registrations" on the event edit screen → `/admin/events/{id}/registrations`: filter by pickup point / status / search, approve, edit, cancel, mark paid, attendance, WhatsApp list, Export CSV | Admin: everything · Guide: view, WhatsApp list, CSV, attendance |
+| Registrations — edit a booking | "Edit" on a row → `/admin/registrations/{id}/edit` | Super Admin, Admin |
+
+To try the Guide view of registrations, create a user with the Guide role in Staff & roles and log in as them.
+Attendance buttons appear from the hike day (Lebanon time): to test them now, set an event's date to today in the CMS.
+Cancelling a booking emails the hiker (Mailpit) and gives the seat to the first person on the waitlist.
 
 Uploaded images are served from `http://localhost:8080/storage/...` (files live in `storage/app/public`).
 
@@ -163,6 +169,8 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Event detail page | https://app.clickup.com/t/z8q7hbmpeq |
 | Registration / booking flow | https://app.clickup.com/t/z8q7hbmpet |
 | Seat capacity, waitlist & sold-out status | https://app.clickup.com/t/z8q7hbmpeu |
+| Meeting points & pickup times | https://app.clickup.com/t/z8q7hbmper |
+| Manage registrations & attendance | https://app.clickup.com/t/z8q7hbmpfq |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
 use Database\Factories\EventRegistrationFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,6 +27,12 @@ use Illuminate\Support\Carbon;
  * @property ?string $notes
  * @property Carbon $terms_accepted_at
  * @property ?Carbon $level_acknowledged_at
+ * @property ?Carbon $paid_at
+ * @property ?Attendance $attendance
+ * @property ?Carbon $attendance_marked_at
+ * @property ?Carbon $cancelled_at
+ * @property ?string $cancellation_reason
+ * @property ?int $updated_by
  * @property Carbon $created_at
  */
 class EventRegistration extends Model
@@ -46,6 +53,10 @@ class EventRegistration extends Model
             'status' => RegistrationStatus::class,
             'terms_accepted_at' => 'datetime',
             'level_acknowledged_at' => 'datetime',
+            'paid_at' => 'datetime',
+            'attendance' => Attendance::class,
+            'attendance_marked_at' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 
@@ -70,6 +81,32 @@ class EventRegistration extends Model
     public function isPending(): bool
     {
         return $this->status === RegistrationStatus::Pending;
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function editor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function isConfirmed(): bool
+    {
+        return $this->status === RegistrationStatus::Confirmed;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === RegistrationStatus::Cancelled;
+    }
+
+    /**
+     * Confirmed and awaiting-approval bookings hold a seat.
+     */
+    public function holdsSeat(): bool
+    {
+        return in_array($this->status, RegistrationStatus::active(), true);
     }
 
     public function isWaitlisted(): bool

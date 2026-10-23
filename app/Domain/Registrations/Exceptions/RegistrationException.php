@@ -28,4 +28,34 @@ final class RegistrationException extends DomainException
     {
         return new self('Please confirm that you meet the level requirements for this hike.');
     }
+
+    public static function phoneTaken(): self
+    {
+        return new self('Another booking for this hike already uses this phone number.');
+    }
+
+    public static function notPending(): self
+    {
+        return new self('Only bookings awaiting approval can be approved.');
+    }
+
+    public static function alreadyCancelled(): self
+    {
+        return new self('This booking is already cancelled.');
+    }
+
+    public static function cancelledCannotChange(): self
+    {
+        return new self('This booking is cancelled and can no longer be changed.');
+    }
+
+    public static function attendanceBeforeHikeDay(): self
+    {
+        return new self('Attendance can be marked from the day of the hike.');
+    }
+
+    public static function attendanceNeedsConfirmedBooking(): self
+    {
+        return new self('Only confirmed bookings can be marked as attended or no-show.');
+    }
 }
