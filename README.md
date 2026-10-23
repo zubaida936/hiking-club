@@ -51,6 +51,12 @@ docker compose exec app vendor/bin/phpstan analyse # static analysis (Larastan l
 
 Recommended: protect `main` and require the CI checks to pass before merging.
 
+## Documentation
+
+- [TESTING.md](TESTING.md): every page, login and link to try while testing.
+- [docs/payments.md](docs/payments.md): how hikers pay, testing online payments with the test gateway, going live with Whish Money / OMT.
+- [docs/open-decisions.md](docs/open-decisions.md): decisions the club still has to take, placeholders to replace, known gaps.
+
 ## Architecture
 
 A modular monolith. See [CLAUDE.md](CLAUDE.md) for the layer conventions.

@@ -94,7 +94,8 @@ X event bookings are "Awaiting approval" and still take a seat; waitlist entries
   page (once the seat is confirmed) → test payment page with Pay / Fail → back to the booking, paid automatically.
   Wallet names/numbers are placeholders: `PAYMENT_WHISH_*` / `PAYMENT_OMT_*` in `.env`. Online payment uses the built-in
   **test gateway** when `PAYMENT_ONLINE_GATEWAY=test` (set in your local `.env`; never in production) until Whish/OMT
-  give the club merchant API access.
+  give the club merchant API access. Step-by-step test and go-live guide: [docs/payments.md](docs/payments.md).
+  Open decisions and known gaps: [docs/open-decisions.md](docs/open-decisions.md).
 - One booking (or waitlist entry) per phone number per hike. Payment and terms texts are placeholders in
   `config/site.php` → `booking`. After pulling: `php artisan migrate` and `docker compose restart queue`.
 
