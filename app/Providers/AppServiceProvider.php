@@ -6,6 +6,7 @@ use App\Domain\Events\Difficulty\DifficultyCalculator;
 use App\Domain\Events\Events\EventPublished;
 use App\Domain\Identity\Enums\Role;
 use App\Domain\Loyalty\Listeners\SyncPointsForRegistration;
+use App\Domain\Members\Codes\CodeChannel;
 use App\Domain\Newsletter\Listeners\AnnounceNewEvent;
 use App\Domain\Registrations\Events\AttendanceMarked;
 use App\Domain\Registrations\Events\RegistrationChanged;
@@ -23,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(DifficultyCalculator::class, fn () => DifficultyCalculator::fromConfig());
+
+        // config/members.php picks how one-time codes reach members (mail today, SMS/WhatsApp later).
+        $this->app->bind(CodeChannel::class, fn ($app) => $app->make(config('members.code_channels.'.config('members.code_channel'))));
     }
 
     /**

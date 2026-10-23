@@ -30,7 +30,11 @@ it('shows every menu item in the header', function () use ($menu) {
 
 it('has a working page behind every header link', function (string $route) {
     $this->get(route($route))->assertOk()->assertSee('Reserve Your Spot');
-})->with([...array_values($menu), 'account', 'cart']);
+})->with([...array_values($menu), 'login', 'cart']);
+
+it('sends guests from the account icon to the member login', function () {
+    $this->get(route('account'))->assertRedirect(route('login'));
+});
 
 it('marks the current page in the menu', function () {
     $html = $this->get(route('about'))->assertOk()->getContent();

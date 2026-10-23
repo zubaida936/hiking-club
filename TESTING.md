@@ -8,6 +8,7 @@ Everything you can open while testing. Start the stack first: `docker compose up
 | Account | Login | Password |
 |---|---|---|
 | CMS super admin | `admin@hiking.test` | `password` |
+| Member (after you activate one) | phone you booked with | the password you chose |
 | phpMyAdmin | automatic (root) | — |
 | MySQL from a desktop client (HeidiSQL, DBeaver, Workbench) | host `127.0.0.1`, port `33060`, user `hiking` (or `root`) | `secret` (root: `root`) |
 
@@ -38,7 +39,6 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 | Hiker's Guide → Difficulty Calculator | http://localhost:8080/difficulty-calculator | Coming soon |
 | Hiker's Guide → Equipment Guide | http://localhost:8080/equipment | Coming soon |
 | Hiker's Guide → Guides | http://localhost:8080/guides | Coming soon |
-| My account (person icon) | http://localhost:8080/account | Coming soon |
 | Cart (cart icon) | http://localhost:8080/cart | Coming soon |
 | Privacy Policy (footer) | http://localhost:8080/privacy-policy | Coming soon |
 
@@ -55,6 +55,20 @@ A green WhatsApp button floats in the bottom-right corner of every public page a
 | Default share image | http://localhost:8080/images/og-default.jpg (placeholder, 1200×630) |
 | Share preview check | view page source and look for `og:` tags, or paste the live URL into https://www.opengraph.xyz once deployed |
 | Analytics | set `GOOGLE_ANALYTICS_ID=G-...` in `.env` + `php artisan config:clear`; never loaded in the CMS |
+
+### Member accounts
+
+| What | Link |
+|---|---|
+| Log in (phone + password) | http://localhost:8080/login (also the person icon in the header) |
+| Activate an account | http://localhost:8080/activate: phone you booked with + a booking reference, then choose a password |
+| Forgot password | http://localhost:8080/forgot-password: a 6-digit code goes to the email on the account (Mailpit) |
+| My account | http://localhost:8080/account: points, rank tier, leaderboard position, upcoming hikes, latest points |
+
+To try it with demo data: book any upcoming hike (or use a demo hiker: phpMyAdmin → `event_registrations`, take a
+`phone` + `reference` pair), activate with them, then log in. No open signup: only phone numbers with a booking can
+activate. Codes can go to the log instead of email with `MEMBER_CODE_CHANNEL=log` in `.env` (local only).
+SMS/WhatsApp codes need a provider (not chosen yet); members without an email are pointed to WhatsApp.
 
 ### Booking (Registration)
 
@@ -186,6 +200,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Manage registrations & attendance | https://app.clickup.com/t/z8q7hbmpfq |
 | Points engine | https://app.clickup.com/t/z8q7hbmpf3 |
 | Rank tiers | https://app.clickup.com/t/z8q7hbmpf4 |
+| Login & account activation | https://app.clickup.com/t/z8q7hbmpf1 |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

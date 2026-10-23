@@ -24,9 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => EnsureCanAccessAdmin::class,
         ]);
 
-        // Until the member area exists, unauthenticated users go to the CMS login.
-        $middleware->redirectGuestsTo(fn () => route('admin.login'));
-        $middleware->redirectUsersTo(fn () => route('admin.dashboard'));
+        // CMS pages send guests to the staff login; the public site to the member login.
+        $isCms = fn (Request $request) => $request->is(trim((string) config('cms.path'), '/'), trim((string) config('cms.path'), '/').'/*');
+        $middleware->redirectGuestsTo(fn (Request $request) => $isCms($request) ? route('admin.login') : route('login'));
+        $middleware->redirectUsersTo(fn (Request $request) => $isCms($request) && $request->user()?->canAccessAdmin()
+            ? route('admin.dashboard')
+            : route('account'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

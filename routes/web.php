@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Site\AccountController;
+use App\Http\Controllers\Site\Auth\ActivationController;
+use App\Http\Controllers\Site\Auth\MemberSessionController;
+use App\Http\Controllers\Site\Auth\PasswordResetController;
 use App\Http\Controllers\Site\EventController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\NewsletterController;
@@ -15,6 +19,31 @@ Route::controller(RegistrationController::class)->group(function () {
     Route::get('events/{event:slug}/register', 'create')->name('events.register');
     Route::post('events/{event:slug}/register', 'store')->middleware('throttle:5,1')->name('events.register.store');
     Route::get('bookings/{registration:token}', 'show')->name('registrations.show');
+});
+
+// Member accounts: no open signup; hikers who booked activate an account, then log in with phone + password.
+Route::middleware('guest')->group(function () {
+    Route::get('login', [MemberSessionController::class, 'create'])->name('login');
+    Route::post('login', [MemberSessionController::class, 'store'])->name('login.store');
+
+    Route::controller(ActivationController::class)->prefix('activate')->name('activate')->group(function () {
+        Route::get('/', 'create')->name('');
+        Route::post('/', 'verify')->middleware('throttle:5,1')->name('.verify');
+        Route::get('password', 'password')->name('.password');
+        Route::post('password', 'store')->name('.store');
+    });
+
+    Route::controller(PasswordResetController::class)->name('password.')->group(function () {
+        Route::get('forgot-password', 'create')->name('request');
+        Route::post('forgot-password', 'send')->middleware('throttle:3,1')->name('email');
+        Route::get('reset-password', 'edit')->name('reset');
+        Route::post('reset-password', 'update')->middleware('throttle:10,1')->name('update');
+    });
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('account', AccountController::class)->name('account');
+    Route::post('logout', [MemberSessionController::class, 'destroy'])->name('logout');
 });
 
 Route::get('sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
@@ -38,7 +67,6 @@ $placeholders = [
     'difficulty-calculator' => ['guide.difficulty', 'Difficulty Calculator'],
     'equipment' => ['guide.equipment', 'Equipment Guide'],
     'guides' => ['guide.articles', 'Guides'],
-    'account' => ['account', 'My Account'],
     'cart' => ['cart', 'Cart'],
     'privacy-policy' => ['legal.privacy', 'Privacy Policy'],
 ];
