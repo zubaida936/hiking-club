@@ -9,6 +9,8 @@ enum PointType: string
     case Referral = 'referral';
     // Manual correction by an organizer.
     case Adjustment = 'adjustment';
+    // One-time bonus that comes with a rank (config/rewards.php, kind bonus_points).
+    case RankBonus = 'rank_bonus';
 
     public function label(): string
     {
@@ -17,6 +19,7 @@ enum PointType: string
             self::EarlyBooking => 'Early booking',
             self::Referral => 'New hiker brought',
             self::Adjustment => 'Adjustment',
+            self::RankBonus => 'Rank bonus',
         };
     }
 

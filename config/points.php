@@ -38,14 +38,6 @@ return [
         'elite' => 700,
     ],
 
-    // What each tier unlocks, shown on the member dashboard (from ClickUp "Rewards per tier & redemption").
-    // Informational until that task adds redemption: members ask an organizer to use a reward.
-    'tier_rewards' => [
-        'pathfinder' => [],
-        'trekker' => ['50% off one hike (after 5 paid hikes)'],
-        'mountaineer' => ['One free Moderate (Level 2) hike', '+5 bonus points'],
-        'highlander' => ['15% off two Challenging (Level 3) hikes', 'Gift card', 'Winter bonus'],
-        'elite' => ['One free hike', 'Eligible for Xtreme hikes', 'Invite-only events'],
-    ],
+    // What each tier unlocks: see config/rewards.php.
 
 ];

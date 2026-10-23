@@ -44,12 +44,24 @@ enum RankTier: string
         return $cases[$index + 1] ?? null;
     }
 
+    public function isAtLeast(self $tier): bool
+    {
+        $order = array_flip(array_map(fn (self $t) => $t->value, self::cases()));
+
+        return $order[$this->value] >= $order[$tier->value];
+    }
+
     /**
+     * Labels of the rewards this rank unlocks (config/rewards.php).
+     *
      * @return list<string>
      */
     public function rewards(): array
     {
-        return array_values((array) config("points.tier_rewards.{$this->value}", []));
+        return array_values(array_map(
+            fn (array $reward) => (string) $reward['label'],
+            array_filter((array) config('rewards'), fn (array $reward) => ($reward['tier'] ?? null) === $this->value),
+        ));
     }
 
     public function badgeClasses(): string

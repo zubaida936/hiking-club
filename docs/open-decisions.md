@@ -37,9 +37,10 @@ Update this file when one is settled. Last reviewed: 2026-10-23.
   Lebanon time; `config/site.php` → `booking.paid_cancellation_days`). A cancelled paid booking shows **Refund due** in
   CMS → Registrations until an organizer pays the hiker back and clicks **Mark refunded**. No cancellation fee.
   Changing a booking (pickup point, details) is still done by organizers in the CMS.
-- **Tier rewards are informational**: the dashboard shows what each rank unlocks (`config/points.php` →
-  `tier_rewards`, copied from the ClickUp task), but there is no redemption yet; members ask an organizer.
-  → "Rewards per tier & redemption".
+- **Rewards** work as described in [docs/rewards.md](rewards.md). Still to define by the club: what the Highlander
+  "gift card" and "winter bonus" are (organizers hand them over and record it), and the "invite-only events" for
+  Elite (no such events exist yet, shown only). Interpretation used: "after 5 paid hikes" for Trekker = 5 completed
+  hikes (attended), free or paid.
 - **Waitlist promotion** happens when an organizer raises the capacity or cancels a booking; there is no automatic
   expiry for unpaid bookings.
 - **X event approval** of bookings is per booking in CMS → Registrations; the X application process itself is in

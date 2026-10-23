@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Site;
 
 use App\Domain\Registrations\Actions\RegisterForEvent;
 use App\Domain\Registrations\Exceptions\RegistrationException;
+use App\Domain\Rewards\Exceptions\RewardException;
+use App\Domain\Rewards\HikerRewards;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Site\RegistrationRequest;
 use App\Models\Event;
@@ -15,16 +17,18 @@ use Illuminate\View\View;
 
 class RegistrationController extends Controller
 {
-    public function create(Request $request, Event $event): View
+    public function create(Request $request, Event $event, HikerRewards $rewards): View
     {
         abort_unless($event->isVisibleOnSite(), 404);
 
         $event->load('meetingPoints')->loadSeatCount();
+        $member = $request->user()?->hiker;
 
         return view('site.registrations.create', [
             'event' => $event,
-            // Logged-in members get their details filled in.
-            'member' => $request->user()?->hiker,
+            // Logged-in members get their details filled in, and can use a reward.
+            'member' => $member,
+            'rewards' => $member ? $rewards->discountsFor($member, $event) : [],
         ]);
     }
 
@@ -32,7 +36,7 @@ class RegistrationController extends Controller
     {
         try {
             $registration = $action->handle($event, $request->toData());
-        } catch (RegistrationException $e) {
+        } catch (RegistrationException|RewardException $e) {
             return back()->withInput()->with('error', $e->getMessage());
         }
 

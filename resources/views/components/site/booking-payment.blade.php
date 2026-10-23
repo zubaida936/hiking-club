@@ -8,9 +8,9 @@
 @endphp
 
 {{-- What the hiker still has to do to pay for this booking. --}}
-@if ($event->fee_cents > 0 && ! $registration->isCancelled())
+@if ($registration->amountDueCents() > 0 && ! $registration->isCancelled())
     <section aria-labelledby="payment-heading" class="mt-8 rounded-2xl border border-slate-200 p-6">
-        <h2 id="payment-heading" class="font-display text-xl font-bold uppercase tracking-wide text-brand-900">Payment · {{ $event->formattedFee() }}</h2>
+        <h2 id="payment-heading" class="font-display text-xl font-bold uppercase tracking-wide text-brand-900">Payment · {{ $registration->formattedAmountDue() }}</h2>
 
         @if ($registration->paid_at)
             <p class="mt-3 font-semibold text-brand-700">✓ Paid{{ $method ? ' ('.$method->label().')' : '' }}. Thank you!</p>
@@ -20,11 +20,11 @@
             <p class="mt-3 text-slate-600">Pay securely online by card or wallet.</p>
             <form method="POST" action="{{ route('registrations.pay', $registration) }}" class="mt-4">
                 @csrf
-                <button class="rounded-full bg-accent-500 px-8 py-3 font-display font-bold uppercase tracking-wide text-white hover:bg-accent-600">Pay {{ $event->formattedFee() }} now</button>
+                <button class="rounded-full bg-accent-500 px-8 py-3 font-display font-bold uppercase tracking-wide text-white hover:bg-accent-600">Pay {{ $registration->formattedAmountDue() }} now</button>
             </form>
         @elseif ($method?->isWalletTransfer())
             <ol class="mt-3 list-decimal space-y-1 pl-5 text-slate-700">
-                <li>Open <strong>{{ $method === PaymentMethod::Whish ? 'Whish Money' : 'OMT Pay' }}</strong> and send <strong>{{ $event->formattedFee() }}</strong> to
+                <li>Open <strong>{{ $method === PaymentMethod::Whish ? 'Whish Money' : 'OMT Pay' }}</strong> and send <strong>{{ $registration->formattedAmountDue() }}</strong> to
                     <strong>{{ $method->accountName() }}</strong>, <strong class="whitespace-nowrap">{{ $method->accountNumber() }}</strong>.</li>
                 <li>Write your booking reference <strong>{{ $registration->reference }}</strong> in the transfer note.</li>
                 <li>Enter the transaction number below so we can confirm your payment faster.</li>
@@ -42,7 +42,7 @@
                 </button>
             </form>
         @elseif ($method === PaymentMethod::Cash)
-            <p class="mt-3 text-slate-600">Pay <strong>{{ $event->formattedFee() }}</strong> in cash to the organizers at the pickup point.</p>
+            <p class="mt-3 text-slate-600">Pay <strong>{{ $registration->formattedAmountDue() }}</strong> in cash to the organizers at the pickup point.</p>
         @else
             <p class="mt-3 text-slate-600">{{ config('site.booking.payment_note') }}</p>
         @endif

@@ -64,7 +64,7 @@ A green WhatsApp button floats in the bottom-right corner of every public page a
 | Log in (phone + password) | http://localhost:8080/login (also the person icon in the header) |
 | Activate an account | http://localhost:8080/activate: phone you booked with + a booking reference, then choose a password |
 | Forgot password | http://localhost:8080/forgot-password: a 6-digit code goes to the email on the account (Mailpit) |
-| My account (member dashboard) | http://localhost:8080/account: rank + progress bar to the next rank, points, hikes completed, km, leaderboard position, upcoming hikes (payment state; cancel: unpaid while bookings are open, paid until 2 days before the hike → "Refund due" in the CMS), hike history with points per hike, rewards per rank (unlocked / locked), latest points. Demo login: `+96170000001` / `demo-pass-1` (Rima, after you activated her or on this dev DB) |
+| My account (member dashboard) | http://localhost:8080/account: rank + progress bar to the next rank, points, hikes completed, km, leaderboard position, upcoming hikes (payment state; cancel: unpaid while bookings are open, paid until 2 days before the hike → "Refund due" in the CMS), hike history with points per hike, rewards (available / locked with what is missing / used), discounts chosen on the booking form, latest points. Demo login: `+96170000001` / `demo-pass-1` (Rima, after you activated her or on this dev DB) |
 
 To try it with demo data: book any upcoming hike (or use a demo hiker: phpMyAdmin → `event_registrations`, take a
 `phone` + `reference` pair), activate with them, then log in. No open signup: only phone numbers with a booking can
@@ -141,7 +141,7 @@ To check the mobile menu, make the browser narrower than 1024 px (or press F12 �
 | Registrations — one event | click an event there, or "Manage registrations" on the event edit screen → `/admin/events/{id}/registrations`: filter by pickup point / status / search, approve, edit, cancel, mark paid, attendance, WhatsApp list, Export CSV | Admin: everything · Guide: view, WhatsApp list, CSV, attendance |
 | Registrations — edit a booking | "Edit" on a row → `/admin/registrations/{id}/edit` | Super Admin, Admin |
 | Points — hikers by rank | http://localhost:8080/admin/points (rank, tier, points, hikes, km; search by name or phone) | Super Admin, Admin |
-| Points — one hiker | click a hiker → history (every line with reason), bookings, "Adjust points" form | Super Admin, Admin |
+| Points — one hiker | click a hiker → history (every line with reason), bookings, rewards (uses, "Mark handed over" for gift card / winter bonus), "Adjust points" form | Super Admin, Admin |
 
 To try the Guide view of registrations, create a user with the Guide role in Staff & roles and log in as them.
 Attendance buttons appear from the hike day (Lebanon time): to test them now, set an event's date to today in the CMS.
@@ -213,6 +213,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Event payments | https://app.clickup.com/t/z8q7hbmpev |
 | Member dashboard | https://app.clickup.com/t/z8q7hbmpf2 |
 | Public leaderboard | https://app.clickup.com/t/z8q7hbmpf7 |
+| Rewards per tier & redemption | https://app.clickup.com/t/z8q7hbmpf5 |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

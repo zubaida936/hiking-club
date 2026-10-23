@@ -6,6 +6,10 @@ use App\Domain\Members\Actions\ResolveHiker;
 use App\Domain\Registrations\Data\RegistrationData;
 use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Domain\Registrations\Exceptions\RegistrationException;
+use App\Domain\Rewards\Exceptions\RewardException;
+use App\Domain\Rewards\HikerRewards;
+use App\Domain\Rewards\Reward;
+use App\Domain\Rewards\RewardCatalog;
 use App\Mail\RegistrationConfirmationMail;
 use App\Models\Event;
 use App\Models\EventRegistration;
@@ -27,7 +31,11 @@ final class RegisterForEvent
      */
     private const REFERENCE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
-    public function __construct(private readonly ResolveHiker $resolveHiker) {}
+    public function __construct(
+        private readonly ResolveHiker $resolveHiker,
+        private readonly RewardCatalog $catalog,
+        private readonly HikerRewards $rewards,
+    ) {}
 
     public function handle(Event $event, RegistrationData $data): EventRegistration
     {
@@ -45,18 +53,25 @@ final class RegisterForEvent
                 throw RegistrationException::alreadyRegistered();
             }
 
-            $status = match (true) {
-                ! $event->isSoldOut() => $event->is_xtreme ? RegistrationStatus::Pending : RegistrationStatus::Confirmed,
-                $event->waitlist_enabled => RegistrationStatus::Waitlisted,
-                default => throw RegistrationException::soldOut(),
-            };
-
             $pickup = $data->meetingPointId !== null ? $event->meetingPoints()->find($data->meetingPointId) : null;
             $hiker = $this->resolveHiker->handle($data->phone, $data->name, $data->email);
             // Unknown numbers are ignored: only existing hikers can earn the referral bonus.
             $referrerId = $data->referrerPhone !== null ? Hiker::where('phone', $data->referrerPhone)->value('id') : null;
+            // Rank perks and rewards only for the logged-in member's own booking.
+            $ownBooking = $data->memberHikerId !== null && $data->memberHikerId === $hiker->id;
+            $reward = $this->chooseReward($data, $event, $hiker, $ownBooking);
 
-            return $event->registrations()->create([
+            $status = match (true) {
+                ! $event->isSoldOut() => $event->is_xtreme && ! ($ownBooking && $this->rewards->has($hiker, Reward::XTREME))
+                    ? RegistrationStatus::Pending
+                    : RegistrationStatus::Confirmed,
+                $event->waitlist_enabled => RegistrationStatus::Waitlisted,
+                default => throw RegistrationException::soldOut(),
+            };
+
+            $discount = $reward?->discountCents($event->fee_cents) ?? 0;
+
+            $registration = $event->registrations()->create([
                 'hiker_id' => $hiker->id,
                 'referred_by_hiker_id' => $referrerId !== $hiker->id ? $referrerId : null,
                 'reference' => $this->uniqueReference(),
@@ -70,10 +85,21 @@ final class RegisterForEvent
                 'emergency_contact_name' => $data->emergencyContactName,
                 'emergency_contact_phone' => $data->emergencyContactPhone,
                 'notes' => $data->notes,
-                'payment_method' => $event->fee_cents > 0 ? $data->paymentMethod : null,
+                'amount_due_cents' => $reward ? $event->fee_cents - $discount : null,
+                'payment_method' => $event->fee_cents - $discount > 0 ? $data->paymentMethod : null,
                 'terms_accepted_at' => now(),
                 'level_acknowledged_at' => $event->requiresLevelAcknowledgement() ? now() : null,
             ]);
+
+            if ($reward) {
+                $hiker->rewardRedemptions()->create([
+                    'reward' => $reward->key,
+                    'event_registration_id' => $registration->id,
+                    'discount_cents' => $discount,
+                ]);
+            }
+
+            return $registration;
         });
 
         if ($registration->email !== null) {
@@ -81,6 +107,32 @@ final class RegisterForEvent
         }
 
         return $registration;
+    }
+
+    /**
+     * @throws RewardException
+     */
+    private function chooseReward(RegistrationData $data, Event $event, Hiker $hiker, bool $ownBooking): ?Reward
+    {
+        if ($data->rewardKey === null) {
+            return null;
+        }
+        if (! $ownBooking) {
+            throw RewardException::onlyOwnBooking();
+        }
+
+        $reward = $this->catalog->find($data->rewardKey);
+        if ($reward === null || ! $reward->isDiscountFor($event)) {
+            throw RewardException::notForThisHike();
+        }
+
+        // Lock the hiker so two bookings at once can't both use the last use of a reward.
+        Hiker::whereKey($hiker->id)->lockForUpdate()->first();
+        if (! $this->rewards->isAvailable($hiker, $reward)) {
+            throw RewardException::notAvailable();
+        }
+
+        return $reward;
     }
 
     private function uniqueReference(): string

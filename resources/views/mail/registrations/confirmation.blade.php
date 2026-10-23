@@ -33,20 +33,20 @@ Thanks, {{ $registration->name }}! Your seat on **{{ $event->title }}** is confi
 | **Pickup** | {{ $registration->pickup_point }} at {{ $registration->pickupTimeShort() }} (Lebanon time) |
 @endif
 | **Level** | {{ $event->difficulty_level->label() }} |
-| **Fee** | {{ $event->formattedFee() }} |
+| **Fee** | {{ $registration->formattedAmountDue() }}{{ $registration->amount_due_cents !== null && $registration->amount_due_cents < $event->fee_cents ? " (reward used, instead of {$event->formattedFee()})" : "" }} |
 </x-mail::table>
 
-@if ($event->fee_cents > 0 && $registration->paid_at === null)
+@if ($registration->amountDueCents() > 0 && $registration->paid_at === null)
 @switch($registration->payment_method?->value)
 @case('whish')
 @case('omt')
-**Payment:** send {{ $event->formattedFee() }} by {{ $registration->payment_method->label() }} to {{ $registration->payment_method->accountName() }}, {{ $registration->payment_method->accountNumber() }}, with your booking reference {{ $registration->reference }} in the note{{ $registration->isConfirmed() ? '' : ' once your seat is confirmed' }}.
+**Payment:** send {{ $registration->formattedAmountDue() }} by {{ $registration->payment_method->label() }} to {{ $registration->payment_method->accountName() }}, {{ $registration->payment_method->accountNumber() }}, with your booking reference {{ $registration->reference }} in the note{{ $registration->isConfirmed() ? '' : ' once your seat is confirmed' }}.
 @break
 @case('cash')
-**Payment:** {{ $event->formattedFee() }} in cash to the organizers at the pickup point.
+**Payment:** {{ $registration->formattedAmountDue() }} in cash to the organizers at the pickup point.
 @break
 @case('online')
-**Payment:** pay {{ $event->formattedFee() }} online from your booking page{{ $registration->isConfirmed() ? '' : ' once your seat is confirmed' }}.
+**Payment:** pay {{ $registration->formattedAmountDue() }} online from your booking page{{ $registration->isConfirmed() ? '' : ' once your seat is confirmed' }}.
 @break
 @default
 {{ config('site.booking.payment_note') }}

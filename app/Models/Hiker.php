@@ -60,6 +60,14 @@ class Hiker extends Model
     }
 
     /**
+     * @return HasMany<RewardRedemption, $this>
+     */
+    public function rewardRedemptions(): HasMany
+    {
+        return $this->hasMany(RewardRedemption::class);
+    }
+
+    /**
      * @return HasMany<PointTransaction, $this>
      */
     public function pointTransactions(): HasMany

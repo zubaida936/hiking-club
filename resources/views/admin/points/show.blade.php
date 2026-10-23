@@ -67,6 +67,45 @@
                 </dl>
             </section>
 
+            <section class="rounded-lg bg-white p-6 shadow-sm">
+                <h2 class="mb-3 font-semibold">Rewards</h2>
+                <ul class="space-y-3 text-sm">
+                    @foreach ($rewards as $state)
+                        @php($reward = $state['reward'])
+                        @continue($reward->kind === \App\Domain\Rewards\Reward::INFO)
+                        <li>
+                            <div class="flex justify-between gap-2">
+                                <span @class(['font-medium', 'text-slate-400' => ! $state['unlocked']])>{{ $reward->label }}</span>
+                                <span class="shrink-0 text-xs text-slate-500">
+                                    {{ $reward->tier->label() }}
+                                    @if ($reward->isCountable()) · {{ $state['uses_left'] }}/{{ $reward->uses }} left @endif
+                                </span>
+                            </div>
+                            @unless ($state['unlocked'])
+                                <p class="text-xs text-slate-400">{{ $state['locked_reason'] }}</p>
+                            @endunless
+                            @foreach ($state['redemptions'] as $use)
+                                <p class="text-xs text-slate-500">
+                                    ✓ {{ $use->created_at->setTimezone(config('site.timezone'))->format('M d, Y') }}
+                                    @if ($use->registration) · {{ $use->registration->event->title }} ({{ $use->registration->reference }}, −${{ number_format($use->discount_cents / 100, 2) }}) @endif
+                                    @if ($use->note) · {{ $use->note }} @endif
+                                </p>
+                            @endforeach
+                            @if ($reward->kind === \App\Domain\Rewards\Reward::PERK && $state['unlocked'] && $state['uses_left'] > 0)
+                                @can('adjustPoints', $hiker)
+                                    <form method="POST" action="{{ route('admin.points.rewards.hand-over', $hiker) }}" class="mt-1 flex gap-2">
+                                        @csrf
+                                        <input type="hidden" name="reward" value="{{ $reward->key }}">
+                                        <input name="note" maxlength="200" placeholder="Note (optional)" class="min-w-0 flex-1 rounded-md border border-slate-300 px-2 py-1 text-xs">
+                                        <button class="text-xs font-medium text-emerald-700 hover:underline">Mark handed over</button>
+                                    </form>
+                                @endcan
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            </section>
+
             @can('adjustPoints', $hiker)
                 <form method="POST" action="{{ route('admin.points.adjust', $hiker) }}" class="space-y-4 rounded-lg bg-white p-6 shadow-sm">
                     @csrf

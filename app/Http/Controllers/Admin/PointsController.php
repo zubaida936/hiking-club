@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Domain\Loyalty\Actions\AdjustPoints;
 use App\Domain\Loyalty\Enums\RankTier;
 use App\Domain\Loyalty\Leaderboard;
+use App\Domain\Rewards\Actions\RecordPerkUse;
+use App\Domain\Rewards\Exceptions\RewardException;
+use App\Domain\Rewards\HikerRewards;
 use App\Http\Controllers\Controller;
 use App\Models\Hiker;
 use Illuminate\Http\RedirectResponse;
@@ -38,7 +41,25 @@ class PointsController extends Controller
         ]);
     }
 
-    public function show(Hiker $hiker, Leaderboard $leaderboard): View
+    public function handOver(Request $request, Hiker $hiker, RecordPerkUse $action): RedirectResponse
+    {
+        Gate::authorize('adjustPoints', $hiker);
+
+        $validated = $request->validate([
+            'reward' => ['required', 'string'],
+            'note' => ['nullable', 'string', 'max:200'],
+        ]);
+
+        try {
+            $action->handle($hiker, $validated['reward'], $validated['note'] ?? null, $request->user());
+        } catch (RewardException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Reward marked as handed over.');
+    }
+
+    public function show(Hiker $hiker, Leaderboard $leaderboard, HikerRewards $rewards): View
     {
         Gate::authorize('viewAny', Hiker::class);
 
@@ -49,6 +70,7 @@ class PointsController extends Controller
             'position' => $leaderboard->positionOf($hiker),
             'transactions' => $hiker->pointTransactions()->with(['registration.event', 'creator'])->latest('id')->get(),
             'bookings' => $hiker->registrations()->with('event')->latest('id')->get(),
+            'rewards' => $rewards->statesFor($hiker),
         ]);
     }
 

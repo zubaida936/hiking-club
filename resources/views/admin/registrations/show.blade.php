@@ -101,6 +101,7 @@
                                 <a href="https://wa.me/{{ ltrim($registration->phone, '+') }}" target="_blank" rel="noopener" class="block text-emerald-700 hover:underline">{{ $registration->phone }}</a>
                                 @if ($registration->email)<span class="block text-xs text-slate-500">{{ $registration->email }}</span>@endif
                                 @if ($registration->level_acknowledged_at)<span class="block text-xs text-slate-500">Level confirmed</span>@endif
+                                @if ($registration->amount_due_cents !== null)<span class="block text-xs font-semibold text-violet-700">🎁 Reward: pays {{ $registration->formattedAmountDue() }} instead of {{ $event->formattedFee() }}</span>@endif
                                 @if ($registration->notes)<p class="mt-1 max-w-xs text-xs text-amber-800">📝 {{ $registration->notes }}</p>@endif
                                 <span class="block text-xs text-slate-400" title="{{ $registration->created_at->setTimezone(config('site.timezone')) }}">booked {{ $registration->created_at->diffForHumans() }}</span>
                             </td>

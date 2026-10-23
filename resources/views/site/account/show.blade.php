@@ -109,13 +109,13 @@
                                 </span>
                             </div>
                             <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-                                @if ($booking->event->fee_cents === 0)
-                                    <span class="text-slate-500">Free hike</span>
+                                @if ($booking->amountDueCents() === 0)
+                                    <span class="text-slate-500">{{ $booking->event->fee_cents === 0 ? 'Free hike' : 'Free with your reward' }}</span>
                                 @elseif ($booking->paid_at)
                                     <span class="font-semibold text-brand-700">✓ Paid</span>
                                 @elseif ($booking->awaitsPayment())
                                     <a href="{{ route('registrations.show', $booking) }}#payment-heading" class="font-semibold text-accent-600 hover:underline">
-                                        {{ $booking->event->formattedFee() }} to pay &rarr;
+                                        {{ $booking->formattedAmountDue() }} to pay &rarr;
                                     </a>
                                 @endif
                                 <a href="{{ route('registrations.show', $booking) }}" class="text-brand-700 hover:underline">Booking details</a>
@@ -146,23 +146,44 @@
                 <section aria-labelledby="rewards-heading">
                     <h2 id="rewards-heading" class="font-display text-2xl font-bold uppercase tracking-wide text-brand-900">Rewards</h2>
                     <ul class="mt-4 space-y-3">
-                        @foreach ($tiers as $level)
-                            @continue($level->rewards() === [])
-                            @php($unlocked = $hiker->totalPoints() >= $level->minPoints())
-                            <li @class(['rounded-2xl border p-4', 'border-brand-200 bg-brand-50' => $unlocked, 'border-slate-200 opacity-70' => ! $unlocked])>
-                                <p class="flex items-center justify-between gap-2 font-semibold">
-                                    <span>{{ $level->label() }} <span class="font-normal text-slate-500">· {{ $level->minPoints() }}+ points</span></span>
-                                    <span @class(['text-xs font-bold uppercase', 'text-brand-700' => $unlocked, 'text-slate-400' => ! $unlocked])>{{ $unlocked ? 'Unlocked' : 'Locked' }}</span>
-                                </p>
-                                <ul class="mt-1 list-disc pl-5 text-sm text-slate-600">
-                                    @foreach ($level->rewards() as $reward)
-                                        <li>{{ $reward }}</li>
+                        @foreach (collect($rewards)->groupBy(fn ($state) => $state['reward']->tier->value) as $states)
+                            @php
+                                $level = $states->first()['reward']->tier;
+                            @endphp
+                            <li class="rounded-2xl border border-slate-200 p-4">
+                                <p class="font-semibold">{{ $level->label() }} <span class="font-normal text-slate-500">· {{ $level->minPoints() }}+ points</span></p>
+                                <ul class="mt-2 space-y-2 text-sm">
+                                    @foreach ($states as $state)
+                                        @php
+                                            $reward = $state['reward'];
+                                            $usedUp = $reward->isCountable() && $state['uses_left'] === 0;
+                                        @endphp
+                                        <li class="flex flex-wrap items-baseline justify-between gap-x-3">
+                                            <span @class(['text-slate-800' => $state['unlocked'] && ! $usedUp, 'text-slate-400' => ! $state['unlocked'] || $usedUp])>{{ $reward->label }}</span>
+                                            <span class="text-xs font-semibold">
+                                                @if ($usedUp && $reward->kind === \App\Domain\Rewards\Reward::BONUS_POINTS)
+                                                    <span class="text-brand-700">✓ Added to your points</span>
+                                                @elseif ($usedUp)
+                                                    <span class="text-slate-500">Used{{ $state['redemptions']->first()?->registration ? ' · '.$state['redemptions']->first()->registration->event->title : '' }}</span>
+                                                @elseif (! $state['unlocked'])
+                                                    <span class="text-slate-400">🔒 {{ $state['locked_reason'] }}</span>
+                                                @elseif ($reward->kind === \App\Domain\Rewards\Reward::DISCOUNT)
+                                                    <span class="text-brand-700">Available{{ $reward->uses > 1 ? ' · '.$state['uses_left'].' left' : '' }} · choose it when you book</span>
+                                                @elseif ($reward->kind === \App\Domain\Rewards\Reward::PERK)
+                                                    <span class="text-brand-700">Available · ask an organizer</span>
+                                                @elseif ($reward->kind === \App\Domain\Rewards\Reward::XTREME)
+                                                    <span class="text-brand-700">Active · your X event bookings are confirmed right away</span>
+                                                @else
+                                                    <span class="text-brand-700">Unlocked</span>
+                                                @endif
+                                            </span>
+                                        </li>
                                     @endforeach
                                 </ul>
                             </li>
                         @endforeach
                     </ul>
-                    <p class="mt-3 text-xs text-slate-500">To use an unlocked reward, tell an organizer when you book. Rewards are one-time, personal and can't be combined.</p>
+                    <p class="mt-3 text-xs text-slate-500">Rewards are personal, one-time unless stated, and can't be combined (one per booking). A reward used on a booking you cancel is given back.</p>
                 </section>
             </div>
 

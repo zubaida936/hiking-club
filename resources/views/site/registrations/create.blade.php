@@ -90,6 +90,31 @@
                     @error('notes') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                 </div>
 
+                @if ($rewards !== [])
+                    <fieldset @error('reward') aria-describedby="reward-help" @enderror>
+                        <legend class="font-display text-xl font-bold uppercase tracking-wide text-brand-900">Use a reward?</legend>
+                        <p class="mt-1 text-sm text-slate-500">Your rank unlocked these. One reward per booking; it's given back if you cancel.</p>
+                        <div class="mt-4 grid gap-2">
+                            <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-300 px-4 py-3 has-checked:border-brand-500 has-checked:bg-brand-50">
+                                <input type="radio" name="reward" value="" class="text-brand-600 focus:ring-brand-500" @checked(! old('reward'))>
+                                <span class="text-slate-800">No reward this time · {{ $event->formattedFee() }}</span>
+                            </label>
+                            @foreach ($rewards as $reward)
+                                @php($price = $event->fee_cents - $reward->discountCents($event->fee_cents))
+                                <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-300 px-4 py-3 has-checked:border-brand-500 has-checked:bg-brand-50">
+                                    <input type="radio" name="reward" value="{{ $reward->key }}" class="text-brand-600 focus:ring-brand-500" @checked(old('reward') === $reward->key)>
+                                    <span class="text-slate-800">
+                                        <span class="font-semibold">{{ $reward->label }}</span>
+                                        · {{ $price === 0 ? 'Free' : '$'.rtrim(rtrim(number_format($price / 100, 2, '.', ''), '0'), '.') }}
+                                        <span class="text-slate-400 line-through">{{ $event->formattedFee() }}</span>
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+                        @error('reward') <p id="reward-help" class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </fieldset>
+                @endif
+
                 @if ($event->fee_cents > 0 && \App\Domain\Payments\Enums\PaymentMethod::available() !== [])
                     <fieldset @error('payment_method') aria-describedby="payment_method-help" @enderror>
                         <legend class="font-display text-xl font-bold uppercase tracking-wide text-brand-900">How will you pay {{ $event->formattedFee() }}?</legend>

@@ -20,5 +20,9 @@ final readonly class RegistrationData
         public bool $levelAcknowledged,
         public ?string $referrerPhone = null,
         public ?PaymentMethod $paymentMethod = null,
+        // config/rewards.php key of a discount the logged-in member uses on this booking.
+        public ?string $rewardKey = null,
+        // Hiker of the logged-in member making the booking (rewards and rank perks only apply to their own bookings).
+        public ?int $memberHikerId = null,
     ) {}
 }

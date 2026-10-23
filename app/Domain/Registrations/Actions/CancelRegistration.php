@@ -7,6 +7,7 @@ use App\Domain\Registrations\Events\RegistrationChanged;
 use App\Domain\Registrations\Exceptions\RegistrationException;
 use App\Mail\RegistrationCancelledMail;
 use App\Models\EventRegistration;
+use App\Models\RewardRedemption;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 
@@ -32,6 +33,9 @@ final class CancelRegistration
             'cancellation_reason' => $reason,
             'updated_by' => $actor->id,
         ]);
+
+        // A reward used on this booking can be used again.
+        RewardRedemption::where('event_registration_id', $registration->id)->active()->update(['released_at' => now()]);
 
         RegistrationChanged::dispatch($registration);
 

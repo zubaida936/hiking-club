@@ -39,6 +39,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('{hiker}', 'show')->name('show');
         Route::post('{hiker}/adjust', 'adjust')->name('adjust');
+        Route::post('{hiker}/rewards', 'handOver')->name('rewards.hand-over');
     });
 
     Route::controller(RegistrationController::class)->group(function () {

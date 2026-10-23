@@ -42,7 +42,7 @@ it('shows rank, progress, stats and rewards', function () {
         ->assertSeeInOrder(['Hikes completed', '1', 'Distance hiked', '14.5 km', 'Leaderboard', '#1'])
         ->assertSeeInOrder(['Hike history', 'Qadisha Valley Descent', '14.5 km', 'Level 2', '+14'])
         ->assertDontSee('Missed Hike')
-        ->assertSeeInOrder(['Trekker', 'Unlocked', '50% off one hike', 'Mountaineer', 'Locked', 'One free Moderate'])
+        ->assertSeeInOrder(['Trekker', '50% off one hike', 'After 5 completed hikes (1 so far)', 'Mountaineer', 'One free Moderate', 'Reach Mountaineer (200 points)'])
         ->assertSee('Welcome back');
 });
 

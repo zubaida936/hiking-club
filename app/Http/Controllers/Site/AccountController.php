@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Site;
 
-use App\Domain\Loyalty\Enums\RankTier;
 use App\Domain\Loyalty\Leaderboard;
 use App\Domain\Members\Actions\SetLeaderboardVisibility;
 use App\Domain\Registrations\Actions\CancelOwnBooking;
 use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Domain\Registrations\Exceptions\RegistrationException;
+use App\Domain\Rewards\HikerRewards;
 use App\Http\Controllers\Controller;
 use App\Models\EventRegistration;
 use Illuminate\Http\RedirectResponse;
@@ -21,7 +21,7 @@ use Illuminate\View\View;
  */
 class AccountController extends Controller
 {
-    public function show(Request $request, Leaderboard $leaderboard): View
+    public function show(Request $request, Leaderboard $leaderboard, HikerRewards $rewards): View
     {
         $hiker = $request->user()?->hiker;
 
@@ -54,7 +54,7 @@ class AccountController extends Controller
             'position' => $leaderboard->publicPositionOf($hiker),
             'upcoming' => $upcoming,
             'history' => $history,
-            'tiers' => RankTier::cases(),
+            'rewards' => $rewards->statesFor($hiker),
             'recentPoints' => $hiker->pointTransactions()->latest('id')->limit(5)->get(),
         ]);
     }

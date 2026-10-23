@@ -4,6 +4,8 @@ namespace App\Http\Requests\Site;
 
 use App\Domain\Payments\Enums\PaymentMethod;
 use App\Domain\Registrations\Data\RegistrationData;
+use App\Domain\Rewards\Reward;
+use App\Domain\Rewards\RewardCatalog;
 use App\Models\Event;
 use App\Support\Phone;
 use Illuminate\Foundation\Http\FormRequest;
@@ -38,8 +40,9 @@ class RegistrationRequest extends FormRequest
             'emergency_contact_phone' => ['required', 'string', 'regex:'.Phone::PATTERN, 'different:phone'],
             'notes' => ['nullable', 'string', 'max:500'],
             'referrer_phone' => ['nullable', 'string', 'regex:'.Phone::PATTERN, 'different:phone'],
-            // Paid hikes: how the hiker will pay (only the methods offered right now).
-            'payment_method' => $event->fee_cents > 0 && PaymentMethod::available() !== []
+            'reward' => ['nullable', 'string', Rule::in(array_keys((array) config('rewards')))],
+            // Paid hikes: how the hiker will pay (only the methods offered right now), unless a reward makes it free.
+            'payment_method' => $event->fee_cents > 0 && PaymentMethod::available() !== [] && ! $this->rewardMakesItFree()
                 ? ['required', Rule::in(array_map(fn (PaymentMethod $m) => $m->value, PaymentMethod::available()))]
                 : ['nullable'], // free hike: ignored
             'level_acknowledged' => [$event->requiresLevelAcknowledgement() ? 'accepted' : 'nullable'],
@@ -94,7 +97,16 @@ class RegistrationRequest extends FormRequest
             levelAcknowledged: $this->boolean('level_acknowledged'),
             referrerPhone: Phone::normalize($this->input('referrer_phone')),
             paymentMethod: PaymentMethod::tryFrom((string) $this->input('payment_method')),
+            rewardKey: $this->filled('reward') ? $this->string('reward')->toString() : null,
+            memberHikerId: $this->user()?->hiker?->id,
         );
+    }
+
+    private function rewardMakesItFree(): bool
+    {
+        $reward = $this->filled('reward') ? app(RewardCatalog::class)->find($this->string('reward')->toString()) : null;
+
+        return $reward !== null && $reward->kind === Reward::DISCOUNT && $reward->percent >= 100;
     }
 
     private function event(): Event

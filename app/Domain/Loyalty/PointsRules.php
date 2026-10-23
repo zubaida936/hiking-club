@@ -77,7 +77,7 @@ final class PointsRules
         return $registration->hiker_id !== null
             && $registration->status === RegistrationStatus::Confirmed
             && $registration->attendance === Attendance::Attended
-            && (! config('points.paid_only') || $event->fee_cents === 0 || $registration->paid_at !== null);
+            && (! config('points.paid_only') || $registration->amountDueCents() === 0 || $registration->paid_at !== null);
     }
 
     private function bookedEarly(EventRegistration $registration, Event $event): bool

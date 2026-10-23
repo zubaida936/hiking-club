@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -28,6 +29,7 @@ use Illuminate\Support\Carbon;
  * @property ?string $pickup_time HH:MM:SS, local time
  * @property string $emergency_contact_name
  * @property string $emergency_contact_phone
+ * @property ?int $amount_due_cents null = the event fee
  * @property ?string $notes
  * @property Carbon $terms_accepted_at
  * @property ?Carbon $level_acknowledged_at
@@ -119,6 +121,31 @@ class EventRegistration extends Model
     }
 
     /**
+     * The reward used on this booking, if any (given back when the booking is cancelled).
+     *
+     * @return HasOne<RewardRedemption, $this>
+     */
+    public function rewardRedemption(): HasOne
+    {
+        return $this->hasOne(RewardRedemption::class)->latestOfMany();
+    }
+
+    /**
+     * What this booking costs: the event fee, minus a reward discount.
+     */
+    public function amountDueCents(): int
+    {
+        return $this->amount_due_cents ?? $this->event->fee_cents;
+    }
+
+    public function formattedAmountDue(): string
+    {
+        $cents = $this->amountDueCents();
+
+        return $cents === 0 ? 'Free' : '$'.rtrim(rtrim(number_format($cents / 100, 2, '.', ''), '0'), '.');
+    }
+
+    /**
      * Cancelled after paying, and the club hasn't paid the money back yet.
      */
     public function refundDue(): bool
@@ -131,7 +158,7 @@ class EventRegistration extends Model
      */
     public function awaitsPayment(): bool
     {
-        return $this->isConfirmed() && $this->paid_at === null && $this->event->fee_cents > 0;
+        return $this->isConfirmed() && $this->paid_at === null && $this->amountDueCents() > 0;
     }
 
     /**

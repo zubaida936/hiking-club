@@ -29,14 +29,14 @@ final class StartOnlinePayment
         if ($registration->paid_at !== null) {
             throw PaymentException::alreadyPaid();
         }
-        if (! $registration->isConfirmed() || $registration->event->fee_cents === 0) {
+        if (! $registration->isConfirmed() || $registration->amountDueCents() === 0) {
             throw PaymentException::notPayable();
         }
 
         $payment = $registration->payments()->create([
             'gateway' => (string) config('payments.online_gateway'),
             'external_id' => (string) Str::uuid(),
-            'amount_cents' => $registration->event->fee_cents,
+            'amount_cents' => $registration->amountDueCents(),
             'currency' => config('payments.currency'),
             'status' => PaymentStatus::Pending,
         ]);
