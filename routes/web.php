@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Site\AccountController;
 use App\Http\Controllers\Site\Auth\ActivationController;
+use App\Http\Controllers\Site\Auth\InviteController;
 use App\Http\Controllers\Site\Auth\MemberSessionController;
 use App\Http\Controllers\Site\Auth\PasswordResetController;
 use App\Http\Controllers\Site\EventController;
@@ -58,7 +59,15 @@ Route::middleware('guest')->group(function () {
     });
 });
 
-Route::middleware('auth')->group(function () {
+// Links organizers send from the CMS (signed, expiring): activate from an invite, choose a new password.
+Route::controller(InviteController::class)->middleware(['signed', 'throttle:10,1'])->group(function () {
+    Route::get('activate/invite/{hiker}', 'showActivation')->name('activate.invite');
+    Route::post('activate/invite/{hiker}', 'activate')->name('activate.invite.store');
+    Route::get('password/set/{user}', 'showPassword')->name('password.set');
+    Route::post('password/set/{user}', 'setPassword')->name('password.set.store');
+});
+
+Route::middleware(['auth', 'active'])->group(function () {
     Route::get('account', [AccountController::class, 'show'])->name('account');
     Route::post('account/bookings/{registration}/cancel', [AccountController::class, 'cancelBooking'])->name('account.bookings.cancel');
     Route::post('account/leaderboard', [AccountController::class, 'leaderboardVisibility'])->name('account.leaderboard');

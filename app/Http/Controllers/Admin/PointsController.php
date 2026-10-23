@@ -63,7 +63,7 @@ class PointsController extends Controller
     {
         Gate::authorize('viewAny', Hiker::class);
 
-        $hiker->loadSum('pointTransactions as total_points', 'points');
+        $hiker->loadSum('pointTransactions as total_points', 'points')->load('user');
 
         return view('admin.points.show', [
             'hiker' => $hiker,

@@ -20,6 +20,16 @@ final class MemberException extends DomainException
         return new self('This phone number already has an account. Log in, or reset your password if you forgot it.');
     }
 
+    public static function staffAccount(): self
+    {
+        return new self('This is a staff account: manage it in Staff & roles.');
+    }
+
+    public static function noAccount(): self
+    {
+        return new self('This hiker has no account yet: send an invite link instead.');
+    }
+
     public static function invalidCode(): self
     {
         return new self('This code is wrong or has expired. Ask for a new one.');

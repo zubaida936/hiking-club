@@ -18,4 +18,12 @@ final class WhatsApp
 
         return "https://wa.me/{$number}".($message !== null && $message !== '' ? '?text='.rawurlencode($message) : '');
     }
+
+    /**
+     * wa.me link to message someone else (e.g. an organizer writing to a hiker), with a pre-filled text.
+     */
+    public static function to(string $phone, string $message): string
+    {
+        return 'https://wa.me/'.preg_replace('/\D/', '', $phone).'?text='.rawurlencode($message);
+    }
 }

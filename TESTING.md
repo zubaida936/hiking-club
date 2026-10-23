@@ -140,6 +140,8 @@ To check the mobile menu, make the browser narrower than 1024 px (or press F12 �
 | Registrations — events overview | http://localhost:8080/admin/registrations (Upcoming / Past tabs: seats, approvals, waitlist, paid, attended) | Super Admin, Admin, Guide |
 | Registrations — one event | click an event there, or "Manage registrations" on the event edit screen → `/admin/events/{id}/registrations`: filter by pickup point / status / search, approve, edit, cancel, mark paid, attendance, WhatsApp list, Export CSV | Admin: everything · Guide: view, WhatsApp list, CSV, attendance |
 | Registrations — edit a booking | "Edit" on a row → `/admin/registrations/{id}/edit` | Super Admin, Admin |
+| Members | http://localhost:8080/admin/members: every hiker (one per phone) with rank, points, hikes, last booking and account status; filter by account; "Invite to activate" / "Password link" (copy or Send on WhatsApp), Deactivate / Reactivate | Super Admin, Admin |
+| Rewards used | http://localhost:8080/admin/members/rewards: every reward used (booking, discount, hand-over notes, given back), filter by reward | Super Admin, Admin |
 | Points — hikers by rank | http://localhost:8080/admin/points (rank, tier, points, hikes, km; search by name or phone) | Super Admin, Admin |
 | Points — one hiker | click a hiker → history (every line with reason), bookings, rewards (uses, "Mark handed over" for gift card / winter bonus), "Adjust points" form | Super Admin, Admin |
 
@@ -214,6 +216,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Member dashboard | https://app.clickup.com/t/z8q7hbmpf2 |
 | Public leaderboard | https://app.clickup.com/t/z8q7hbmpf7 |
 | Rewards per tier & redemption | https://app.clickup.com/t/z8q7hbmpf5 |
+| Manage members, points & rewards | https://app.clickup.com/t/z8q7hbmpfr |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

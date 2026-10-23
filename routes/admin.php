@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\PointsController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\StaffUserController;
@@ -33,6 +34,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('unpublish', 'unpublish')->name('unpublish');
         Route::post('cancel', 'cancel')->name('cancel');
         Route::post('duplicate', 'duplicate')->name('duplicate');
+    });
+
+    Route::controller(MemberController::class)->prefix('members')->name('members.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('rewards', 'rewards')->name('rewards');
+        Route::post('{hiker}/invite', 'invite')->name('invite');
+        Route::post('{hiker}/password-link', 'passwordLink')->name('password-link');
+        Route::post('{hiker}/deactivate', 'deactivate')->name('deactivate');
+        Route::post('{hiker}/reactivate', 'reactivate')->name('reactivate');
     });
 
     Route::controller(PointsController::class)->prefix('points')->name('points.')->group(function () {

@@ -45,8 +45,9 @@ Update this file when one is settled. Last reviewed: 2026-10-23.
   expiry for unpaid bookings.
 - **X event approval** of bookings is per booking in CMS → Registrations; the X application process itself is in
   "X Events application form" / "Manage X applications".
-- **Activation needs a booking reference.** Hikers who lost theirs ask on WhatsApp; organizers can find it in CMS →
-  Registrations.
+- **Account help without SMS:** hikers who lost their booking reference, or have no email for a password reset, ask
+  on WhatsApp; organizers send them an **invite link** (7 days) or a **password link** (24 hours, works once) from
+  CMS → Members, with a "Send on WhatsApp" button. An SMS/WhatsApp provider would let hikers do this themselves.
 
 ## Local development notes
 

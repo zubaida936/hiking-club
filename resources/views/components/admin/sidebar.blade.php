@@ -6,7 +6,9 @@
         ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard', 'can' => Permission::AccessAdmin],
         ['label' => 'Events', 'route' => 'admin.events.index', 'active' => ['admin.events.index', 'admin.events.create', 'admin.events.edit'], 'can' => Permission::ManageEvents],
         ['label' => 'Registrations', 'route' => 'admin.registrations.index', 'active' => ['admin.registrations.*', 'admin.events.registrations*'], 'can' => Permission::ViewRegistrations],
+        ['label' => 'Members', 'route' => 'admin.members.index', 'active' => ['admin.members.index'], 'can' => Permission::ManageMembers],
         ['label' => 'Points', 'route' => 'admin.points.index', 'active' => 'admin.points.*', 'can' => Permission::ManageLoyalty],
+        ['label' => 'Rewards used', 'route' => 'admin.members.rewards', 'active' => 'admin.members.rewards', 'can' => Permission::ManageLoyalty],
         ['label' => 'Staff & roles', 'route' => 'admin.staff.index', 'active' => 'admin.staff.*', 'can' => Permission::ManageStaff],
     ];
 @endphp

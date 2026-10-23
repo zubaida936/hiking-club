@@ -1,5 +1,5 @@
 <x-site.auth-card title="Choose a password" :intro="'Hi '.$hiker->name.'! Last step: choose the password for your account.'">
-    <form method="POST" action="{{ route('activate.store') }}" class="space-y-5" novalidate>
+    <form method="POST" action="{{ $action ?? route('activate.store') }}" class="space-y-5" novalidate>
         @csrf
         <p class="text-sm text-slate-600">You'll log in with <strong>{{ $hiker->phone }}</strong> and this password.</p>
         <x-site.password-field label="New password" autocomplete="new-password" :hint="'At least '.config('members.password_min_length').' characters.'" />

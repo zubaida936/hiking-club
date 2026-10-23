@@ -1,4 +1,5 @@
 <x-admin.layout :title="$hiker->name.' · Points'">
+    <x-admin.member-link />
     <div class="grid gap-6 lg:grid-cols-3">
         <div class="space-y-6 lg:col-span-2">
             <section class="rounded-lg bg-white p-6 shadow-sm">
@@ -65,6 +66,10 @@
                     <div class="flex justify-between"><dt class="text-slate-500">Phone</dt><dd>{{ $hiker->phone }}</dd></div>
                     @if ($hiker->email)<div class="flex justify-between gap-2"><dt class="text-slate-500">Email</dt><dd class="truncate">{{ $hiker->email }}</dd></div>@endif
                 </dl>
+                <div class="mt-4 border-t border-slate-100 pt-4">
+                    <p class="mb-1 text-xs uppercase text-slate-500">Account</p>
+                    <x-admin.member-account :hiker="$hiker" />
+                </div>
             </section>
 
             <section class="rounded-lg bg-white p-6 shadow-sm">
