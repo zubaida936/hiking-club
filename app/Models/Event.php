@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Domain\Events\Enums\DifficultyLevel;
 use App\Domain\Events\Enums\EventStatus;
+use Carbon\CarbonImmutable;
 use Database\Factories\EventFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,6 +32,8 @@ use Illuminate\Support\Facades\Storage;
  * @property DifficultyLevel $difficulty_level
  * @property int $fee_cents
  * @property int $capacity
+ * @property ?Carbon $registration_closes_at
+ * @property bool $waitlist_enabled
  * @property ?list<string> $included
  * @property ?list<string> $what_to_bring
  * @property ?list<string> $itinerary
@@ -69,6 +72,8 @@ class Event extends Model
             'difficulty_level' => DifficultyLevel::class,
             'fee_cents' => 'integer',
             'capacity' => 'integer',
+            'registration_closes_at' => 'datetime',
+            'waitlist_enabled' => 'boolean',
             'included' => 'array',
             'what_to_bring' => 'array',
             'itinerary' => 'array',
@@ -222,12 +227,52 @@ class Event extends Model
         return max(0, $this->capacity - $this->seatsTaken());
     }
 
+    public function isSoldOut(): bool
+    {
+        return $this->seatsLeft() === 0;
+    }
+
     /**
-     * Bookings are taken for published events until the day before the hike.
+     * When bookings close: the organizer's deadline, or midnight (club time) at the start of the hike day.
+     */
+    public function registrationDeadline(): CarbonImmutable
+    {
+        return $this->registration_closes_at?->toImmutable()
+            ?? CarbonImmutable::parse($this->starts_on->toDateString(), config('site.timezone'))->utc();
+    }
+
+    /**
+     * Published events take bookings (or waitlist entries) until the deadline.
      */
     public function isOpenForRegistration(): bool
     {
-        return $this->isPublished() && $this->starts_on->isAfter(today());
+        return $this->isPublished() && now()->isBefore($this->registrationDeadline());
+    }
+
+    /**
+     * Full, but visitors can still join the waitlist.
+     */
+    public function acceptsWaitlist(): bool
+    {
+        return $this->waitlist_enabled && $this->isOpenForRegistration() && $this->isSoldOut();
+    }
+
+    /**
+     * Single-model counterpart of scopeWithSeatCounts().
+     */
+    public function loadSeatCount(): static
+    {
+        return $this->loadCount(['registrations as active_registrations_count' => fn ($q) => $q->active()]);
+    }
+
+    /**
+     * Adds active_registrations_count (seats taken), used by seatsTaken() without a query per event.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeWithSeatCounts(Builder $query): void
+    {
+        $query->withCount(['registrations as active_registrations_count' => fn ($q) => $q->active()]);
     }
 
     /**

@@ -17,6 +17,9 @@
             @if ($event->is_xtreme)
                 <span class="rounded-full bg-red-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">X Event</span>
             @endif
+            @unless ($past)
+                <x-site.seats-badge :event="$event" />
+            @endunless
         </div>
     </div>
 

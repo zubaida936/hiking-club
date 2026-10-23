@@ -11,7 +11,7 @@ class HomeController extends Controller
     public function __invoke(): View
     {
         return view('site.home', [
-            'nextEvent' => Event::nextUpcoming(),
+            'nextEvent' => Event::nextUpcoming()?->loadSeatCount(),
         ]);
     }
 }

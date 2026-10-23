@@ -72,6 +72,26 @@ class EventRegistration extends Model
         return $this->status === RegistrationStatus::Pending;
     }
 
+    public function isWaitlisted(): bool
+    {
+        return $this->status === RegistrationStatus::Waitlisted;
+    }
+
+    /**
+     * 1-based place in the event's waitlist (booking order); null when not waitlisted.
+     */
+    public function waitlistPosition(): ?int
+    {
+        if (! $this->isWaitlisted()) {
+            return null;
+        }
+
+        return static::where('event_id', $this->event_id)
+            ->where('status', RegistrationStatus::Waitlisted)
+            ->where('id', '<=', $this->id)
+            ->count();
+    }
+
     public function pickupTimeShort(): ?string
     {
         return $this->pickup_time ? substr($this->pickup_time, 0, 5) : null;

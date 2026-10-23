@@ -36,6 +36,14 @@ class EventRequest extends FormRequest
             'duration_hours' => ['nullable', 'numeric', 'min:0.5', 'max:72'],
             'fee' => ['required', 'numeric', 'min:0', 'max:10000', 'decimal:0,2'],
             'capacity' => ['required', 'integer', 'min:1', 'max:1000'],
+            // Club local time (config site.timezone); at the latest during the hike day.
+            'registration_closes_at' => ['nullable', 'date_format:Y-m-d\TH:i', function (string $attribute, mixed $value, Closure $fail) {
+                $startsOn = (string) $this->input('starts_on');
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $startsOn) && substr((string) $value, 0, 10) > $startsOn) {
+                    $fail('Bookings must close on or before the day of the hike.');
+                }
+            }],
+            'waitlist_enabled' => ['boolean'],
             'included' => ['nullable', 'string', 'max:2000'],
             'what_to_bring' => ['nullable', 'string', 'max:2000'],
             'itinerary' => ['nullable', 'string', 'max:3000'],
@@ -67,6 +75,7 @@ class EventRequest extends FormRequest
             'elevation_loss_m' => 'elevation loss',
             'duration_hours' => 'duration',
             'gpx_file' => 'GPX file',
+            'registration_closes_at' => 'booking deadline',
             'meeting_points.*.name' => 'meeting point name',
             'meeting_points.*.pickup_time' => 'pickup time',
         ];
@@ -87,6 +96,7 @@ class EventRequest extends FormRequest
             'is_xtreme' => $this->boolean('is_xtreme'),
             'remove_cover_image' => $this->boolean('remove_cover_image'),
             'remove_gpx' => $this->boolean('remove_gpx'),
+            'waitlist_enabled' => $this->boolean('waitlist_enabled'),
             'meeting_points' => $points,
             'slug' => $this->filled('slug') ? strtolower(trim($this->string('slug')->toString())) : null,
         ]);
@@ -121,6 +131,10 @@ class EventRequest extends FormRequest
             removeCoverImage: $this->boolean('remove_cover_image'),
             gpxFile: $this->file('gpx_file'),
             removeGpx: $this->boolean('remove_gpx'),
+            registrationClosesAt: $this->filled('registration_closes_at')
+                ? CarbonImmutable::createFromFormat('Y-m-d\TH:i', $this->string('registration_closes_at')->toString(), config('site.timezone'))?->utc()
+                : null,
+            waitlistEnabled: $this->boolean('waitlist_enabled'),
         );
     }
 

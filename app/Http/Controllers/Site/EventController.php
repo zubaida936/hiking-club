@@ -37,7 +37,7 @@ class EventController extends Controller
         /** @var Builder<Event> $published */
         $published = Event::published()->where($filter);
 
-        $upcoming = (clone $published)->upcoming()->orderBy('starts_on')->orderBy('id')->get();
+        $upcoming = (clone $published)->upcoming()->withSeatCounts()->orderBy('starts_on')->orderBy('id')->get();
         $pastTotal = (clone $published)->past()->count();
         $past = (clone $published)->past()->orderByDesc('starts_on')->orderByDesc('id')->limit($page * self::PAST_PER_PAGE)->get();
 
@@ -57,7 +57,7 @@ class EventController extends Controller
         // Drafts (including unpublished events) have no public page.
         abort_unless($event->isVisibleOnSite(), 404);
 
-        $event->load('meetingPoints')->loadCount(['registrations as active_registrations_count' => fn ($q) => $q->active()]);
+        $event->load('meetingPoints')->loadSeatCount();
 
         return view('site.events.show', [
             'event' => $event,

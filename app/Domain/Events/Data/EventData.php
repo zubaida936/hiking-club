@@ -37,5 +37,7 @@ final readonly class EventData
         public bool $removeCoverImage = false,
         public ?UploadedFile $gpxFile = null,
         public bool $removeGpx = false,
+        public ?CarbonImmutable $registrationClosesAt = null,
+        public bool $waitlistEnabled = true,
     ) {}
 }

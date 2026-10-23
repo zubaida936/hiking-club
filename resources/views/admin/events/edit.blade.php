@@ -71,11 +71,17 @@
     </form>
 
     @can(\App\Domain\Identity\Enums\Permission::ViewRegistrations->value)
-        @php($active = $event->registrations->filter(fn ($r) => $r->status !== \App\Domain\Registrations\Enums\RegistrationStatus::Cancelled))
+        @php
+            $active = $event->registrations->filter(fn ($r) => in_array($r->status, \App\Domain\Registrations\Enums\RegistrationStatus::active(), true));
+            $waitlist = $event->registrations->filter(fn ($r) => $r->isWaitlisted())->values();
+        @endphp
         <section id="registrations" class="mt-10 rounded-lg bg-white p-6 shadow-sm">
             <h2 class="font-semibold">
                 Registrations
-                <span class="ml-2 text-sm font-normal text-slate-500">{{ $active->count() }} / {{ $event->capacity }} seats taken</span>
+                <span class="ml-2 text-sm font-normal text-slate-500">
+                    {{ $active->count() }} / {{ $event->capacity }} seats taken{{ $waitlist->isNotEmpty() ? ' · '.$waitlist->count().' on the waitlist' : '' }}
+                    · bookings close {{ $event->registrationDeadline()->setTimezone(config('site.timezone'))->format('D j M, H:i') }}
+                </span>
             </h2>
 
             @if ($event->registrations->isEmpty())
@@ -112,7 +118,10 @@
                                     <td class="py-2 pr-4">{{ $registration->pickup_point ? $registration->pickup_point.' '.$registration->pickupTimeShort() : '—' }}</td>
                                     <td class="py-2 pr-4">{{ $registration->emergency_contact_name }}<span class="block text-xs text-slate-500">{{ $registration->emergency_contact_phone }}</span></td>
                                     <td class="max-w-xs py-2 pr-4 text-slate-600">{{ $registration->notes }}</td>
-                                    <td class="py-2 pr-4"><x-admin.badge :classes="$registration->status->badgeClasses()">{{ $registration->status->label() }}</x-admin.badge></td>
+                                    <td class="py-2 pr-4 whitespace-nowrap">
+                                        <x-admin.badge :classes="$registration->status->badgeClasses()">{{ $registration->status->label() }}</x-admin.badge>
+                                        @if ($registration->isWaitlisted())<span class="block text-xs text-slate-500">#{{ $waitlist->search(fn ($r) => $r->id === $registration->id) + 1 }} in line</span>@endif
+                                    </td>
                                     <td class="py-2 whitespace-nowrap text-slate-500" title="{{ $registration->created_at }}">{{ $registration->created_at->diffForHumans() }}</td>
                                 </tr>
                             @endforeach

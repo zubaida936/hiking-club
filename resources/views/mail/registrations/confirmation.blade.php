@@ -1,5 +1,19 @@
 <x-mail::message>
+@if ($registration->isWaitlisted())
+# You're on the waitlist
+
+Thanks, {{ $registration->name }}! **{{ $event->title }}** is fully booked, so you're **number {{ $registration->waitlistPosition() }}**
+on the waitlist. If a seat opens up, you move up automatically and we email you right away.
+@elseif ($promoted)
+# Good news: a seat opened up!
+
+{{ $registration->name }}, you've moved up from the waitlist for **{{ $event->title }}**.
 @if ($registration->isPending())
+It's an X Event, so an organizer will still review your registration before confirming the seat.
+@else
+Your seat is confirmed.
+@endif
+@elseif ($registration->isPending())
 # Registration received
 
 Thanks, {{ $registration->name }}! **{{ $event->title }}** is an X Event, so an organizer will review your

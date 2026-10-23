@@ -21,7 +21,7 @@ final class DuplicateEvent
         return DB::transaction(function () use ($source, $actor) {
             $copy = $source->replicate([
                 'slug', 'status', 'published_at', 'cancelled_at', 'cancellation_reason',
-                'cover_image_path', 'gpx_path', 'created_by', 'updated_by',
+                'cover_image_path', 'gpx_path', 'registration_closes_at', 'created_by', 'updated_by',
             ]);
 
             $copy->title = Str::limit($source->title.' (copy)', 150, '');

@@ -7,6 +7,7 @@ use App\Domain\Events\Data\MeetingPointData;
 use App\Domain\Events\Difficulty\DifficultyCalculator;
 use App\Domain\Events\Enums\EventStatus;
 use App\Domain\Events\Gpx\GpxReader;
+use App\Domain\Registrations\Actions\FillFreedSeats;
 use App\Models\Event;
 use App\Models\User;
 use App\Support\ImageOptimizer;
@@ -29,6 +30,7 @@ final class SaveEvent
     public function __construct(
         private readonly DifficultyCalculator $difficulty,
         private readonly GpxReader $gpx,
+        private readonly FillFreedSeats $fillFreedSeats,
     ) {}
 
     public function handle(EventData $data, User $actor, ?Event $event = null): Event
@@ -55,6 +57,8 @@ final class SaveEvent
             'difficulty_level' => $difficulty->level,
             'fee_cents' => $data->feeCents,
             'capacity' => $data->capacity,
+            'registration_closes_at' => $data->registrationClosesAt,
+            'waitlist_enabled' => $data->waitlistEnabled,
             'included' => $data->included,
             'what_to_bring' => $data->whatToBring,
             'itinerary' => $data->itinerary,
@@ -97,6 +101,9 @@ final class SaveEvent
         if ($replaced !== []) {
             Storage::disk('public')->delete(array_values($replaced));
         }
+
+        // A raised capacity lets waitlisted hikers move up.
+        $this->fillFreedSeats->handle($event);
 
         return $event->load('meetingPoints');
     }

@@ -181,8 +181,8 @@ describe('booking', function () {
 });
 
 describe('sold out and closed', function () {
-    it('stops taking bookings when the hike is full', function () {
-        $this->event->update(['capacity' => 2]);
+    it('stops taking bookings when the hike is full and has no waitlist', function () {
+        $this->event->update(['capacity' => 2, 'waitlist_enabled' => false]);
         EventRegistration::factory()->for($this->event)->create();
         EventRegistration::factory()->pending()->for($this->event)->create();
 

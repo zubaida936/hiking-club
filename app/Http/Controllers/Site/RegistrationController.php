@@ -18,7 +18,7 @@ class RegistrationController extends Controller
     {
         abort_unless($event->isVisibleOnSite(), 404);
 
-        $event->load('meetingPoints')->loadCount(['registrations as active_registrations_count' => fn ($q) => $q->active()]);
+        $event->load('meetingPoints')->loadSeatCount();
 
         return view('site.registrations.create', ['event' => $event]);
     }

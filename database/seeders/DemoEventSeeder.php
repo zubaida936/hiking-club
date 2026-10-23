@@ -70,15 +70,22 @@ class DemoEventSeeder extends Seeder
                 $event->meetingPoints()->create($p + ['position' => $i]);
             }
 
-            // Bookings on the upcoming published hikes: one almost full, the X event awaiting approvals.
+            // Bookings on the upcoming published hikes: one almost full, the X event full
+            // (awaiting approvals) with two people on the waitlist.
             $event->registrations()->delete();
             if ($status === EventStatus::Published && $inDays > 0) {
+                $pickup = fn ($s) => ['pickup_point' => $pickups[$s->index % 4]['name'], 'pickup_time' => $pickups[$s->index % 4]['pickup_time']];
+
                 EventRegistration::factory()
-                    ->count($xtreme ? 3 : 26)
+                    ->count($xtreme ? 30 : 26)
                     ->state($xtreme ? ['status' => RegistrationStatus::Pending] : [])
-                    ->sequence(fn ($s) => ['pickup_point' => $pickups[$s->index % 4]['name'], 'pickup_time' => $pickups[$s->index % 4]['pickup_time']])
+                    ->sequence($pickup)
                     ->for($event)
                     ->create();
+
+                if ($xtreme) {
+                    EventRegistration::factory()->count(2)->state(['status' => RegistrationStatus::Waitlisted])->sequence($pickup)->for($event)->create();
+                }
             }
         }
     }

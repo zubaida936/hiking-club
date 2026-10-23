@@ -13,6 +13,7 @@
         @if ($event->season_tag)
             <span class="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-sm font-medium text-brand-800">{{ $event->season_tag }}</span>
         @endif
+        <x-site.seats-badge :event="$event" class="absolute right-4 top-4" />
     </div>
 
     <div class="flex flex-col p-6 sm:p-8">
@@ -47,7 +48,7 @@
 
         <a href="{{ route('events.show', $event) }}"
            class="mt-6 inline-block rounded-full bg-accent-500 px-6 py-3 text-center font-display font-bold uppercase tracking-wide text-white hover:bg-accent-600">
-            Reserve Your Spot
+            {{ $event->isSoldOut() ? 'View Event' : 'Reserve Your Spot' }}
         </a>
     </div>
 </article>

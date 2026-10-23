@@ -1,13 +1,21 @@
-<x-site.layout :title="$registration->isPending() ? 'Registration received' : 'You\'re booked'" :noindex="true">
+@php
+    $heading = match (true) {
+        $registration->isWaitlisted() => "You're on the waitlist",
+        $registration->isPending() => 'Registration received',
+        default => "You're booked!",
+    };
+@endphp
+
+<x-site.layout :title="rtrim($heading, '!')" :noindex="true">
     <section class="bg-brand-800 px-4 py-14 text-center text-white sm:px-6">
         <p class="font-display text-sm font-semibold uppercase tracking-[0.2em] text-accent-400">Booking reference</p>
         <p class="mt-2 font-display text-4xl font-bold tracking-[0.15em]">{{ $registration->reference }}</p>
-        <h1 class="mt-6 font-display text-3xl font-bold uppercase tracking-wide sm:text-4xl">
-            {{ $registration->isPending() ? 'Registration received' : "You're booked!" }}
-        </h1>
+        <h1 class="mt-6 font-display text-3xl font-bold uppercase tracking-wide sm:text-4xl">{{ $heading }}</h1>
         <p class="mx-auto mt-3 max-w-xl text-white/85">
             @if ($registration->status === \App\Domain\Registrations\Enums\RegistrationStatus::Cancelled)
                 This booking has been cancelled.
+            @elseif ($registration->isWaitlisted())
+                {{ $event->title }} is fully booked. You're number {{ $registration->waitlistPosition() }} on the waitlist: if a seat opens up you move up automatically{{ $registration->email ? ' and we email you' : '' }}.
             @elseif ($registration->isPending())
                 {{ $event->title }} is an X Event. An organizer will review your registration and confirm your seat; it's held for you in the meantime.
             @else

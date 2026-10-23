@@ -1,6 +1,7 @@
 @php
     $seatsLeft = $event->seatsLeft();
-    $open = $event->isOpenForRegistration() && $seatsLeft > 0;
+    $waitlist = $event->acceptsWaitlist();
+    $open = $event->isOpenForRegistration() && ($seatsLeft > 0 || $waitlist);
     $level = $event->difficulty_level;
 @endphp
 
@@ -9,7 +10,7 @@
         <div class="mx-auto max-w-3xl">
             <a href="{{ route('events.show', $event) }}" class="font-display text-sm font-semibold uppercase tracking-wide text-white/80 hover:text-white">&larr; Back to the hike</a>
             <p class="mt-6 font-display text-sm font-semibold uppercase tracking-widest text-accent-400">{{ $event->starts_on->format('l, j F Y') }}</p>
-            <h1 class="mt-1 font-display text-3xl font-bold uppercase tracking-wide sm:text-4xl">{{ $event->registerLabel() }}</h1>
+            <h1 class="mt-1 font-display text-3xl font-bold uppercase tracking-wide sm:text-4xl">{{ $waitlist ? 'Join the Waitlist' : $event->registerLabel() }}</h1>
             <p class="mt-2 text-white/85">{{ $event->title }} · {{ $event->location }} · {{ $event->formattedFee() }}</p>
         </div>
     </section>
@@ -28,7 +29,13 @@
             @endif
 
             <p class="mb-8 text-slate-600">
-                <strong class="text-brand-800">{{ $seatsLeft }} {{ Str::plural('seat', $seatsLeft) }} left.</strong>
+                @if ($waitlist)
+                    <strong class="text-red-600">This hike is fully booked.</strong>
+                    Join the waitlist: if a seat opens up, you move up in the order you joined and we let you know right away.
+                @else
+                    <strong class="text-brand-800">{{ $seatsLeft }} {{ Str::plural('seat', $seatsLeft) }} left.</strong>
+                    Bookings close {{ $event->registrationDeadline()->setTimezone(config('site.timezone'))->format('D j M \a\t H:i') }} (Lebanon time).
+                @endif
                 @if ($event->is_xtreme)
                     This is an X Event: an organizer reviews every registration before confirming the seat.
                 @endif
@@ -112,7 +119,7 @@
                 </div>
 
                 <button type="submit" class="w-full rounded-full bg-accent-500 px-8 py-4 font-display text-lg font-bold uppercase tracking-wide text-white hover:bg-accent-600 sm:w-auto">
-                    {{ $event->is_xtreme ? 'Send my registration' : 'Book my seat' }}
+                    {{ $waitlist ? 'Join the waitlist' : ($event->is_xtreme ? 'Send my registration' : 'Book my seat') }}
                 </button>
             </form>
         @endunless

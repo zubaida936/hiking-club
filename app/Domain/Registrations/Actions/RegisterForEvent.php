@@ -15,7 +15,8 @@ use Illuminate\Support\Str;
 /**
  * Books a seat on an event. The event row is locked while seats are counted,
  * so two people can never take the last seat. X events need an organizer's
- * approval: their bookings hold a seat as "pending".
+ * approval: their bookings hold a seat as "pending". When the event is full
+ * and has a waitlist, the visitor joins the waitlist instead.
  */
 final class RegisterForEvent
 {
@@ -36,19 +37,22 @@ final class RegisterForEvent
             if ($event->requiresLevelAcknowledgement() && ! $data->levelAcknowledged) {
                 throw RegistrationException::levelNotAcknowledged();
             }
-            if ($event->registrations()->active()->where('phone', $data->phone)->exists()) {
+            if ($event->registrations()->where('status', '!=', RegistrationStatus::Cancelled)->where('phone', $data->phone)->exists()) {
                 throw RegistrationException::alreadyRegistered();
             }
-            if ($event->seatsLeft() === 0) {
-                throw RegistrationException::soldOut();
-            }
+
+            $status = match (true) {
+                ! $event->isSoldOut() => $event->is_xtreme ? RegistrationStatus::Pending : RegistrationStatus::Confirmed,
+                $event->waitlist_enabled => RegistrationStatus::Waitlisted,
+                default => throw RegistrationException::soldOut(),
+            };
 
             $pickup = $data->meetingPointId !== null ? $event->meetingPoints()->find($data->meetingPointId) : null;
 
             return $event->registrations()->create([
                 'reference' => $this->uniqueReference(),
                 'token' => Str::random(64),
-                'status' => $event->is_xtreme ? RegistrationStatus::Pending : RegistrationStatus::Confirmed,
+                'status' => $status,
                 'name' => $data->name,
                 'phone' => $data->phone,
                 'email' => $data->email,

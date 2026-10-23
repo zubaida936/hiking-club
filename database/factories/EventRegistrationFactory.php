@@ -37,6 +37,11 @@ class EventRegistrationFactory extends Factory
         return $this->state(['status' => RegistrationStatus::Pending]);
     }
 
+    public function waitlisted(): static
+    {
+        return $this->state(['status' => RegistrationStatus::Waitlisted]);
+    }
+
     public function cancelled(): static
     {
         return $this->state(['status' => RegistrationStatus::Cancelled]);

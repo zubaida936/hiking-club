@@ -264,14 +264,22 @@
                     <p class="mt-6 rounded-lg bg-red-50 p-3 text-sm text-red-800">X Event: only approved hikers can register.</p>
                 @endif
 
-                @if ($event->isOpenForRegistration() && $event->seatsLeft() > 0)
+                @if ($event->isOpenForRegistration() && ! $event->isSoldOut())
                     <a href="{{ route('events.register', $event) }}"
                        class="mt-6 block rounded-full bg-accent-500 px-6 py-3 text-center font-display font-bold uppercase tracking-wide text-white hover:bg-accent-600">
                         {{ $event->registerLabel() }}
                     </a>
+                    <p class="mt-2 text-center text-xs text-slate-500">Bookings close {{ $event->registrationDeadline()->setTimezone(config('site.timezone'))->format('D j M \a\t H:i') }} (Lebanon time).</p>
+                @elseif ($event->acceptsWaitlist())
+                    <p class="mt-6 text-center font-display font-bold uppercase tracking-wide text-red-600">Fully booked</p>
+                    <a href="{{ route('events.register', $event) }}"
+                       class="mt-2 block rounded-full border-2 border-accent-500 px-6 py-2.5 text-center font-display font-bold uppercase tracking-wide text-accent-600 hover:bg-accent-500/10">
+                        Join the Waitlist
+                    </a>
+                    <p class="mt-2 text-center text-xs text-slate-500">We email you if a seat opens up.</p>
                 @elseif ($upcoming)
                     <p class="mt-6 rounded-full bg-slate-100 px-6 py-3 text-center font-display font-bold uppercase tracking-wide text-slate-500">
-                        {{ $event->seatsLeft() === 0 ? 'Fully booked' : 'Registration closed' }}
+                        {{ $event->isSoldOut() ? 'Fully booked' : 'Registration closed' }}
                     </p>
                 @endif
 

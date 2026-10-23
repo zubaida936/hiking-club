@@ -12,6 +12,9 @@ return [
 
     'tagline' => 'Trails, summits and good company, every weekend.',
 
+    // The club's local time: pickup times and booking deadlines are entered and shown in it (the app stores UTC).
+    'timezone' => 'Asia/Beirut',
+
     /*
     | SEO defaults, used when a page doesn't set its own description / share image.
     | The share image should be 1200×630 JPEG or PNG (path under public/).

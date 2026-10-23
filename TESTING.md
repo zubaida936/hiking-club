@@ -66,10 +66,16 @@ A green WhatsApp button floats in the bottom-right corner of every public page a
 | Confirmation email | Mailpit, http://localhost:8025 (only when an email is given) |
 | Bookings in the database | phpMyAdmin → `hiking` → `event_registrations`, or the CMS event edit screen |
 
-Demo data: Horch Ehden has 26 of 30 seats booked (book 4 more to see "Fully booked"); the X event has 3 bookings
-awaiting approval. X event bookings are "Awaiting approval" and still take a seat. Registration closes the day
-before the hike. One booking per phone number per hike. Payment and terms texts are placeholders in
-`config/site.php` → `booking`. After pulling: `php artisan migrate` and `docker compose restart queue`.
+Demo data: Horch Ehden has 26 of 30 seats booked (cards show "Only 4 seats left"). The X event X30 is full
+(30 awaiting approval) with 2 people on the waitlist: its cards say "Sold out" and its page offers "Join the Waitlist".
+X event bookings are "Awaiting approval" and still take a seat; waitlist entries don't.
+
+- **Booking deadline:** midnight (Lebanon time) before the hike day, or the event's "Bookings close" date in the CMS
+  (Booking box). The event page shows "Bookings close …".
+- **Waitlist:** on by default ("Waitlist when full" in the CMS). Raising the capacity in the CMS moves people up in
+  the order they joined and emails them "A seat opened up". Untick it to show plain "Fully booked" instead.
+- One booking (or waitlist entry) per phone number per hike. Payment and terms texts are placeholders in
+  `config/site.php` → `booking`. After pulling: `php artisan migrate` and `docker compose restart queue`.
 
 ### Newsletter (Next Destination Alerts)
 
@@ -156,6 +162,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Events listing page | https://app.clickup.com/t/z8q7hbmpep |
 | Event detail page | https://app.clickup.com/t/z8q7hbmpeq |
 | Registration / booking flow | https://app.clickup.com/t/z8q7hbmpet |
+| Seat capacity, waitlist & sold-out status | https://app.clickup.com/t/z8q7hbmpeu |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

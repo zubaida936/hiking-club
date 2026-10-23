@@ -55,6 +55,7 @@ class EventController extends Controller
         return view('admin.events.create', [
             'event' => new Event([
                 'capacity' => 30,
+                'waitlist_enabled' => true,
                 'fee_cents' => 0,
                 'elevation_gain_m' => 0,
                 'elevation_loss_m' => 0,

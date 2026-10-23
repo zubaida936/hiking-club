@@ -7,6 +7,8 @@ enum RegistrationStatus: string
     case Confirmed = 'confirmed';
     // X events: the seat is held until an organizer approves the hiker.
     case Pending = 'pending';
+    // Event was full: no seat yet, moves up in booking order when one frees up.
+    case Waitlisted = 'waitlisted';
     case Cancelled = 'cancelled';
 
     /**
@@ -24,6 +26,7 @@ enum RegistrationStatus: string
         return match ($this) {
             self::Confirmed => 'Confirmed',
             self::Pending => 'Awaiting approval',
+            self::Waitlisted => 'On the waitlist',
             self::Cancelled => 'Cancelled',
         };
     }
@@ -33,6 +36,7 @@ enum RegistrationStatus: string
         return match ($this) {
             self::Confirmed => 'bg-emerald-100 text-emerald-800',
             self::Pending => 'bg-amber-100 text-amber-800',
+            self::Waitlisted => 'bg-sky-100 text-sky-800',
             self::Cancelled => 'bg-slate-200 text-slate-700',
         };
     }

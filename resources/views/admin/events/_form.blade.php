@@ -127,7 +127,15 @@
             <h2 class="mb-4 font-semibold">Booking</h2>
             <div class="space-y-4">
                 <x-admin.input name="fee" label="Fee (USD)" type="number" step="0.01" min="0" :value="$event->exists || $event->fee_cents ? $event->feeAmount() : ''" required hint="0 = free" />
-                <x-admin.input name="capacity" label="Seats (capacity)" type="number" min="1" :value="$event->capacity" required />
+                <x-admin.input name="capacity" label="Seats (capacity)" type="number" min="1" :value="$event->capacity" required
+                               hint="Raising it moves people up from the waitlist automatically." />
+                <x-admin.input name="registration_closes_at" label="Bookings close" type="datetime-local"
+                               :value="$event->registration_closes_at?->setTimezone(config('site.timezone'))->format('Y-m-d\TH:i')"
+                               hint="Lebanon time. Leave empty to close at midnight before the hike day." />
+                <label class="flex items-start gap-2 text-sm text-slate-700">
+                    <input type="checkbox" name="waitlist_enabled" value="1" class="mt-0.5 rounded border-slate-300" @checked(old('waitlist_enabled', $event->waitlist_enabled))>
+                    <span>Waitlist when full <span class="block text-xs text-slate-500">People can join a waitlist and move up when seats free up.</span></span>
+                </label>
                 <label class="flex items-start gap-2 text-sm text-slate-700">
                     <input type="checkbox" name="is_xtreme" value="1" class="mt-0.5 rounded border-slate-300" @checked(old('is_xtreme', $event->is_xtreme))>
                     <span>X event <span class="block text-xs text-slate-500">Only approved hikers can register.</span></span>
