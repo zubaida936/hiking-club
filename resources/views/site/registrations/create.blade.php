@@ -90,6 +90,33 @@
                     @error('notes') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                 </div>
 
+                @if ($event->fee_cents > 0 && \App\Domain\Payments\Enums\PaymentMethod::available() !== [])
+                    <fieldset @error('payment_method') aria-describedby="payment_method-help" @enderror>
+                        <legend class="font-display text-xl font-bold uppercase tracking-wide text-brand-900">How will you pay {{ $event->formattedFee() }}?</legend>
+                        <div class="mt-4 grid gap-2">
+                            @foreach (\App\Domain\Payments\Enums\PaymentMethod::available() as $method)
+                                <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-300 px-4 py-3 has-checked:border-brand-500 has-checked:bg-brand-50">
+                                    <input type="radio" name="payment_method" value="{{ $method->value }}" required class="mt-1 text-brand-600 focus:ring-brand-500"
+                                           @checked(old('payment_method') === $method->value)>
+                                    <span>
+                                        <span class="block font-semibold text-slate-800">{{ $method->label() }}</span>
+                                        <span class="block text-sm text-slate-500">
+                                            @if ($method === \App\Domain\Payments\Enums\PaymentMethod::Online)
+                                                Card or wallet, on the next page once your seat is confirmed.
+                                            @elseif ($method->isWalletTransfer())
+                                                Send the fee to our {{ $method === \App\Domain\Payments\Enums\PaymentMethod::Whish ? 'Whish Money' : 'OMT Pay' }} account; the number is on the next page.
+                                            @else
+                                                Pay the organizers at the pickup point.
+                                            @endif
+                                        </span>
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+                        @error('payment_method') <p id="payment_method-help" class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </fieldset>
+                @endif
+
                 <x-site.field name="referrer_phone" label="Invited by a friend? Their phone number" type="tel" :optional="true" placeholder="+961 70 123 456"
                               :hint="'They earn '.config('points.referral').' points once you complete your first hike with us.'" />
 

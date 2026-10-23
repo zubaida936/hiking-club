@@ -29,7 +29,7 @@ final class RegistrationExport
 
         $rows = [[
             'Reference', 'Status', 'Name', 'Phone', 'Email', 'Pickup point', 'Pickup time',
-            'Emergency contact', 'Emergency phone', 'Notes', 'Paid', 'Attendance', 'Booked at',
+            'Emergency contact', 'Emergency phone', 'Notes', 'Paid', 'Payment method', 'Transaction number', 'Attendance', 'Booked at',
         ]];
 
         foreach ($this->registrations as $r) {
@@ -45,6 +45,8 @@ final class RegistrationExport
                 $r->emergency_contact_phone,
                 (string) $r->notes,
                 $r->paid_at ? 'Yes' : 'No',
+                (string) $r->payment_method?->label(),
+                (string) $r->payment_reference,
                 (string) $r->attendance?->label(),
                 $r->created_at->setTimezone($timezone)->format('Y-m-d H:i'),
             ]);

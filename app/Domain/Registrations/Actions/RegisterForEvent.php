@@ -70,6 +70,7 @@ final class RegisterForEvent
                 'emergency_contact_name' => $data->emergencyContactName,
                 'emergency_contact_phone' => $data->emergencyContactPhone,
                 'notes' => $data->notes,
+                'payment_method' => $event->fee_cents > 0 ? $data->paymentMethod : null,
                 'terms_accepted_at' => now(),
                 'level_acknowledged_at' => $event->requiresLevelAcknowledgement() ? now() : null,
             ]);

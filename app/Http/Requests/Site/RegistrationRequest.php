@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Site;
 
+use App\Domain\Payments\Enums\PaymentMethod;
 use App\Domain\Registrations\Data\RegistrationData;
 use App\Models\Event;
 use App\Support\Phone;
@@ -37,6 +38,10 @@ class RegistrationRequest extends FormRequest
             'emergency_contact_phone' => ['required', 'string', 'regex:'.Phone::PATTERN, 'different:phone'],
             'notes' => ['nullable', 'string', 'max:500'],
             'referrer_phone' => ['nullable', 'string', 'regex:'.Phone::PATTERN, 'different:phone'],
+            // Paid hikes: how the hiker will pay (only the methods offered right now).
+            'payment_method' => $event->fee_cents > 0 && PaymentMethod::available() !== []
+                ? ['required', Rule::in(array_map(fn (PaymentMethod $m) => $m->value, PaymentMethod::available()))]
+                : ['nullable'], // free hike: ignored
             'level_acknowledged' => [$event->requiresLevelAcknowledgement() ? 'accepted' : 'nullable'],
             'terms' => ['accepted'],
             // Honeypot: hidden from people, bots fill it in.
@@ -70,6 +75,7 @@ class RegistrationRequest extends FormRequest
             'meeting_point_id.required' => 'Choose where we pick you up.',
             'level_acknowledged.accepted' => 'Please confirm that you meet the level requirements for this hike.',
             'terms.accepted' => 'Please accept the terms to book your seat.',
+            'payment_method.required' => 'Choose how you will pay.',
         ];
     }
 
@@ -87,6 +93,7 @@ class RegistrationRequest extends FormRequest
             notes: $this->filled('notes') ? $this->string('notes')->trim()->toString() : null,
             levelAcknowledged: $this->boolean('level_acknowledged'),
             referrerPhone: Phone::normalize($this->input('referrer_phone')),
+            paymentMethod: PaymentMethod::tryFrom((string) $this->input('payment_method')),
         );
     }
 

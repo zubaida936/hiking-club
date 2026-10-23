@@ -25,6 +25,13 @@
     </section>
 
     <div class="mx-auto max-w-2xl px-4 py-12 sm:px-6">
+        @if (session('status'))
+            <p class="mb-6 rounded-xl bg-brand-50 px-5 py-4 font-medium text-brand-900" role="status">{{ session('status') }}</p>
+        @endif
+        @if (session('error'))
+            <p class="mb-6 rounded-xl bg-red-50 px-5 py-4 font-medium text-red-800" role="alert">{{ session('error') }}</p>
+        @endif
+
         <dl class="divide-y divide-slate-100 rounded-2xl border border-slate-200">
             @foreach (array_filter([
                 'Hike' => $event->title,
@@ -45,7 +52,7 @@
             @endforeach
         </dl>
 
-        <p class="mt-6 text-slate-600">{{ config('site.booking.payment_note') }}</p>
+        <x-site.booking-payment :registration="$registration" />
         @unless ($registration->isCancelled())
             <p class="mt-2 text-slate-600">
                 You earn <strong class="text-accent-600">{{ app(\App\Domain\Loyalty\PointsRules::class)->hikePoints($event) }} points</strong> when you complete this hike{{ config('points.paid_only') && $event->fee_cents > 0 ? ' (paid bookings only)' : '' }}.

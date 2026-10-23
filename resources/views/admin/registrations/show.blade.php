@@ -121,6 +121,12 @@
                                     @elseif ($registration->holdsSeat())
                                         <span class="text-slate-400">Unpaid</span>
                                     @endif
+                                    @if ($registration->payment_method)
+                                        <span class="block text-xs text-slate-500">{{ $registration->payment_method->label() }}</span>
+                                    @endif
+                                    @if ($registration->payment_reference)
+                                        <span class="block font-mono text-xs text-slate-700" title="Transaction number">#{{ $registration->payment_reference }}</span>
+                                    @endif
                                     @if ($canManage && $registration->holdsSeat())
                                         <form method="POST" action="{{ route('admin.registrations.payment', $registration) }}">@csrf
                                             <input type="hidden" name="paid" value="{{ $registration->paid_at ? 0 : 1 }}">
@@ -177,7 +183,8 @@
             <form method="POST" :action="cancel?.url" class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl" @click.outside="cancel = null">
                 @csrf
                 <h2 class="text-lg font-semibold">Cancel <span x-text="cancel?.name"></span>'s booking?</h2>
-                <p class="mt-1 text-sm text-slate-500">The seat goes to the first person on the waitlist, if any. This can't be undone.</p>
+                <p class="mt-1 text-sm text-slate-500">The seat goes to the first person on the waitlist, if any. This can't be undone.
+                    If they already paid, refund them yourself (Whish, OMT, cash or the online provider).</p>
                 <div class="mt-4">
                     <x-admin.textarea name="cancellation_reason" label="Reason (shown to the hiker)" rows="3" maxlength="500" />
                 </div>

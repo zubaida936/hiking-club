@@ -38,6 +38,7 @@ function bookViaForm(Event $event, array $overrides = []): void
         'emergency_contact_name' => 'Karim',
         'emergency_contact_phone' => '+961 3 000 000',
         'terms' => '1',
+        'payment_method' => 'cash',
         'level_acknowledged' => '1',
     ], $overrides))->assertSessionHasNoErrors();
 }

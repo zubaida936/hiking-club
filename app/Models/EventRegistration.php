@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domain\Payments\Enums\PaymentMethod;
 use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
 use Database\Factories\EventRegistrationFactory;
@@ -31,6 +32,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon $terms_accepted_at
  * @property ?Carbon $level_acknowledged_at
  * @property ?Carbon $paid_at
+ * @property ?PaymentMethod $payment_method
+ * @property ?string $payment_reference transfer number reported by the hiker, or the gateway's id
  * @property ?Attendance $attendance
  * @property ?Carbon $attendance_marked_at
  * @property ?Carbon $cancelled_at
@@ -57,6 +60,7 @@ class EventRegistration extends Model
             'terms_accepted_at' => 'datetime',
             'level_acknowledged_at' => 'datetime',
             'paid_at' => 'datetime',
+            'payment_method' => PaymentMethod::class,
             'attendance' => Attendance::class,
             'attendance_marked_at' => 'datetime',
             'cancelled_at' => 'datetime',
@@ -100,6 +104,24 @@ class EventRegistration extends Model
     public function referrer(): BelongsTo
     {
         return $this->belongsTo(Hiker::class, 'referred_by_hiker_id');
+    }
+
+    /**
+     * Online payment attempts.
+     *
+     * @return HasMany<Payment, $this>
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Whether the hiker still has to pay (paid hike, seat confirmed, not paid yet).
+     */
+    public function awaitsPayment(): bool
+    {
+        return $this->isConfirmed() && $this->paid_at === null && $this->event->fee_cents > 0;
     }
 
     /**

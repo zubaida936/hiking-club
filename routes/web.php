@@ -7,8 +7,10 @@ use App\Http\Controllers\Site\Auth\PasswordResetController;
 use App\Http\Controllers\Site\EventController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\NewsletterController;
+use App\Http\Controllers\Site\PaymentController;
 use App\Http\Controllers\Site\RegistrationController;
 use App\Http\Controllers\Site\SeoController;
+use App\Http\Controllers\Site\TestPaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -19,6 +21,19 @@ Route::controller(RegistrationController::class)->group(function () {
     Route::get('events/{event:slug}/register', 'create')->name('events.register');
     Route::post('events/{event:slug}/register', 'store')->middleware('throttle:5,1')->name('events.register.store');
     Route::get('bookings/{registration:token}', 'show')->name('registrations.show');
+});
+
+Route::controller(PaymentController::class)->group(function () {
+    Route::post('bookings/{registration:token}/pay', 'pay')->middleware('throttle:10,1')->name('registrations.pay');
+    Route::post('bookings/{registration:token}/transfer', 'transfer')->middleware('throttle:10,1')->name('registrations.transfer');
+    Route::get('payments/{payment:external_id}/return', 'return')->name('payments.return');
+    // CSRF-exempt (bootstrap/app.php): called by the payment provider, not a browser.
+    Route::post('payments/webhook/{gateway}', 'webhook')->middleware('throttle:60,1')->name('payments.webhook');
+});
+
+Route::controller(TestPaymentController::class)->prefix('payments/test/{payment:external_id}')->name('payments.test.')->group(function () {
+    Route::get('/', 'show')->name('show');
+    Route::post('/', 'simulate')->name('simulate');
 });
 
 // Member accounts: no open signup; hikers who booked activate an account, then log in with phone + password.

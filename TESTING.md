@@ -88,6 +88,13 @@ X event bookings are "Awaiting approval" and still take a seat; waitlist entries
   (Booking box). The event page shows "Bookings close …".
 - **Waitlist:** on by default ("Waitlist when full" in the CMS). Raising the capacity in the CMS moves people up in
   the order they joined and emails them "A seat opened up". Untick it to show plain "Fully booked" instead.
+- **Payment** (paid hikes): the hiker picks Whish Money transfer, OMT Pay transfer, Cash on the day, or Online payment.
+  Whish/OMT: the booking page shows the club account + reference to put in the note, and a box for the transaction
+  number; organizers see method + number in Registrations and click "Mark paid". Online: "Pay $N now" on the booking
+  page (once the seat is confirmed) → test payment page with Pay / Fail → back to the booking, paid automatically.
+  Wallet names/numbers are placeholders: `PAYMENT_WHISH_*` / `PAYMENT_OMT_*` in `.env`. Online payment uses the built-in
+  **test gateway** when `PAYMENT_ONLINE_GATEWAY=test` (set in your local `.env`; never in production) until Whish/OMT
+  give the club merchant API access.
 - One booking (or waitlist entry) per phone number per hike. Payment and terms texts are placeholders in
   `config/site.php` → `booking`. After pulling: `php artisan migrate` and `docker compose restart queue`.
 
@@ -201,6 +208,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Points engine | https://app.clickup.com/t/z8q7hbmpf3 |
 | Rank tiers | https://app.clickup.com/t/z8q7hbmpf4 |
 | Login & account activation | https://app.clickup.com/t/z8q7hbmpf1 |
+| Event payments | https://app.clickup.com/t/z8q7hbmpev |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

@@ -34,6 +34,7 @@ function waitlistPayload(Event $event, string $phone = '+961 71 000 001'): array
         'emergency_contact_name' => 'Someone',
         'emergency_contact_phone' => '+961 3 000 000',
         'terms' => '1',
+        'payment_method' => 'cash',
     ];
 }
 

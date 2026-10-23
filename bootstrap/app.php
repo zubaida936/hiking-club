@@ -24,6 +24,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => EnsureCanAccessAdmin::class,
         ]);
 
+        // Payment providers post here server-to-server; the payment status is re-checked with them.
+        $middleware->validateCsrfTokens(except: ['payments/webhook/*']);
+
         // CMS pages send guests to the staff login; the public site to the member login.
         $isCms = fn (Request $request) => $request->is(trim((string) config('cms.path'), '/'), trim((string) config('cms.path'), '/').'/*');
         $middleware->redirectGuestsTo(fn (Request $request) => $isCms($request) ? route('admin.login') : route('login'));

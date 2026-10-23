@@ -28,6 +28,7 @@ function bookingPayload(Event $event, array $overrides = []): array
         'emergency_contact_phone' => '+961 3 987 654',
         'notes' => 'First hike with you!',
         'terms' => '1',
+        'payment_method' => 'cash',
     ], $overrides);
 }
 
@@ -106,7 +107,7 @@ describe('booking', function () {
             ->assertSee($registration->pickup_point)
             ->assertSee('Karim Haddad')
             ->assertSee('rima@example.com')
-            ->assertSee(config('site.booking.payment_note'))
+            ->assertSee('in cash to the organizers at the pickup point')
             ->assertSee('wa.me/');
 
         $this->get(route('events.show', $this->event))->assertSee('19 of 20');

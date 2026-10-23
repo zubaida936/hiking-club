@@ -27,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
 
         // config/members.php picks how one-time codes reach members (mail today, SMS/WhatsApp later).
         $this->app->bind(CodeChannel::class, fn ($app) => $app->make(config('members.code_channels.'.config('members.code_channel'))));
+
     }
 
     /**

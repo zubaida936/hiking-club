@@ -2,6 +2,8 @@
 
 namespace App\Domain\Registrations\Data;
 
+use App\Domain\Payments\Enums\PaymentMethod;
+
 final readonly class RegistrationData
 {
     /**
@@ -17,5 +19,6 @@ final readonly class RegistrationData
         public ?string $notes,
         public bool $levelAcknowledged,
         public ?string $referrerPhone = null,
+        public ?PaymentMethod $paymentMethod = null,
     ) {}
 }
