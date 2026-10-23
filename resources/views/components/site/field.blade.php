@@ -1,11 +1,11 @@
-@props(['name', 'label', 'type' => 'text', 'hint' => null, 'optional' => false])
+@props(['name', 'label', 'type' => 'text', 'hint' => null, 'optional' => false, 'value' => null])
 
 {{-- Labelled public-site form input with its hint and validation error. --}}
 <div>
     <label for="{{ $name }}" class="block text-sm font-semibold text-slate-700">
         {{ $label }} @if ($optional)<span class="font-normal text-slate-400">(optional)</span>@endif
     </label>
-    <input id="{{ $name }}" name="{{ $name }}" type="{{ $type }}" value="{{ old($name) }}"
+    <input id="{{ $name }}" name="{{ $name }}" type="{{ $type }}" value="{{ old($name, $value) }}"
            @if ($hint || $errors->has($name)) aria-describedby="{{ $name }}-help" @endif
            @error($name) aria-invalid="true" @enderror
            {{ $attributes->class([

@@ -46,10 +46,10 @@
 
                 <fieldset class="space-y-5">
                     <legend class="font-display text-xl font-bold uppercase tracking-wide text-brand-900">Your details</legend>
-                    <x-site.field name="name" label="Full name" required maxlength="120" autocomplete="name" />
+                    <x-site.field name="name" label="Full name" :value="$member?->name" required maxlength="120" autocomplete="name" />
                     <div class="grid gap-5 sm:grid-cols-2">
-                        <x-site.field name="phone" label="Phone (WhatsApp)" type="tel" required placeholder="+961 70 123 456" autocomplete="tel" />
-                        <x-site.field name="email" label="Email" type="email" :optional="true" placeholder="you@example.com" autocomplete="email"
+                        <x-site.field name="phone" label="Phone (WhatsApp)" :value="$member?->phone" type="tel" required placeholder="+961 70 123 456" autocomplete="tel" />
+                        <x-site.field name="email" label="Email" :value="$member?->email" type="email" :optional="true" placeholder="you@example.com" autocomplete="email"
                                       hint="We send your confirmation here." />
                     </div>
                 </fieldset>

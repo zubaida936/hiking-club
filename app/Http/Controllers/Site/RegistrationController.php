@@ -10,17 +10,22 @@ use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Support\WhatsApp;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class RegistrationController extends Controller
 {
-    public function create(Event $event): View
+    public function create(Request $request, Event $event): View
     {
         abort_unless($event->isVisibleOnSite(), 404);
 
         $event->load('meetingPoints')->loadSeatCount();
 
-        return view('site.registrations.create', ['event' => $event]);
+        return view('site.registrations.create', [
+            'event' => $event,
+            // Logged-in members get their details filled in.
+            'member' => $request->user()?->hiker,
+        ]);
     }
 
     public function store(RegistrationRequest $request, Event $event, RegisterForEvent $action): RedirectResponse

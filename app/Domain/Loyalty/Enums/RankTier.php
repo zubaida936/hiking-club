@@ -44,6 +44,14 @@ enum RankTier: string
         return $cases[$index + 1] ?? null;
     }
 
+    /**
+     * @return list<string>
+     */
+    public function rewards(): array
+    {
+        return array_values((array) config("points.tier_rewards.{$this->value}", []));
+    }
+
     public function badgeClasses(): string
     {
         return match ($this) {

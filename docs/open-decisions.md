@@ -25,8 +25,13 @@ Update this file when one is settled. Last reviewed: 2026-10-23.
   → "Event reminders & notifications".
 - **Refunds are manual.** Cancelling a paid booking (or a whole event) doesn't refund; organizers refund the hiker
   themselves. An online provider's refund API can be added with the real gateway.
-- **Hikers can't cancel or change a booking themselves**; they ask on WhatsApp and an organizer does it in the CMS.
-  → "Member dashboard".
+- **Self-service cancellation is limited**: members can cancel an *unpaid* booking from their dashboard until bookings
+  for the hike close. Paid bookings must be cancelled by an organizer (refund). Changing a booking (pickup point,
+  details) is still done by organizers in the CMS. **Club decision:** a cancellation / refund policy (deadline, fees)
+  would let paid bookings be cancelled online too.
+- **Tier rewards are informational**: the dashboard shows what each rank unlocks (`config/points.php` →
+  `tier_rewards`, copied from the ClickUp task), but there is no redemption yet; members ask an organizer.
+  → "Rewards per tier & redemption".
 - **Waitlist promotion** happens when an organizer raises the capacity or cancels a booking; there is no automatic
   expiry for unpaid bookings.
 - **X event approval** of bookings is per booking in CMS → Registrations; the X application process itself is in

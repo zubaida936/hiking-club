@@ -57,7 +57,8 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('account', AccountController::class)->name('account');
+    Route::get('account', [AccountController::class, 'show'])->name('account');
+    Route::post('account/bookings/{registration}/cancel', [AccountController::class, 'cancelBooking'])->name('account.bookings.cancel');
     Route::post('logout', [MemberSessionController::class, 'destroy'])->name('logout');
 });
 

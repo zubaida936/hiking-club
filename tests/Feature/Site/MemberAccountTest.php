@@ -229,7 +229,7 @@ describe('account page', function () {
             ->assertSee('Hi Rima!')
             ->assertSee('85')
             ->assertSee('Trekker')
-            ->assertSee('115 points to Mountaineer')
+            ->assertSee('<strong>115 points</strong> to Mountaineer', false)
             ->assertSee('#1')
             ->assertSee('Horch Ehden Nature Reserve')
             ->assertSee(route('registrations.show', $this->booking))

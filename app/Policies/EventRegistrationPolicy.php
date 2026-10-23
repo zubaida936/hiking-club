@@ -21,6 +21,14 @@ class EventRegistrationPolicy
         return $actor->can(Permission::ManageRegistrations->value);
     }
 
+    /**
+     * A member managing their own booking from the dashboard.
+     */
+    public function cancelOwn(User $actor, EventRegistration $registration): bool
+    {
+        return $registration->hiker_id !== null && $actor->hiker?->id === $registration->hiker_id;
+    }
+
     public function markAttendance(User $actor, EventRegistration $registration): bool
     {
         return $actor->can(Permission::ManageAttendance->value);

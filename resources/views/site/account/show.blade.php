@@ -1,9 +1,16 @@
+@php
+    $km = fn (float $value) => rtrim(rtrim(number_format($value, 1), '0'), '.').' km';
+@endphp
+
 <x-site.layout title="My account" :noindex="true">
     <section class="bg-brand-800 px-4 py-12 text-white sm:px-6">
-        <div class="mx-auto flex max-w-5xl flex-wrap items-end justify-between gap-4">
+        <div class="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-4">
             <div>
                 <p class="font-display text-sm font-semibold uppercase tracking-[0.2em] text-accent-400">My account</p>
                 <h1 class="mt-1 font-display text-3xl font-bold uppercase tracking-wide sm:text-4xl">Hi {{ Str::before(auth()->user()->name, ' ') }}!</h1>
+                @if ($hiker)
+                    <p class="mt-2 text-white/85">{{ $hiker->tier()->label() }} · {{ $hiker->totalPoints() }} points</p>
+                @endif
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -12,50 +19,157 @@
         </div>
     </section>
 
-    <div class="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+    <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         @if (session('success'))
             <p class="mb-8 rounded-xl bg-brand-50 px-5 py-4 font-medium text-brand-900" role="status">{{ session('success') }}</p>
+        @endif
+        @if (session('error'))
+            <p class="mb-8 rounded-xl bg-red-50 px-5 py-4 font-medium text-red-800" role="alert">{{ session('error') }}</p>
         @endif
 
         @if ($hiker === null)
             <p class="text-slate-600">There are no hikes on this account yet.</p>
         @else
-            @php($tier = $hiker->tier())
-            <div class="grid gap-6 sm:grid-cols-3">
-                <div class="rounded-2xl bg-brand-50 p-6">
-                    <p class="text-xs uppercase tracking-wide text-slate-500">Points</p>
-                    <p class="font-display text-4xl font-bold text-brand-900">{{ $hiker->totalPoints() }}</p>
-                </div>
-                <div class="rounded-2xl bg-brand-50 p-6">
-                    <p class="text-xs uppercase tracking-wide text-slate-500">Rank</p>
-                    <p class="font-display text-4xl font-bold text-brand-900">{{ $tier->label() }}</p>
-                    @if ($hiker->pointsToNextTier() !== null)
-                        <p class="mt-1 text-sm text-slate-600">{{ $hiker->pointsToNextTier() }} points to {{ $tier->next()?->label() }}</p>
-                    @endif
-                </div>
-                <div class="rounded-2xl bg-brand-50 p-6">
-                    <p class="text-xs uppercase tracking-wide text-slate-500">Leaderboard</p>
-                    <p class="font-display text-4xl font-bold text-brand-900">#{{ $position }}</p>
-                    <p class="mt-1 text-sm text-slate-600">{{ rtrim(rtrim(number_format($hiker->totalDistanceKm(), 1), '0'), '.') }} km hiked</p>
-                </div>
-            </div>
+            @php
+                $tier = $hiker->tier();
+                $next = $tier->next();
+            @endphp
 
-            <div class="mt-12 grid gap-10 lg:grid-cols-2">
+            {{-- Rank & progress --}}
+            <section aria-labelledby="rank-heading" class="rounded-2xl bg-brand-50 p-6 sm:p-8">
+                <h2 id="rank-heading" class="sr-only">My rank</h2>
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p class="text-xs uppercase tracking-wide text-slate-500">Rank</p>
+                        <p class="font-display text-4xl font-bold text-brand-900">{{ $tier->label() }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs uppercase tracking-wide text-slate-500">Points</p>
+                        <p class="font-display text-4xl font-bold text-accent-600">{{ $hiker->totalPoints() }}</p>
+                    </div>
+                </div>
+                <div class="mt-5">
+                    <div class="h-3 overflow-hidden rounded-full bg-white" role="progressbar" aria-label="Progress to the next rank"
+                         aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $hiker->tierProgressPercent() }}">
+                        <div class="h-full rounded-full bg-accent-500" style="width: {{ $hiker->tierProgressPercent() }}%"></div>
+                    </div>
+                    <p class="mt-2 text-sm text-slate-600">
+                        @if ($next)
+                            <strong>{{ $hiker->pointsToNextTier() }} points</strong> to {{ $next->label() }} ({{ $next->minPoints() }} points)
+                        @else
+                            You've reached the highest rank. Respect!
+                        @endif
+                    </p>
+                </div>
+
+                <dl class="mt-6 grid grid-cols-2 gap-4 border-t border-brand-100 pt-6 text-center sm:grid-cols-3">
+                    <div>
+                        <dt class="text-xs uppercase tracking-wide text-slate-500">Hikes completed</dt>
+                        <dd class="font-display text-2xl font-bold text-brand-900">{{ $history->count() }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs uppercase tracking-wide text-slate-500">Distance hiked</dt>
+                        <dd class="font-display text-2xl font-bold text-brand-900">{{ $km($hiker->totalDistanceKm()) }}</dd>
+                    </div>
+                    <div class="col-span-2 sm:col-span-1">
+                        <dt class="text-xs uppercase tracking-wide text-slate-500">Leaderboard</dt>
+                        <dd class="font-display text-2xl font-bold text-brand-900">#{{ $position }}</dd>
+                    </div>
+                </dl>
+            </section>
+
+            <div class="mt-12 grid gap-12 lg:grid-cols-2">
+                {{-- Upcoming --}}
                 <section aria-labelledby="upcoming-heading">
                     <h2 id="upcoming-heading" class="font-display text-2xl font-bold uppercase tracking-wide text-brand-900">My upcoming hikes</h2>
                     @forelse ($upcoming as $booking)
-                        <a href="{{ route('registrations.show', $booking) }}" class="mt-4 flex items-center justify-between gap-4 rounded-2xl border border-slate-200 p-4 hover:bg-slate-50">
-                            <span>
-                                <span class="block font-semibold text-brand-900">{{ $booking->event->title }}</span>
-                                <span class="text-sm text-slate-500">{{ $booking->event->starts_on->format('D, j M Y') }}{{ $booking->pickup_point ? ' · '.$booking->pickup_point.' '.$booking->pickupTimeShort() : '' }}</span>
-                            </span>
-                            <span class="shrink-0 text-sm font-semibold text-slate-600">{{ $booking->status->label() }}</span>
-                        </a>
+                        <article class="mt-4 rounded-2xl border border-slate-200 p-4">
+                            <div class="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                    <a href="{{ route('registrations.show', $booking) }}" class="font-semibold text-brand-900 hover:underline">{{ $booking->event->title }}</a>
+                                    <p class="text-sm text-slate-500">
+                                        {{ $booking->event->starts_on->format('D, j M Y') }}{{ $booking->pickup_point ? ' · '.$booking->pickup_point.' '.$booking->pickupTimeShort() : '' }}
+                                    </p>
+                                </div>
+                                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                                    {{ $booking->status->label() }}{{ $booking->isWaitlisted() ? ' #'.$booking->waitlistPosition() : '' }}
+                                </span>
+                            </div>
+                            <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                                @if ($booking->event->fee_cents === 0)
+                                    <span class="text-slate-500">Free hike</span>
+                                @elseif ($booking->paid_at)
+                                    <span class="font-semibold text-brand-700">✓ Paid</span>
+                                @elseif ($booking->awaitsPayment())
+                                    <a href="{{ route('registrations.show', $booking) }}#payment-heading" class="font-semibold text-accent-600 hover:underline">
+                                        {{ $booking->event->formattedFee() }} to pay &rarr;
+                                    </a>
+                                @endif
+                                <a href="{{ route('registrations.show', $booking) }}" class="text-brand-700 hover:underline">Booking details</a>
+                                @if (\App\Domain\Registrations\Actions\CancelOwnBooking::allowed($booking))
+                                    <form method="POST" action="{{ route('account.bookings.cancel', $booking) }}" class="ml-auto"
+                                          onsubmit="return confirm('Cancel this booking? Your seat goes to the next person.')">
+                                        @csrf
+                                        <button class="text-red-600 hover:underline">Cancel booking</button>
+                                    </form>
+                                @endif
+                            </div>
+                        </article>
                     @empty
                         <p class="mt-4 text-slate-600">No upcoming hikes booked. <a href="{{ route('events.index') }}" class="font-semibold text-brand-700 hover:underline">Find your next one</a></p>
                     @endforelse
+                    @if ($upcoming->contains(fn ($b) => $b->paid_at !== null))
+                        <p class="mt-3 text-xs text-slate-500">To cancel a paid booking, message us on WhatsApp so we can arrange your refund.</p>
+                    @endif
                 </section>
 
+                {{-- Rewards --}}
+                <section aria-labelledby="rewards-heading">
+                    <h2 id="rewards-heading" class="font-display text-2xl font-bold uppercase tracking-wide text-brand-900">Rewards</h2>
+                    <ul class="mt-4 space-y-3">
+                        @foreach ($tiers as $level)
+                            @continue($level->rewards() === [])
+                            @php($unlocked = $hiker->totalPoints() >= $level->minPoints())
+                            <li @class(['rounded-2xl border p-4', 'border-brand-200 bg-brand-50' => $unlocked, 'border-slate-200 opacity-70' => ! $unlocked])>
+                                <p class="flex items-center justify-between gap-2 font-semibold">
+                                    <span>{{ $level->label() }} <span class="font-normal text-slate-500">· {{ $level->minPoints() }}+ points</span></span>
+                                    <span @class(['text-xs font-bold uppercase', 'text-brand-700' => $unlocked, 'text-slate-400' => ! $unlocked])>{{ $unlocked ? 'Unlocked' : 'Locked' }}</span>
+                                </p>
+                                <ul class="mt-1 list-disc pl-5 text-sm text-slate-600">
+                                    @foreach ($level->rewards() as $reward)
+                                        <li>{{ $reward }}</li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @endforeach
+                    </ul>
+                    <p class="mt-3 text-xs text-slate-500">To use an unlocked reward, tell an organizer when you book. Rewards are one-time, personal and can't be combined.</p>
+                </section>
+            </div>
+
+            <div class="mt-12 grid gap-12 lg:grid-cols-2">
+                {{-- History --}}
+                <section aria-labelledby="history-heading">
+                    <h2 id="history-heading" class="font-display text-2xl font-bold uppercase tracking-wide text-brand-900">Hike history</h2>
+                    @if ($history->isEmpty())
+                        <p class="mt-4 text-slate-600">Your completed hikes will appear here.</p>
+                    @else
+                        <p class="mt-1 text-sm text-slate-500">{{ $history->count() }} {{ Str::plural('hike', $history->count()) }} · {{ $km($hiker->totalDistanceKm()) }}</p>
+                        <ul class="mt-4 divide-y divide-slate-100">
+                            @foreach ($history as $hike)
+                                <li class="flex items-center justify-between gap-4 py-3 text-sm">
+                                    <span>
+                                        <a href="{{ route('events.show', $hike->event) }}" class="font-semibold text-brand-900 hover:underline">{{ $hike->event->title }}</a>
+                                        <span class="block text-slate-500">{{ $hike->event->starts_on->format('j M Y') }} · {{ $hike->event->formattedDistance() }} · {{ $hike->event->difficulty_level->label() }}</span>
+                                    </span>
+                                    <span class="shrink-0 font-semibold text-accent-600">+{{ (int) $hike->earned_points }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </section>
+
+                {{-- Latest points --}}
                 <section aria-labelledby="points-heading">
                     <h2 id="points-heading" class="font-display text-2xl font-bold uppercase tracking-wide text-brand-900">Latest points</h2>
                     @forelse ($recentPoints as $line)

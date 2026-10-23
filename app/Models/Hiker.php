@@ -91,6 +91,23 @@ class Hiker extends Model
     }
 
     /**
+     * How far (0-100) the hiker is from their current tier to the next one; 100 at the top tier.
+     */
+    public function tierProgressPercent(): int
+    {
+        $tier = $this->tier();
+        $next = $tier->next();
+
+        if ($next === null) {
+            return 100;
+        }
+
+        $span = max(1, $next->minPoints() - $tier->minPoints());
+
+        return (int) min(100, max(0, floor(($this->totalPoints() - $tier->minPoints()) * 100 / $span)));
+    }
+
+    /**
      * Km of completed (attended) hikes; uses total_distance_km from the Leaderboard query when present.
      */
     public function totalDistanceKm(): float
