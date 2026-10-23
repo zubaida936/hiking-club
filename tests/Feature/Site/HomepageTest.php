@@ -67,9 +67,10 @@ it('shows a friendly message when no event is scheduled', function () {
         ->assertSee('Our next adventure is being planned');
 });
 
-it('shows the leaderboard placeholder with progress links', function () {
+it('shows an empty leaderboard with progress links', function () {
     $this->get('/')
-        ->assertSee('The leaderboard goes live once members start earning points')
+        ->assertSee('The leaderboard fills up as hikers complete hikes and earn points.')
+        ->assertSee('href="'.route('leaderboard').'"', false)
         ->assertSee('View My Progress')
         ->assertSee('href="'.route('account').'"', false)
         ->assertSee('href="'.route('rank-system').'"', false);

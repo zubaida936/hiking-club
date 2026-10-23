@@ -50,24 +50,20 @@
         @endif
     </section>
 
-    {{-- Leaderboard (placeholder until the points engine exists) --}}
+    {{-- Leaderboard: top 10 --}}
     <section id="leaderboard" class="mx-auto max-w-3xl px-4 py-20 sm:px-6">
         <x-site.section-heading eyebrow="Rank system">Top 10 Hikers</x-site.section-heading>
         <div class="mt-10 overflow-hidden rounded-2xl ring-1 ring-slate-200">
-            <ol class="divide-y divide-slate-100" aria-hidden="true">
-                @foreach (range(1, 5) as $rank)
-                    <li class="flex items-center gap-4 px-6 py-4">
-                        <span class="w-6 font-display font-bold text-brand-700">{{ $rank }}</span>
-                        <span class="h-3 flex-1 rounded bg-slate-100"></span>
-                        <span class="h-3 w-16 rounded bg-slate-100"></span>
-                    </li>
-                @endforeach
-            </ol>
-            <p class="bg-slate-50 px-6 py-4 text-center text-slate-600">
-                The leaderboard goes live once members start earning points on hikes.
-            </p>
+            @if ($topHikers->isEmpty())
+                <p class="bg-slate-50 px-6 py-8 text-center text-slate-600">The leaderboard fills up as hikers complete hikes and earn points.</p>
+            @else
+                <x-site.leaderboard-list :hikers="$topHikers" :highlight="auth()->user()?->hiker?->id" />
+            @endif
         </div>
         <div class="mt-8 flex flex-wrap justify-center gap-4">
+            <a href="{{ route('leaderboard') }}" class="rounded-full border border-brand-600 px-6 py-3 font-display font-semibold uppercase tracking-wide text-brand-700 hover:bg-brand-50">
+                Full leaderboard
+            </a>
             <a href="{{ route('account') }}" class="rounded-full bg-brand-600 px-6 py-3 font-display font-semibold uppercase tracking-wide text-white hover:bg-brand-700">
                 View My Progress
             </a>

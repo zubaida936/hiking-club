@@ -60,7 +60,8 @@ it('lists upcoming bookings with their payment state', function () {
     $unpaid = myBooking(Event::factory()->published()->create(['title' => 'Unpaid Hike', 'fee_cents' => 3000, 'starts_on' => now()->addDays(10)->toDateString()]));
     myBooking(Event::factory()->published()->create(['title' => 'Free Hike', 'fee_cents' => 0, 'starts_on' => now()->addDays(15)->toDateString()]));
     myBooking(Event::factory()->published()->create(['title' => 'Waiting Hike', 'starts_on' => now()->addDays(20)->toDateString()]), ['status' => RegistrationStatus::Waitlisted]);
-    myBooking(Event::factory()->published()->create(['title' => 'Cancelled Hike']), ['status' => RegistrationStatus::Cancelled]);
+    // Later than the others, so the announcement bar (next hike on every page) doesn't show its title.
+    myBooking(Event::factory()->published()->create(['title' => 'Cancelled Hike', 'starts_on' => now()->addDays(40)->toDateString()]), ['status' => RegistrationStatus::Cancelled]);
 
     $this->actingAs($this->user)->get(route('account'))
         ->assertSeeInOrder(['Paid Hike', '✓ Paid', 'Unpaid Hike', '$30 to pay', 'Free Hike', 'Free hike', 'Waiting Hike', 'On the waitlist #1'])

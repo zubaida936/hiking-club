@@ -12,6 +12,13 @@ Update this file when one is settled. Last reviewed: 2026-10-23.
 | **Branding, hosting, languages** | Club name, logo, colours, domain, Arabic (RTL)? The site runs on placeholders. | `resources/css/app.css`, logo component, `config/site.php`, `public/images/og-default.jpg` |
 | **Legal texts** (privacy policy, terms) | Postponed. The booking form shows short placeholder terms and links to a "coming soon" privacy page. A cookie banner is needed if Google Analytics is enabled for EU visitors. | `config/site.php` → `booking.terms`, route `legal.privacy` |
 
+## Choices made that the club may want to revisit
+
+- **Public leaderboard privacy:** names are shown as first name + last initial ("Rima H."), never phone numbers; only
+  hikers with points are listed; members can hide themselves on My account ("Hide me"). Full names or an opt-in
+  instead of opt-out are one-line changes (`Hiker::publicName()`, `hikers.show_on_leaderboard` default).
+- **Leaderboard period:** points are counted for all time (no seasons / yearly reset yet).
+
 ## Placeholders to replace before launch
 
 - Club contact details and social handles: `SITE_*` in `.env` (`config/site.php`).

@@ -73,9 +73,22 @@
                     </div>
                     <div class="col-span-2 sm:col-span-1">
                         <dt class="text-xs uppercase tracking-wide text-slate-500">Leaderboard</dt>
-                        <dd class="font-display text-2xl font-bold text-brand-900">#{{ $position }}</dd>
+                        <dd class="font-display text-2xl font-bold text-brand-900">{{ $position ? '#'.$position : '—' }}</dd>
                     </div>
                 </dl>
+
+                <form method="POST" action="{{ route('account.leaderboard') }}" class="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-slate-600">
+                    @csrf
+                    <input type="hidden" name="show_on_leaderboard" value="{{ $hiker->show_on_leaderboard ? 0 : 1 }}">
+                    <span>
+                        @if ($hiker->show_on_leaderboard)
+                            You appear on the <a href="{{ route('leaderboard') }}" class="font-semibold text-brand-700 hover:underline">public leaderboard</a> as "{{ $hiker->publicName() }}".
+                        @else
+                            You're hidden from the <a href="{{ route('leaderboard') }}" class="font-semibold text-brand-700 hover:underline">public leaderboard</a>.
+                        @endif
+                    </span>
+                    <button class="font-semibold text-brand-700 underline hover:text-brand-900">{{ $hiker->show_on_leaderboard ? 'Hide me' : 'Show me' }}</button>
+                </form>
             </section>
 
             <div class="mt-12 grid gap-12 lg:grid-cols-2">

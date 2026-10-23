@@ -6,6 +6,7 @@ use App\Http\Controllers\Site\Auth\MemberSessionController;
 use App\Http\Controllers\Site\Auth\PasswordResetController;
 use App\Http\Controllers\Site\EventController;
 use App\Http\Controllers\Site\HomeController;
+use App\Http\Controllers\Site\LeaderboardController;
 use App\Http\Controllers\Site\NewsletterController;
 use App\Http\Controllers\Site\PaymentController;
 use App\Http\Controllers\Site\RegistrationController;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('events', [EventController::class, 'index'])->name('events.index');
+Route::get('leaderboard', LeaderboardController::class)->name('leaderboard');
 Route::get('events/{event:slug}', [EventController::class, 'show'])->name('events.show');
 
 Route::controller(RegistrationController::class)->group(function () {
@@ -59,6 +61,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('account', [AccountController::class, 'show'])->name('account');
     Route::post('account/bookings/{registration}/cancel', [AccountController::class, 'cancelBooking'])->name('account.bookings.cancel');
+    Route::post('account/leaderboard', [AccountController::class, 'leaderboardVisibility'])->name('account.leaderboard');
     Route::post('logout', [MemberSessionController::class, 'destroy'])->name('logout');
 });
 

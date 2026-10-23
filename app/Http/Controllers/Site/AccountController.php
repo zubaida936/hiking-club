@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Domain\Loyalty\Enums\RankTier;
 use App\Domain\Loyalty\Leaderboard;
+use App\Domain\Members\Actions\SetLeaderboardVisibility;
 use App\Domain\Registrations\Actions\CancelOwnBooking;
 use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
@@ -50,12 +51,23 @@ class AccountController extends Controller
 
         return view('site.account.show', [
             'hiker' => $hiker,
-            'position' => $leaderboard->positionOf($hiker),
+            'position' => $leaderboard->publicPositionOf($hiker),
             'upcoming' => $upcoming,
             'history' => $history,
             'tiers' => RankTier::cases(),
             'recentPoints' => $hiker->pointTransactions()->latest('id')->limit(5)->get(),
         ]);
+    }
+
+    public function leaderboardVisibility(Request $request, SetLeaderboardVisibility $action): RedirectResponse
+    {
+        $hiker = $request->user()?->hiker;
+        abort_if($hiker === null, 404);
+
+        $visible = $request->boolean('show_on_leaderboard');
+        $action->handle($hiker, $visible);
+
+        return back()->with('success', $visible ? 'You are shown on the leaderboard.' : 'You are hidden from the public leaderboard.');
     }
 
     public function cancelBooking(Request $request, EventRegistration $registration, CancelOwnBooking $action): RedirectResponse

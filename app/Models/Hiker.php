@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property ?string $email
  * @property ?int $user_id
+ * @property bool $show_on_leaderboard
  */
 class Hiker extends Model
 {
@@ -32,6 +33,23 @@ class Hiker extends Model
      * @var list<string>
      */
     protected $guarded = ['id'];
+
+    protected function casts(): array
+    {
+        return ['show_on_leaderboard' => 'boolean'];
+    }
+
+    /**
+     * Name shown publicly: first name and last initial ("Rima H.").
+     */
+    public function publicName(): string
+    {
+        $parts = preg_split('/\s+/', trim($this->name)) ?: [];
+        $first = array_shift($parts) ?? '';
+        $last = array_pop($parts);
+
+        return $last ? $first.' '.mb_strtoupper(mb_substr($last, 0, 1)).'.' : $first;
+    }
 
     /**
      * @return HasMany<EventRegistration, $this>

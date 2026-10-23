@@ -28,7 +28,8 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 
 | Page | Link | Status |
 |---|---|---|
-| Home | http://localhost:8080/ | Hero carousel, About, Next Challenge, X Events, contact. Leaderboard and newsletter are placeholders; texts/contact details are placeholders in `config/site.php` |
+| Home | http://localhost:8080/ | Hero carousel, About, Next Challenge, X Events, Top 10 Hikers (live leaderboard), newsletter sign-up, contact. Texts/contact details are placeholders in `config/site.php` |
+| Leaderboard | http://localhost:8080/leaderboard | Up to 100 hikers by points (ties by km), with rank tier, hikes and km. Names shown as "Rima H."; hikers without points or who chose "Hide me" on My account are not listed. Logged-in members see their own place |
 | About | http://localhost:8080/about | Coming soon |
 | Events | http://localhost:8080/events | Upcoming events (soonest first) and Past events with Load More; filter by level or month, e.g. http://localhost:8080/events?level=2 or http://localhost:8080/events?month=2026-11 |
 | Event detail | http://localhost:8080/events/horch-ehden-nature-reserve (or click "View Details" on any card) | Everything about one hike: level, effort, distance, elevation, fee, seats left, itinerary, meeting points, included / what to bring, technical details, route map + GPX download, WhatsApp inquiry. Cancelled example: http://localhost:8080/events/hadath-el-jebbe-to-tannourine-el-tahta. Drafts return 404 |
@@ -211,6 +212,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Login & account activation | https://app.clickup.com/t/z8q7hbmpf1 |
 | Event payments | https://app.clickup.com/t/z8q7hbmpev |
 | Member dashboard | https://app.clickup.com/t/z8q7hbmpf2 |
+| Public leaderboard | https://app.clickup.com/t/z8q7hbmpf7 |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

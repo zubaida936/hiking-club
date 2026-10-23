@@ -7,6 +7,7 @@ use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Models\EventRegistration;
 use App\Models\Hiker;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Hikers ranked by points, ties broken by total distance hiked (then name).
@@ -33,6 +34,37 @@ final class Leaderboard
             ->orderByDesc('total_distance_km')
             ->orderBy('name')
             ->orderBy('id');
+    }
+
+    /**
+     * The public leaderboard: hikers with points who haven't hidden themselves, in rank order.
+     *
+     * @return Builder<Hiker>
+     */
+    public function publicQuery(): Builder
+    {
+        return $this->query()
+            ->where('hikers.show_on_leaderboard', true)
+            ->having('total_points', '>', 0);
+    }
+
+    /**
+     * @return Collection<int, Hiker>
+     */
+    public function top(int $limit): Collection
+    {
+        return $this->publicQuery()->limit($limit)->get();
+    }
+
+    /**
+     * A hiker's place on the public leaderboard; null when not listed (hidden or no points).
+     */
+    public function publicPositionOf(Hiker $hiker): ?int
+    {
+        $ids = $this->publicQuery()->toBase()->get()->values()->map(fn (object $row) => (int) $row->id);
+        $index = $ids->search($hiker->id);
+
+        return $index === false ? null : $index + 1;
     }
 
     /**
