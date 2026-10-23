@@ -12,6 +12,7 @@ use App\Domain\Events\Difficulty\DifficultyCalculator;
 use App\Domain\Events\Enums\DifficultyLevel;
 use App\Domain\Events\Enums\EventStatus;
 use App\Domain\Events\Exceptions\EventException;
+use App\Domain\Identity\Enums\Permission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\EventRequest;
 use App\Models\Event;
@@ -72,11 +73,15 @@ class EventController extends Controller
         return redirect()->route('admin.events.edit', $event)->with('success', 'Event created as a draft.');
     }
 
-    public function edit(Event $event, DifficultyCalculator $difficulty): View
+    public function edit(Request $request, Event $event, DifficultyCalculator $difficulty): View
     {
         Gate::authorize('update', $event);
 
         $event->load('meetingPoints', 'creator', 'editor');
+
+        if ($request->user()?->can(Permission::ViewRegistrations->value)) {
+            $event->load(['registrations' => fn ($q) => $q->orderBy('created_at')->orderBy('id')]);
+        }
 
         return view('admin.events.edit', ['event' => $event, 'calculator' => $difficulty->toArray()]);
     }

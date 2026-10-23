@@ -89,6 +89,14 @@ class Event extends Model
     }
 
     /**
+     * @return HasMany<EventRegistration, $this>
+     */
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(EventRegistration::class);
+    }
+
+    /**
      * @return BelongsTo<User, $this>
      */
     public function creator(): BelongsTo
@@ -201,12 +209,38 @@ class Event extends Model
     }
 
     /**
-     * Seats still available. Bookings don't exist yet, so this is the full capacity
-     * until the booking feature subtracts confirmed registrations.
+     * Seats taken by confirmed and pending registrations. Uses a loaded
+     * withCount(['registrations as active_registrations_count' => ...]) when present.
      */
+    public function seatsTaken(): int
+    {
+        return (int) ($this->attributes['active_registrations_count'] ?? $this->registrations()->active()->count());
+    }
+
     public function seatsLeft(): int
     {
-        return $this->capacity;
+        return max(0, $this->capacity - $this->seatsTaken());
+    }
+
+    /**
+     * Bookings are taken for published events until the day before the hike.
+     */
+    public function isOpenForRegistration(): bool
+    {
+        return $this->isPublished() && $this->starts_on->isAfter(today());
+    }
+
+    /**
+     * Levels 3 and 4 ask hikers to confirm they are ready for the level.
+     */
+    public function requiresLevelAcknowledgement(): bool
+    {
+        return $this->difficulty_level->value >= DifficultyLevel::Advanced->value;
+    }
+
+    public function registerLabel(): string
+    {
+        return $this->requiresLevelAcknowledgement() ? "Register for Level {$this->difficulty_level->value}" : 'Reserve Your Spot';
     }
 
     /**

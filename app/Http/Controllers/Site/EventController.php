@@ -57,7 +57,7 @@ class EventController extends Controller
         // Drafts (including unpublished events) have no public page.
         abort_unless($event->isVisibleOnSite(), 404);
 
-        $event->load('meetingPoints');
+        $event->load('meetingPoints')->loadCount(['registrations as active_registrations_count' => fn ($q) => $q->active()]);
 
         return view('site.events.show', [
             'event' => $event,

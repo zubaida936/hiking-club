@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Domain\Events\Difficulty\DifficultyCalculator;
 use App\Domain\Events\Enums\EventStatus;
+use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Models\Event;
+use App\Models\EventRegistration;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -66,6 +68,17 @@ class DemoEventSeeder extends Seeder
             $event->meetingPoints()->delete();
             foreach ($pickups as $i => $p) {
                 $event->meetingPoints()->create($p + ['position' => $i]);
+            }
+
+            // Bookings on the upcoming published hikes: one almost full, the X event awaiting approvals.
+            $event->registrations()->delete();
+            if ($status === EventStatus::Published && $inDays > 0) {
+                EventRegistration::factory()
+                    ->count($xtreme ? 3 : 26)
+                    ->state($xtreme ? ['status' => RegistrationStatus::Pending] : [])
+                    ->sequence(fn ($s) => ['pickup_point' => $pickups[$s->index % 4]['name'], 'pickup_time' => $pickups[$s->index % 4]['pickup_time']])
+                    ->for($event)
+                    ->create();
             }
         }
     }

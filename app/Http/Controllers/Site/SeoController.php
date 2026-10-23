@@ -42,7 +42,7 @@ class SeoController extends Controller
     public function robots(): Response
     {
         $lines = app()->isProduction()
-            ? ['User-agent: *', 'Disallow: /'.trim(config('cms.path'), '/').'/', 'Disallow: /newsletter/', '', 'Sitemap: '.route('sitemap')]
+            ? ['User-agent: *', 'Disallow: /'.trim(config('cms.path'), '/').'/', 'Disallow: /newsletter/', 'Disallow: /bookings/', 'Disallow: /events/*/register', '', 'Sitemap: '.route('sitemap')]
             : ['User-agent: *', 'Disallow: /'];
 
         return response(implode("\n", $lines)."\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);

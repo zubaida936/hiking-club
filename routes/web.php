@@ -3,12 +3,19 @@
 use App\Http\Controllers\Site\EventController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\NewsletterController;
+use App\Http\Controllers\Site\RegistrationController;
 use App\Http\Controllers\Site\SeoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('events', [EventController::class, 'index'])->name('events.index');
 Route::get('events/{event:slug}', [EventController::class, 'show'])->name('events.show');
+
+Route::controller(RegistrationController::class)->group(function () {
+    Route::get('events/{event:slug}/register', 'create')->name('events.register');
+    Route::post('events/{event:slug}/register', 'store')->middleware('throttle:5,1')->name('events.register.store');
+    Route::get('bookings/{registration:token}', 'show')->name('registrations.show');
+});
 
 Route::get('sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::get('robots.txt', [SeoController::class, 'robots'])->name('robots');

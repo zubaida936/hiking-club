@@ -92,6 +92,16 @@ return [
     ],
 
     /*
+    | Event bookings. PLACEHOLDER texts until the "Event payments" task decides how hikers pay.
+    */
+    'booking' => [
+        // Shown on the confirmation page and in the confirmation email.
+        'payment_note' => 'The organizers will contact you on WhatsApp with the payment details.',
+        // Short terms hikers accept on the booking form (the full text comes with the Legal task).
+        'terms' => 'I take part at my own risk, I will follow the guides\' instructions, and I agree that the club may contact me about this hike by phone, WhatsApp or email.',
+    ],
+
+    /*
     | Social account handles (without @). Leave one empty to hide its link.
     */
     'social' => [

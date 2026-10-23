@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Site;
 
 use App\Domain\Newsletter\Data\SubscriptionData;
+use App\Support\Phone;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SubscribeRequest extends FormRequest
@@ -22,7 +23,7 @@ class SubscribeRequest extends FormRequest
     {
         return [
             'email' => ['nullable', 'required_without:phone', 'string', 'email:rfc', 'max:190'],
-            'phone' => ['nullable', 'required_without:email', 'string', 'regex:/^\+?[0-9\s\-().]{7,20}$/'],
+            'phone' => ['nullable', 'required_without:email', 'string', 'regex:'.Phone::PATTERN],
             // Honeypot: hidden from people, bots fill it in.
             'website' => ['prohibited'],
         ];

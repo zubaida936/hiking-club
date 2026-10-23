@@ -264,9 +264,20 @@
                     <p class="mt-6 rounded-lg bg-red-50 p-3 text-sm text-red-800">X Event: only approved hikers can register.</p>
                 @endif
 
+                @if ($event->isOpenForRegistration() && $event->seatsLeft() > 0)
+                    <a href="{{ route('events.register', $event) }}"
+                       class="mt-6 block rounded-full bg-accent-500 px-6 py-3 text-center font-display font-bold uppercase tracking-wide text-white hover:bg-accent-600">
+                        {{ $event->registerLabel() }}
+                    </a>
+                @elseif ($upcoming)
+                    <p class="mt-6 rounded-full bg-slate-100 px-6 py-3 text-center font-display font-bold uppercase tracking-wide text-slate-500">
+                        {{ $event->seatsLeft() === 0 ? 'Fully booked' : 'Registration closed' }}
+                    </p>
+                @endif
+
                 @if ($whatsappUrl && $upcoming)
                     <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener"
-                       class="mt-6 flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3 font-display font-bold uppercase tracking-wide text-white hover:bg-[#1ebe5b]">
+                       class="mt-3 flex items-center justify-center gap-2 rounded-full border-2 border-[#25D366] px-6 py-2.5 font-display font-bold uppercase tracking-wide text-[#128C4B] hover:bg-[#25D366]/10">
                         <x-site.social-icon name="whatsapp" class="size-5" /> Ask on WhatsApp
                     </a>
                     <p class="mt-2 text-center text-xs text-slate-500">Questions about this hike? Message us and we'll get back to you.</p>

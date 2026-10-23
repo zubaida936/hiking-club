@@ -56,6 +56,21 @@ A green WhatsApp button floats in the bottom-right corner of every public page a
 | Share preview check | view page source and look for `og:` tags, or paste the live URL into https://www.opengraph.xyz once deployed |
 | Analytics | set `GOOGLE_ANALYTICS_ID=G-...` in `.env` + `php artisan config:clear`; never loaded in the CMS |
 
+### Booking (Registration)
+
+| What | Where |
+|---|---|
+| Booking form | "Reserve Your Spot" (or "Register for Level 3/4") on an upcoming event page, e.g. http://localhost:8080/events/horch-ehden-nature-reserve/register |
+| Level 3+ warning | any Advanced/Xtreme upcoming event, e.g. http://localhost:8080/events/x30-tannourine-to-douma/register |
+| Confirmation page | where the form sends you: `/bookings/{secret}` (also linked in the email) |
+| Confirmation email | Mailpit, http://localhost:8025 (only when an email is given) |
+| Bookings in the database | phpMyAdmin → `hiking` → `event_registrations`, or the CMS event edit screen |
+
+Demo data: Horch Ehden has 26 of 30 seats booked (book 4 more to see "Fully booked"); the X event has 3 bookings
+awaiting approval. X event bookings are "Awaiting approval" and still take a seat. Registration closes the day
+before the hike. One booking per phone number per hike. Payment and terms texts are placeholders in
+`config/site.php` → `booking`. After pulling: `php artisan migrate` and `docker compose restart queue`.
+
 ### Newsletter (Next Destination Alerts)
 
 | What | Where |
@@ -93,6 +108,7 @@ To check the mobile menu, make the browser narrower than 1024 px (or press F12 �
 | Events — upcoming only | http://localhost:8080/admin/events?when=upcoming | Super Admin, Admin |
 | Events — new event | http://localhost:8080/admin/events/create | Super Admin, Admin |
 | Events — edit / publish / cancel / duplicate | http://localhost:8080/admin/events/{id}/edit (click an event title) | Super Admin, Admin |
+| Events — registrations | bottom of the event edit screen (who booked, pickup, emergency contact, notes, status) | Super Admin, Admin |
 
 Uploaded images are served from `http://localhost:8080/storage/...` (files live in `storage/app/public`).
 
@@ -139,6 +155,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | SEO, performance & analytics | https://app.clickup.com/t/z8q7hbmpem |
 | Events listing page | https://app.clickup.com/t/z8q7hbmpep |
 | Event detail page | https://app.clickup.com/t/z8q7hbmpeq |
+| Registration / booking flow | https://app.clickup.com/t/z8q7hbmpet |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands
