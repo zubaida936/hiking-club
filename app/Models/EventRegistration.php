@@ -34,6 +34,7 @@ use Illuminate\Support\Carbon;
  * @property ?Carbon $paid_at
  * @property ?PaymentMethod $payment_method
  * @property ?string $payment_reference transfer number reported by the hiker, or the gateway's id
+ * @property ?Carbon $refunded_at
  * @property ?Attendance $attendance
  * @property ?Carbon $attendance_marked_at
  * @property ?Carbon $cancelled_at
@@ -61,6 +62,7 @@ class EventRegistration extends Model
             'level_acknowledged_at' => 'datetime',
             'paid_at' => 'datetime',
             'payment_method' => PaymentMethod::class,
+            'refunded_at' => 'datetime',
             'attendance' => Attendance::class,
             'attendance_marked_at' => 'datetime',
             'cancelled_at' => 'datetime',
@@ -114,6 +116,14 @@ class EventRegistration extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Cancelled after paying, and the club hasn't paid the money back yet.
+     */
+    public function refundDue(): bool
+    {
+        return $this->isCancelled() && $this->paid_at !== null && $this->refunded_at === null;
     }
 
     /**

@@ -23,12 +23,13 @@ Update this file when one is settled. Last reviewed: 2026-10-23.
 
 - **Cancelled events don't notify registered hikers yet.** `EventCancelled` is raised but nothing listens to it.
   → "Event reminders & notifications".
-- **Refunds are manual.** Cancelling a paid booking (or a whole event) doesn't refund; organizers refund the hiker
-  themselves. An online provider's refund API can be added with the real gateway.
-- **Self-service cancellation is limited**: members can cancel an *unpaid* booking from their dashboard until bookings
-  for the hike close. Paid bookings must be cancelled by an organizer (refund). Changing a booking (pickup point,
-  details) is still done by organizers in the CMS. **Club decision:** a cancellation / refund policy (deadline, fees)
-  would let paid bookings be cancelled online too.
+- **Cancelling a whole event** doesn't flag refunds yet: organizers must cancel/refund each paid booking.
+  → "Event reminders & notifications". An online provider's refund API can be added with the real gateway.
+- **Refunds are paid back by hand.** Cancellation policy (decided 2026-10-23): members cancel from My account, unpaid
+  bookings until bookings close, **paid bookings until 2 days before the hike** (Saturday hike → until Wednesday 23:59,
+  Lebanon time; `config/site.php` → `booking.paid_cancellation_days`). A cancelled paid booking shows **Refund due** in
+  CMS → Registrations until an organizer pays the hiker back and clicks **Mark refunded**. No cancellation fee.
+  Changing a booking (pickup point, details) is still done by organizers in the CMS.
 - **Tier rewards are informational**: the dashboard shows what each rank unlocks (`config/points.php` →
   `tier_rewards`, copied from the ClickUp task), but there is no redemption yet; members ask an organizer.
   → "Rewards per tier & redemption".

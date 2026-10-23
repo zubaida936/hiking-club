@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Domain\Registrations\Actions\ApproveRegistration;
 use App\Domain\Registrations\Actions\CancelRegistration;
 use App\Domain\Registrations\Actions\MarkAttendance;
+use App\Domain\Registrations\Actions\MarkRefunded;
 use App\Domain\Registrations\Actions\SetPaymentStatus;
 use App\Domain\Registrations\Actions\UpdateRegistration;
 use App\Domain\Registrations\Enums\Attendance;
@@ -43,6 +44,8 @@ class RegistrationController extends Controller
                 'registrations as waitlisted_count' => fn ($q) => $q->where('status', RegistrationStatus::Waitlisted),
                 'registrations as paid_count' => fn ($q) => $q->active()->whereNotNull('paid_at'),
                 'registrations as attended_count' => fn ($q) => $q->where('attendance', Attendance::Attended),
+                'registrations as refunds_due_count' => fn ($q) => $q
+                    ->where('status', RegistrationStatus::Cancelled)->whereNotNull('paid_at')->whereNull('refunded_at'),
             ])
             ->paginate(config('cms.per_page'))
             ->withQueryString();
@@ -139,6 +142,13 @@ class RegistrationController extends Controller
         );
     }
 
+    public function refunded(Request $request, EventRegistration $registration, MarkRefunded $action): RedirectResponse
+    {
+        Gate::authorize('update', $registration);
+
+        return $this->attempt(fn () => $action->handle($registration, $request->user()), "{$registration->name} marked as refunded.");
+    }
+
     public function attendance(Request $request, EventRegistration $registration, MarkAttendance $action): RedirectResponse
     {
         Gate::authorize('markAttendance', $registration);
@@ -166,7 +176,10 @@ class RegistrationController extends Controller
         $digits = (string) preg_replace('/\D/', '', $search);
 
         return EventRegistration::query()->whereBelongsTo($event)
-            ->when($status, fn ($q) => $q->where('status', $status), fn ($q) => $q->where('status', '!=', RegistrationStatus::Cancelled))
+            // Default view hides cancelled bookings, except those still waiting for a refund.
+            ->when($status, fn ($q) => $q->where('status', $status), fn ($q) => $q->where(fn ($q) => $q
+                ->where('status', '!=', RegistrationStatus::Cancelled)
+                ->orWhere(fn ($q) => $q->whereNotNull('paid_at')->whereNull('refunded_at'))))
             ->when($pickup !== '', fn ($q) => $pickup === '-' ? $q->whereNull('pickup_point') : $q->where('pickup_point', $pickup))
             ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q
                 ->where('name', 'like', "%{$search}%")

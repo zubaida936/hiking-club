@@ -241,6 +241,17 @@ class Event extends Model
     }
 
     /**
+     * Until when a paid booking can be cancelled online: midnight (club time) starting the day that is
+     * config site.booking.paid_cancellation_days before the hike day (2 → a Saturday hike until Wednesday 23:59).
+     */
+    public function paidCancellationDeadline(): CarbonImmutable
+    {
+        return CarbonImmutable::parse($this->starts_on->toDateString(), config('site.timezone'))
+            ->subDays(max(0, (int) config('site.booking.paid_cancellation_days')))
+            ->utc();
+    }
+
+    /**
      * When bookings close: the organizer's deadline, or midnight (club time) at the start of the hike day.
      */
     public function registrationDeadline(): CarbonImmutable

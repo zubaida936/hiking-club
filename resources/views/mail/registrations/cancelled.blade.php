@@ -7,6 +7,10 @@ Hi {{ $registration->name }}, your booking for **{{ $event->title }}** on {{ $ev
 **Reason:** {{ $registration->cancellation_reason }}
 @endif
 
+@if ($registration->paid_at && ! $registration->refunded_at)
+**Refund:** you paid {{ $event->formattedFee() }}{{ $registration->payment_method ? ' ('.$registration->payment_method->label().')' : '' }}. We'll pay it back to you and contact you on WhatsApp to arrange it.
+
+@endif
 If you think this is a mistake, reply to this email or message us on WhatsApp with your booking reference.
 
 <x-mail::button :url="route('events.index')">

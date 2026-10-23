@@ -18,7 +18,15 @@ When a hiker books a paid hike they choose one (free hikes skip the question):
   see "You'll pay once your seat is confirmed".
 - Only paid bookings earn points (free hikes always do): `config/points.php` → `paid_only`.
 - Organizers see the method and the transaction number in CMS → Registrations (Paid column) and in the CSV export.
-- Cancelling a paid booking does **not** refund anything: refund the hiker yourself (Whish, OMT, cash or the provider).
+## Cancellations and refunds
+
+- Hikers cancel from **My account**: unpaid bookings while bookings are open, **paid bookings until 2 days before the
+  hike** (Saturday hike → Wednesday 23:59, Lebanon time). The exact last moment is shown on My account and on the
+  booking page. Setting: `config/site.php` → `booking.paid_cancellation_days`.
+- After that, hikers message the club on WhatsApp; organizers can still cancel any booking in the CMS.
+- Refunds are paid back **by hand** (Whish, OMT, cash or the provider's dashboard). A cancelled paid booking shows
+  **Refund due** in CMS → Registrations (and "N refunds due" in the overview) until an organizer clicks
+  **Mark refunded**. The hiker's cancellation email says the refund is coming.
 
 ## Settings (`.env`)
 

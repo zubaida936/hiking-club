@@ -53,6 +53,13 @@
         </dl>
 
         <x-site.booking-payment :registration="$registration" />
+
+        @if (\App\Domain\Registrations\Actions\CancelOwnBooking::allowed($registration))
+            <p class="mt-4 text-sm text-slate-500">
+                Can't make it? Cancel from <a href="{{ route('account') }}" class="font-semibold text-brand-700 hover:underline">My account</a>
+                until {{ \App\Domain\Registrations\Actions\CancelOwnBooking::lastMoment($registration) }}{{ $registration->paid_at ? ' and we refund you' : '' }}.
+            </p>
+        @endif
         @unless ($registration->isCancelled())
             <p class="mt-2 text-slate-600">
                 You earn <strong class="text-accent-600">{{ app(\App\Domain\Loyalty\PointsRules::class)->hikePoints($event) }} points</strong> when you complete this hike{{ config('points.paid_only') && $event->fee_cents > 0 ? ' (paid bookings only)' : '' }}.

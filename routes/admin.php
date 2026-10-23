@@ -52,6 +52,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
             Route::post('approve', 'approve')->name('approve');
             Route::post('cancel', 'cancel')->name('cancel');
             Route::post('payment', 'payment')->name('payment');
+            Route::post('refunded', 'refunded')->name('refunded');
             Route::post('attendance', 'attendance')->name('attendance');
         });
     });

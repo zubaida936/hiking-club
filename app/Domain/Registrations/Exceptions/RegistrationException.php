@@ -34,9 +34,14 @@ final class RegistrationException extends DomainException
         return new self('Another booking for this hike already uses this phone number.');
     }
 
-    public static function paidCancelNeedsOrganizer(): self
+    public static function paidCancellationClosed(string $until): self
     {
-        return new self('This booking is paid: message us on WhatsApp to cancel it and arrange your refund.');
+        return new self("Paid bookings can be cancelled online until {$until}. Message us on WhatsApp.");
+    }
+
+    public static function notRefundable(): self
+    {
+        return new self('Only cancelled bookings that were paid can be marked as refunded.');
     }
 
     public static function cancellationClosed(): self

@@ -65,9 +65,10 @@ it('lists upcoming bookings with their payment state', function () {
     $this->actingAs($this->user)->get(route('account'))
         ->assertSeeInOrder(['Paid Hike', '✓ Paid', 'Unpaid Hike', '$30 to pay', 'Free Hike', 'Free hike', 'Waiting Hike', 'On the waitlist #1'])
         ->assertDontSee('Cancelled Hike')
-        ->assertDontSee(route('account.bookings.cancel', $paid))
+        ->assertSee(route('account.bookings.cancel', $paid))
         ->assertSee(route('account.bookings.cancel', $unpaid))
-        ->assertSee('To cancel a paid booking, message us on WhatsApp');
+        ->assertSee('with refund')
+        ->assertSee('Paid bookings can be cancelled here until 2 days before the hike, and we refund you.');
 });
 
 describe('cancelling own bookings', function () {
@@ -84,13 +85,40 @@ describe('cancelling own bookings', function () {
         Mail::assertQueued(RegistrationCancelledMail::class, fn ($mail) => $mail->hasTo('rima@example.com'));
     });
 
-    it('refuses paid bookings, closed hikes and other people\'s bookings', function () {
-        $paid = myBooking(Event::factory()->published()->create(), ['paid_at' => now()]);
+    it('cancels a paid booking up to 2 days before the hike and flags the refund', function () {
+        // Saturday 7 Nov hike: paid bookings can be cancelled online until Wednesday 4 Nov, 23:59 (Lebanon time).
+        $this->travelTo('2026-11-04 21:58:00'); // 23:58 in Beirut
+        $event = Event::factory()->published()->create(['title' => 'Paid Hike', 'starts_on' => '2026-11-07', 'fee_cents' => 3000]);
+        $mine = myBooking($event, ['email' => 'rima@example.com', 'paid_at' => now(), 'payment_method' => 'whish']);
+
+        $this->actingAs($this->user)->get(route('account'))->assertSee('until Wed 4 Nov, 23:59, with refund');
+        $this->get(route('registrations.show', $mine))->assertSee('until Wed 4 Nov, 23:59 and we refund you');
+
+        $this->actingAs($this->user)->post(route('account.bookings.cancel', $mine))->assertSessionHas('success');
+
+        expect($mine->fresh())->status->toBe(RegistrationStatus::Cancelled)->and($mine->fresh()->refundDue())->toBeTrue();
+        Mail::assertQueued(RegistrationCancelledMail::class, fn ($mail) => str_contains($mail->render(), "We'll pay it back to you"));
+
+        // Organizers see the refund and mark it done.
+        $admin = userWithRole(Role::Admin);
+        $this->actingAs($admin)->get(route('admin.registrations.index'))->assertSee('1 refund due');
+        $this->actingAs($admin)->get(route('admin.events.registrations', $event))->assertSee('Refund due')->assertSee('Mark refunded');
+        $this->actingAs($admin)->post(route('admin.registrations.refunded', $mine))->assertSessionHas('success');
+        expect($mine->fresh()->refunded_at)->not->toBeNull();
+        $this->actingAs($admin)->get(route('admin.events.registrations', $event))->assertDontSee('Refund due');
+        $this->actingAs($admin)->post(route('admin.registrations.refunded', $mine))
+            ->assertSessionHas('error', 'Only cancelled bookings that were paid can be marked as refunded.');
+    });
+
+    it('refuses paid bookings inside the last 2 days, closed hikes and other people\'s bookings', function () {
+        $this->travelTo('2026-11-04 22:00:00'); // Thursday 5 Nov, 00:00 in Beirut
+        $paid = myBooking(Event::factory()->published()->create(['starts_on' => '2026-11-07']), ['paid_at' => now()]);
         $today = myBooking(Event::factory()->published()->create(['starts_on' => today()->toDateString()]));
         $someoneElse = EventRegistration::factory()->for(Event::factory()->published())->create();
 
+        $this->actingAs($this->user)->get(route('account'))->assertDontSee(route('account.bookings.cancel', $paid));
         $this->actingAs($this->user)->post(route('account.bookings.cancel', $paid))
-            ->assertSessionHas('error', 'This booking is paid: message us on WhatsApp to cancel it and arrange your refund.');
+            ->assertSessionHas('error', 'Paid bookings can be cancelled online until Wed 4 Nov, 23:59. Message us on WhatsApp.');
         $this->actingAs($this->user)->post(route('account.bookings.cancel', $today))
             ->assertSessionHas('error', 'Bookings for this hike are closed, so it can no longer be cancelled online. Message us on WhatsApp.');
         $this->actingAs($this->user)->post(route('account.bookings.cancel', $someoneElse))->assertForbidden();

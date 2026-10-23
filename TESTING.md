@@ -63,7 +63,7 @@ A green WhatsApp button floats in the bottom-right corner of every public page a
 | Log in (phone + password) | http://localhost:8080/login (also the person icon in the header) |
 | Activate an account | http://localhost:8080/activate: phone you booked with + a booking reference, then choose a password |
 | Forgot password | http://localhost:8080/forgot-password: a 6-digit code goes to the email on the account (Mailpit) |
-| My account (member dashboard) | http://localhost:8080/account: rank + progress bar to the next rank, points, hikes completed, km, leaderboard position, upcoming hikes (payment state, cancel unpaid bookings), hike history with points per hike, rewards per rank (unlocked / locked), latest points. Demo login: `+96170000001` / `demo-pass-1` (Rima, after you activated her or on this dev DB) |
+| My account (member dashboard) | http://localhost:8080/account: rank + progress bar to the next rank, points, hikes completed, km, leaderboard position, upcoming hikes (payment state; cancel: unpaid while bookings are open, paid until 2 days before the hike → "Refund due" in the CMS), hike history with points per hike, rewards per rank (unlocked / locked), latest points. Demo login: `+96170000001` / `demo-pass-1` (Rima, after you activated her or on this dev DB) |
 
 To try it with demo data: book any upcoming hike (or use a demo hiker: phpMyAdmin → `event_registrations`, take a
 `phone` + `reference` pair), activate with them, then log in. No open signup: only phone numbers with a booking can

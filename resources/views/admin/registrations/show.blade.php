@@ -127,6 +127,17 @@
                                     @if ($registration->payment_reference)
                                         <span class="block font-mono text-xs text-slate-700" title="Transaction number">#{{ $registration->payment_reference }}</span>
                                     @endif
+                                    @if ($registration->refundDue())
+                                        <span class="block text-xs font-bold text-red-600">Refund due</span>
+                                        @if ($canManage)
+                                            <form method="POST" action="{{ route('admin.registrations.refunded', $registration) }}"
+                                                  onsubmit="return confirm('Did you pay this hiker back?')">@csrf
+                                                <button class="text-xs font-medium text-emerald-700 hover:underline">Mark refunded</button>
+                                            </form>
+                                        @endif
+                                    @elseif ($registration->refunded_at)
+                                        <span class="block text-xs text-slate-500">Refunded {{ $registration->refunded_at->setTimezone(config('site.timezone'))->format('M d') }}</span>
+                                    @endif
                                     @if ($canManage && $registration->holdsSeat())
                                         <form method="POST" action="{{ route('admin.registrations.payment', $registration) }}">@csrf
                                             <input type="hidden" name="paid" value="{{ $registration->paid_at ? 0 : 1 }}">

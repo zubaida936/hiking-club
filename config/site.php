@@ -98,6 +98,10 @@ return [
     | Event bookings. PLACEHOLDER texts until the "Event payments" task decides how hikers pay.
     */
     'booking' => [
+        // Paid bookings can be cancelled online (and refunded) until this many days before the hike day,
+        // Lebanon time: 2 = for a Saturday hike, until Wednesday 23:59. Unpaid ones until bookings close.
+        'paid_cancellation_days' => 2,
+
         // Shown on the confirmation page and in the confirmation email.
         'payment_note' => 'The organizers will contact you on WhatsApp with the payment details.',
         // Short terms hikers accept on the booking form (the full text comes with the Legal task).

@@ -107,10 +107,13 @@
                                 @endif
                                 <a href="{{ route('registrations.show', $booking) }}" class="text-brand-700 hover:underline">Booking details</a>
                                 @if (\App\Domain\Registrations\Actions\CancelOwnBooking::allowed($booking))
-                                    <form method="POST" action="{{ route('account.bookings.cancel', $booking) }}" class="ml-auto"
-                                          onsubmit="return confirm('Cancel this booking? Your seat goes to the next person.')">
+                                    <form method="POST" action="{{ route('account.bookings.cancel', $booking) }}" class="ml-auto text-right"
+                                          onsubmit="return confirm('{{ $booking->paid_at ? 'Cancel this booking? We will refund you, and your seat goes to the next person.' : 'Cancel this booking? Your seat goes to the next person.' }}')">
                                         @csrf
                                         <button class="text-red-600 hover:underline">Cancel booking</button>
+                                        <span class="block text-xs text-slate-500">
+                                            until {{ \App\Domain\Registrations\Actions\CancelOwnBooking::lastMoment($booking) }}{{ $booking->paid_at ? ', with refund' : '' }}
+                                        </span>
                                     </form>
                                 @endif
                             </div>
@@ -118,8 +121,11 @@
                     @empty
                         <p class="mt-4 text-slate-600">No upcoming hikes booked. <a href="{{ route('events.index') }}" class="font-semibold text-brand-700 hover:underline">Find your next one</a></p>
                     @endforelse
-                    @if ($upcoming->contains(fn ($b) => $b->paid_at !== null))
-                        <p class="mt-3 text-xs text-slate-500">To cancel a paid booking, message us on WhatsApp so we can arrange your refund.</p>
+                    @if ($upcoming->isNotEmpty())
+                        <p class="mt-3 text-xs text-slate-500">
+                            Paid bookings can be cancelled here until {{ config('site.booking.paid_cancellation_days') }} days before the hike, and we refund you.
+                            After that, message us on WhatsApp.
+                        </p>
                     @endif
                 </section>
 

@@ -38,7 +38,12 @@
                         <td class="px-4 py-3">{{ $event->pending_count ?: '—' }}</td>
                         <td class="px-4 py-3">{{ $event->waitlisted_count ?: '—' }}</td>
                         <td class="px-4 py-3">{{ $event->fee_cents === 0 ? 'Free' : $event->paid_count.' / '.$event->seatsTaken() }}</td>
-                        <td class="px-4 py-3">{{ $event->hikeDayReached() ? $event->attended_count : '—' }}</td>
+                        <td class="px-4 py-3">
+                            {{ $event->hikeDayReached() ? $event->attended_count : '—' }}
+                            @if ($event->refunds_due_count)
+                                <span class="block text-xs font-semibold text-red-600">{{ $event->refunds_due_count }} {{ Str::plural('refund', $event->refunds_due_count) }} due</span>
+                            @endif
+                        </td>
                         <td class="px-4 py-3 text-right whitespace-nowrap">
                             <a href="{{ route('admin.events.registrations', $event) }}" class="font-medium text-emerald-700 hover:underline">View list</a>
                         </td>
