@@ -29,7 +29,7 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 |---|---|---|
 | Home | http://localhost:8080/ | Hero carousel, About, Next Challenge, X Events, contact. Leaderboard and newsletter are placeholders; texts/contact details are placeholders in `config/site.php` |
 | About | http://localhost:8080/about | Coming soon |
-| Events | http://localhost:8080/events | Coming soon |
+| Events | http://localhost:8080/events | Upcoming events (soonest first) and Past events with Load More; filter by level or month, e.g. http://localhost:8080/events?level=2 or http://localhost:8080/events?month=2026-11 |
 | X Events | http://localhost:8080/x-events | Coming soon |
 | Shop | http://localhost:8080/shop | Coming soon |
 | Rank System | http://localhost:8080/rank-system | Coming soon |
@@ -100,6 +100,13 @@ Uploaded images are served from `http://localhost:8080/storage/...` (files live 
 `docker compose exec app php artisan migrate:fresh --seed` creates 6 sample events (published, draft,
 cancelled, past and X events) so every screen has something to show. Re-run it to reset them.
 
+The demo data has only 2 past events, so the Events page shows no "Load More" button. To get one, add
+8 random published past events:
+
+```powershell
+docker compose exec app php artisan tinker --execute="App\Models\Event::factory()->published()->past()->count(8)->create()"
+```
+
 ## GitHub
 
 | What | Link |
@@ -127,6 +134,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Newsletter signup | https://app.clickup.com/t/z8q7hbmpej |
 | Floating WhatsApp button | https://app.clickup.com/t/z8q7hbmpek |
 | SEO, performance & analytics | https://app.clickup.com/t/z8q7hbmpem |
+| Events listing page | https://app.clickup.com/t/z8q7hbmpep |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

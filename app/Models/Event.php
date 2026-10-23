@@ -160,6 +160,14 @@ class Event extends Model
         return $this->fee_cents === 0 ? 'Free' : '$'.rtrim(rtrim($this->feeAmount(), '0'), '.');
     }
 
+    /**
+     * "12.5 km", "8 km": one decimal at most, no trailing ".0".
+     */
+    public function formattedDistance(): string
+    {
+        return rtrim(rtrim(number_format($this->distance_km, 1), '0'), '.').' km';
+    }
+
     public function coverImageUrl(): ?string
     {
         return $this->cover_image_path ? Storage::disk('public')->url($this->cover_image_path) : null;

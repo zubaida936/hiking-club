@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\Site\EventController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\NewsletterController;
 use App\Http\Controllers\Site\SeoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('events', [EventController::class, 'index'])->name('events.index');
 
 Route::get('sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::get('robots.txt', [SeoController::class, 'robots'])->name('robots');
@@ -21,7 +23,6 @@ Route::controller(NewsletterController::class)->prefix('newsletter')->name('news
 // with a real controller route (keep the route name: the header links by name).
 $placeholders = [
     'about' => ['about', 'About'],
-    'events' => ['events.index', 'Events'],
     'x-events' => ['x-events', 'X Events'],
     'shop' => ['shop.index', 'Shop'],
     'rank-system' => ['rank-system', 'Rank System'],

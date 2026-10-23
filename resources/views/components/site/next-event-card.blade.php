@@ -34,7 +34,7 @@
         <dl class="mt-6 grid grid-cols-3 gap-4 border-y border-slate-100 py-4 text-center">
             <div>
                 <dt class="text-xs uppercase tracking-wide text-slate-500">Distance</dt>
-                <dd class="font-display text-lg font-bold text-brand-800">{{ rtrim(rtrim(number_format($event->distance_km, 1), '0'), '.') }} km</dd>
+                <dd class="font-display text-lg font-bold text-brand-800">{{ $event->formattedDistance() }}</dd>
             </div>
             <div>
                 <dt class="text-xs uppercase tracking-wide text-slate-500">Elevation</dt>
