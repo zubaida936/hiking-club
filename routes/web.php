@@ -5,6 +5,7 @@ use App\Http\Controllers\Site\Auth\ActivationController;
 use App\Http\Controllers\Site\Auth\InviteController;
 use App\Http\Controllers\Site\Auth\MemberSessionController;
 use App\Http\Controllers\Site\Auth\PasswordResetController;
+use App\Http\Controllers\Site\DifficultyCalculatorController;
 use App\Http\Controllers\Site\EventController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\LeaderboardController;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class)->name('home');
 Route::get('events', [EventController::class, 'index'])->name('events.index');
 Route::get('leaderboard', LeaderboardController::class)->name('leaderboard');
+Route::get('difficulty-calculator', DifficultyCalculatorController::class)->name('guide.difficulty');
 Route::get('events/{event:slug}', [EventController::class, 'show'])->name('events.show');
 
 Route::controller(RegistrationController::class)->group(function () {
@@ -92,7 +94,6 @@ $placeholders = [
     'shop' => ['shop.index', 'Shop'],
     'rank-system' => ['rank-system', 'Rank System'],
     'contact' => ['contact', 'Contact'],
-    'difficulty-calculator' => ['guide.difficulty', 'Difficulty Calculator'],
     'equipment' => ['guide.equipment', 'Equipment Guide'],
     'guides' => ['guide.articles', 'Guides'],
     'cart' => ['cart', 'Cart'],

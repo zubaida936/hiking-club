@@ -37,7 +37,7 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 | Shop | http://localhost:8080/shop | Coming soon |
 | Rank System | http://localhost:8080/rank-system | Coming soon |
 | Contact | http://localhost:8080/contact | Coming soon |
-| Hiker's Guide → Difficulty Calculator | http://localhost:8080/difficulty-calculator | Coming soon |
+| Hiker's Guide → Difficulty Calculator | http://localhost:8080/difficulty-calculator | Enter km, elevation gain (and loss): live effort score, level, description and points; formula, level table and limitations; upcoming hikes of that level. Shareable, e.g. http://localhost:8080/difficulty-calculator?km=8&gain=220&loss=320 |
 | Hiker's Guide → Equipment Guide | http://localhost:8080/equipment | Coming soon |
 | Hiker's Guide → Guides | http://localhost:8080/guides | Coming soon |
 | Cart (cart icon) | http://localhost:8080/cart | Coming soon |
@@ -217,6 +217,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Public leaderboard | https://app.clickup.com/t/z8q7hbmpf7 |
 | Rewards per tier & redemption | https://app.clickup.com/t/z8q7hbmpf5 |
 | Manage members, points & rewards | https://app.clickup.com/t/z8q7hbmpfr |
+| Difficulty Calculator page | https://app.clickup.com/t/z8q7hbmpez |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

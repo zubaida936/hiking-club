@@ -54,5 +54,34 @@ Alpine.data('routeMap', (points) => ({
     },
 }));
 
+/*
+ * Difficulty calculator: live effort score and level. The formula parameters and level
+ * texts come from the server (DifficultyCalculator::toArray), so this always matches it.
+ */
+Alpine.data('difficultyCalculator', ({ calculator, levels, km, gain, loss }) => ({
+    km: km ?? '',
+    gain: gain ?? '',
+    loss: loss ?? '',
+
+    get ready() {
+        return Number(this.km) > 0;
+    },
+
+    get equivalentKm() {
+        return Math.max(0, Number(this.km) || 0)
+            + Math.max(0, Number(this.gain) || 0) / calculator.gainPerKm
+            + Math.max(0, Number(this.loss) || 0) / calculator.lossPerKm;
+    },
+
+    get score() {
+        return Math.round(calculator.multiplier * this.equivalentKm);
+    },
+
+    get level() {
+        const value = calculator.levels.find((l) => l.max === null || this.score <= l.max).value;
+        return levels.find((l) => l.value === value);
+    },
+}));
+
 window.Alpine = Alpine;
 Alpine.start();
