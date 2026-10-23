@@ -3,13 +3,17 @@
 namespace App\Providers;
 
 use App\Domain\Events\Difficulty\DifficultyCalculator;
+use App\Domain\Events\Events\EventCancelled;
 use App\Domain\Events\Events\EventPublished;
+use App\Domain\Events\Events\EventRescheduled;
+use App\Domain\Events\Listeners\AnnounceNewDate;
 use App\Domain\Identity\Enums\Role;
 use App\Domain\Loyalty\Listeners\SyncPointsForRegistration;
 use App\Domain\Members\Codes\CodeChannel;
 use App\Domain\Newsletter\Listeners\AnnounceNewEvent;
 use App\Domain\Registrations\Events\AttendanceMarked;
 use App\Domain\Registrations\Events\RegistrationChanged;
+use App\Domain\Registrations\Listeners\CancelBookingsOfCancelledEvent;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event as EventBus;
@@ -43,5 +47,7 @@ class AppServiceProvider extends ServiceProvider
         // Domain listeners live in their module, outside app/Listeners, so register them here.
         EventBus::listen(EventPublished::class, AnnounceNewEvent::class);
         EventBus::listen([AttendanceMarked::class, RegistrationChanged::class], SyncPointsForRegistration::class);
+        EventBus::listen(EventCancelled::class, CancelBookingsOfCancelledEvent::class);
+        EventBus::listen(EventRescheduled::class, AnnounceNewDate::class);
     }
 }

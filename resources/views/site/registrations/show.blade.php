@@ -52,6 +52,10 @@
             @endforeach
         </dl>
 
+        @unless ($registration->isCancelled())
+            <x-site.event-updates :updates="$event->updates" class="mt-8" />
+        @endunless
+
         <x-site.booking-payment :registration="$registration" />
 
         @if (\App\Domain\Registrations\Actions\CancelOwnBooking::allowed($registration))

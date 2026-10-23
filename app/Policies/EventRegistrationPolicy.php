@@ -29,6 +29,14 @@ class EventRegistrationPolicy
         return $registration->hiker_id !== null && $actor->hiker?->id === $registration->hiker_id;
     }
 
+    /**
+     * Send an update (weather, route, timing) to everyone booked on a hike.
+     */
+    public function notifyHikers(User $actor): bool
+    {
+        return $actor->can(Permission::ManageRegistrations->value);
+    }
+
     public function markAttendance(User $actor, EventRegistration $registration): bool
     {
         return $actor->can(Permission::ManageAttendance->value);

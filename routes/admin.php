@@ -67,6 +67,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('registrations', 'index')->name('registrations.index');
         Route::get('events/{event}/registrations', 'show')->name('events.registrations');
         Route::get('events/{event}/registrations/export', 'export')->name('events.registrations.export');
+        Route::post('events/{event}/updates', 'postUpdate')->name('events.updates.store');
 
         Route::prefix('registrations/{registration}')->name('registrations.')->group(function () {
             Route::get('edit', 'edit')->name('edit');

@@ -101,6 +101,10 @@ return [
         // Paid bookings can be cancelled online (and refunded) until this many days before the hike day,
         // Lebanon time: 2 = for a Saturday hike, until Wednesday 23:59. Unpaid ones until bookings close.
         'paid_cancellation_days' => 2,
+        // Reminder email to booked hikers: this many days before the hike day, from this hour (Lebanon time).
+        // Sent by the scheduler (`php artisan events:send-reminders`, every hour).
+        'reminder_days_before' => 1,
+        'reminder_hour' => 17,
 
         // Shown on the confirmation page and in the confirmation email.
         'payment_note' => 'The organizers will contact you on WhatsApp with the payment details.',

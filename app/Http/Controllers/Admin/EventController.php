@@ -20,6 +20,7 @@ use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class EventController extends Controller
@@ -130,11 +131,12 @@ class EventController extends Controller
         Gate::authorize('update', $event);
 
         $validated = $request->validate(['cancellation_reason' => ['required', 'string', 'max:500']]);
+        $bookings = $event->registrations()->where('status', '!=', RegistrationStatus::Cancelled)->count();
 
         return $this->attempt(
             fn () => $action->handle($event, $validated['cancellation_reason'], $request->user()),
             back(),
-            'Event cancelled.',
+            $bookings > 0 ? "Event cancelled. {$bookings} ".Str::plural('booking', $bookings).' cancelled and the hikers emailed (paid ones are marked "Refund due").' : 'Event cancelled.',
         );
     }
 

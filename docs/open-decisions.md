@@ -30,8 +30,11 @@ Update this file when one is settled. Last reviewed: 2026-10-23.
 
 - **Cancelled events don't notify registered hikers yet.** `EventCancelled` is raised but nothing listens to it.
   → "Event reminders & notifications".
-- **Cancelling a whole event** doesn't flag refunds yet: organizers must cancel/refund each paid booking.
-  → "Event reminders & notifications". An online provider's refund API can be added with the real gateway.
+- **Notifications are email only.** Cancelling a hike cancels its bookings and emails every hiker (paid ones become
+  "Refund due"); organizers' updates and date changes are emailed and shown on the hike/booking pages; a reminder goes
+  out the day before at 17:00 (`config/site.php` → `booking.reminder_*`). Hikers without an email get nothing
+  automatically: organizers use the WhatsApp list / group. An SMS/WhatsApp provider would cover them.
+- **Refunds** are paid back by hand (an online provider's refund API can be added with the real gateway).
 - **Refunds are paid back by hand.** Cancellation policy (decided 2026-10-23): members cancel from My account, unpaid
   bookings until bookings close, **paid bookings until 2 days before the hike** (Saturday hike → until Wednesday 23:59,
   Lebanon time; `config/site.php` → `booking.paid_cancellation_days`). A cancelled paid booking shows **Refund due** in

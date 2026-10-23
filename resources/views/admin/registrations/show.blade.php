@@ -8,7 +8,7 @@
 @endphp
 
 <x-admin.layout :title="'Registrations · '.$event->title">
-    <div x-data="{ cancel: null, whatsapp: false, copied: false }">
+    <div x-data="{ cancel: null, whatsapp: false, copied: false, update: @js($errors->has('message')) }">
         {{-- Event summary & tools --}}
         <div class="mb-6 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg bg-white p-4 shadow-sm">
             <div>
@@ -23,6 +23,9 @@
                 <div><dt class="text-xs uppercase text-slate-500">Bookings close</dt><dd class="font-semibold">{{ $event->registrationDeadline()->setTimezone(config('site.timezone'))->format('D j M, H:i') }}</dd></div>
             </dl>
             <div class="ml-auto flex flex-wrap gap-2">
+                @can('notifyHikers', \App\Models\EventRegistration::class)
+                    <x-admin.button type="button" @click="update = !update">Send update to hikers</x-admin.button>
+                @endcan
                 <x-admin.button variant="secondary" type="button" @click="whatsapp = !whatsapp">WhatsApp list</x-admin.button>
                 <x-admin.button variant="secondary" :href="route('admin.events.registrations.export', ['event' => $event] + request()->only(['status', 'pickup', 'q']))">Export CSV</x-admin.button>
                 @can(Permission::ManageEvents->value)
@@ -30,6 +33,33 @@
                 @endcan
             </div>
         </div>
+
+        {{-- Updates to everyone booked (weather, route, timing) --}}
+        @can('notifyHikers', \App\Models\EventRegistration::class)
+            <form method="POST" action="{{ route('admin.events.updates.store', $event) }}" x-show="update" x-cloak class="mb-6 space-y-3 rounded-lg bg-white p-4 shadow-sm"
+                  onsubmit="return confirm('Email this update to everyone booked on this hike (and the waitlist)?')">
+                @csrf
+                <x-admin.textarea name="message" label="Update for the hikers" rows="4" maxlength="2000" required
+                                  hint="E.g. weather, a route change, a new pickup time. It is emailed to every booking with an email (waitlist included) and shown on the hike page and booking pages." />
+                <x-admin.button>Send update</x-admin.button>
+            </form>
+        @endcan
+        @if ($updates->isNotEmpty())
+            <div class="mb-6 rounded-lg bg-white p-4 shadow-sm">
+                <h2 class="mb-2 font-semibold">Updates sent</h2>
+                <ul class="divide-y divide-slate-100 text-sm">
+                    @foreach ($updates as $update)
+                        <li class="py-2">
+                            <p class="whitespace-pre-line">{{ $update->message }}</p>
+                            <p class="text-xs text-slate-500">
+                                {{ $update->created_at->setTimezone(config('site.timezone'))->format('M d, H:i') }}{{ $update->creator ? ' · '.$update->creator->name : '' }}
+                                · emailed to {{ $update->emailed_count }}
+                            </p>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         {{-- WhatsApp list (hikers holding a seat, by pickup point) --}}
         <div x-show="whatsapp" x-cloak class="mb-6 rounded-lg bg-white p-4 shadow-sm">

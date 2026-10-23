@@ -94,6 +94,16 @@ class Event extends Model
     }
 
     /**
+     * Messages from the organizers, newest first.
+     *
+     * @return HasMany<EventUpdate, $this>
+     */
+    public function updates(): HasMany
+    {
+        return $this->hasMany(EventUpdate::class)->latest('id');
+    }
+
+    /**
      * @return HasMany<EventRegistration, $this>
      */
     public function registrations(): HasMany

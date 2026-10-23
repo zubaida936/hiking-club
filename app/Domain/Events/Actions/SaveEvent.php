@@ -6,6 +6,7 @@ use App\Domain\Events\Data\EventData;
 use App\Domain\Events\Data\MeetingPointData;
 use App\Domain\Events\Difficulty\DifficultyCalculator;
 use App\Domain\Events\Enums\EventStatus;
+use App\Domain\Events\Events\EventRescheduled;
 use App\Domain\Events\Gpx\GpxReader;
 use App\Domain\Registrations\Actions\FillFreedSeats;
 use App\Models\Event;
@@ -37,6 +38,7 @@ final class SaveEvent
     {
         $event ??= new Event(['status' => EventStatus::Draft, 'created_by' => $actor->id]);
         $oldFiles = array_filter([$event->cover_image_path, $event->gpx_path]);
+        $previousDate = $event->exists ? $event->starts_on->toImmutable() : null;
 
         $difficulty = $this->difficulty->calculate($data->distanceKm, $data->elevationGainM, $data->elevationLossM);
 
@@ -100,6 +102,11 @@ final class SaveEvent
         $replaced = array_diff($oldFiles, [$event->cover_image_path, $event->gpx_path]);
         if ($replaced !== []) {
             Storage::disk('public')->delete(array_values($replaced));
+        }
+
+        // Hikers already booked on a published hike hear about a new date.
+        if ($previousDate !== null && $event->isPublished() && ! $previousDate->isSameDay($event->starts_on)) {
+            EventRescheduled::dispatch($event, $previousDate, $actor);
         }
 
         // A raised capacity lets waitlisted hikers move up.

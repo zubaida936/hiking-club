@@ -23,7 +23,7 @@ final class CancelEvent
             'updated_by' => $actor->id,
         ]);
 
-        EventCancelled::dispatch($event);
+        EventCancelled::dispatch($event, $actor);
 
         return $event;
     }

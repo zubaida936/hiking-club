@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Domain\Events\Actions\PostEventUpdate;
 use App\Domain\Registrations\Actions\ApproveRegistration;
 use App\Domain\Registrations\Actions\CancelRegistration;
 use App\Domain\Registrations\Actions\MarkAttendance;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -70,7 +72,18 @@ class RegistrationController extends Controller
                 ->get(),
             'whatsapp' => (new RegistrationExport($event, $event->registrations()->active()->get()))->whatsappText(),
             'statuses' => RegistrationStatus::cases(),
+            'updates' => $event->updates()->with('creator')->get(),
         ]);
+    }
+
+    public function postUpdate(Request $request, Event $event, PostEventUpdate $action): RedirectResponse
+    {
+        Gate::authorize('notifyHikers', EventRegistration::class);
+
+        $message = $request->validate(['message' => ['required', 'string', 'max:2000']])['message'];
+        $update = $action->handle($event, trim($message), $request->user());
+
+        return back()->with('success', "Update posted on the hike page and emailed to {$update->emailed_count} ".Str::plural('hiker', $update->emailed_count).'.');
     }
 
     public function export(Request $request, Event $event): StreamedResponse

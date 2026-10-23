@@ -149,6 +149,7 @@ To check the mobile menu, make the browser narrower than 1024 px (or press F12 �
 To try the Guide view of registrations, create a user with the Guide role in Staff & roles and log in as them.
 Attendance buttons appear from the hike day (Lebanon time): to test them now, set an event's date to today in the CMS.
 Cancelling a booking emails the hiker (Mailpit) and gives the seat to the first person on the waitlist.
+**Notifications** (all in Mailpit): cancelling a hike (Event edit → Cancel event) cancels every booking and emails each hiker the reason (paid ones become "Refund due"); "Send update to hikers" on a hike's registrations page emails everyone booked (waitlist included) and shows the update on the hike and booking pages; changing a published hike's date sends an automatic update. Reminders go out the day before at 17:00 Lebanon time (scheduler, every hour); to test now: set a hike's date to tomorrow, then run `docker compose exec app php artisan events:send-reminders` after 17:00, or lower `reminder_hour` in `config/site.php`.
 
 **Points:** a hiker is one phone number; all their bookings and points belong to them. Points are added when a
 confirmed booking is marked **Attended** (and paid, unless the hike is free): Level 1/2/3/4 = 8/14/22/35, +4 for
@@ -220,6 +221,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Manage members, points & rewards | https://app.clickup.com/t/z8q7hbmpfr |
 | Difficulty Calculator page | https://app.clickup.com/t/z8q7hbmpez |
 | X Events (landing, application form, review, manage) | https://app.clickup.com/t/z8q7hbmpf9 · https://app.clickup.com/t/z8q7hbmpfa · https://app.clickup.com/t/z8q7hbmpfb · https://app.clickup.com/t/z8q7hbmpft |
+| Event reminders & notifications | https://app.clickup.com/t/z8q7hbmpex |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

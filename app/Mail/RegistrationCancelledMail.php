@@ -24,7 +24,9 @@ class RegistrationCancelledMail extends Mailable implements ShouldQueue
     {
         $event = $this->registration->event;
 
-        return new Envelope(subject: "Booking cancelled: {$event->title} · {$event->starts_on->format('D j M')} (ref {$this->registration->reference})");
+        $what = $event->isCancelled() ? 'Hike cancelled' : 'Booking cancelled';
+
+        return new Envelope(subject: "{$what}: {$event->title} · {$event->starts_on->format('D j M')} (ref {$this->registration->reference})");
     }
 
     public function content(): Content

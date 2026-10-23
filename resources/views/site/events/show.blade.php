@@ -86,6 +86,10 @@
     <div class="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-3 lg:py-16">
         {{-- Main column --}}
         <div class="space-y-12 lg:col-span-2">
+            @if ($upcoming)
+                <x-site.event-updates :updates="$event->updates" />
+            @endif
+
             {{-- Key numbers --}}
             <dl class="grid grid-cols-2 gap-4 rounded-2xl bg-brand-50 p-6 text-center sm:grid-cols-4">
                 <div>

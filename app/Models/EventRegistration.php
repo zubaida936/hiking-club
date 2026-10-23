@@ -37,6 +37,7 @@ use Illuminate\Support\Carbon;
  * @property ?PaymentMethod $payment_method
  * @property ?string $payment_reference transfer number reported by the hiker, or the gateway's id
  * @property ?Carbon $refunded_at
+ * @property ?Carbon $reminder_sent_at
  * @property ?Attendance $attendance
  * @property ?Carbon $attendance_marked_at
  * @property ?Carbon $cancelled_at
@@ -65,6 +66,7 @@ class EventRegistration extends Model
             'paid_at' => 'datetime',
             'payment_method' => PaymentMethod::class,
             'refunded_at' => 'datetime',
+            'reminder_sent_at' => 'datetime',
             'attendance' => Attendance::class,
             'attendance_marked_at' => 'datetime',
             'cancelled_at' => 'datetime',
