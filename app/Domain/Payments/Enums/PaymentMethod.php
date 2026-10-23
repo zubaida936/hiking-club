@@ -37,7 +37,7 @@ enum PaymentMethod: string
 
     public function label(): string
     {
-        return $this === self::Online ? 'Online payment' :(string) config("payments.methods.{$this->value}.label", ucfirst($this->value));
+        return $this === self::Online ? 'Online payment' : (string) config("payments.methods.{$this->value}.label", ucfirst($this->value));
     }
 
     /**
