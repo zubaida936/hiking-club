@@ -53,7 +53,15 @@
             <section class="rounded-lg bg-white p-6 shadow-sm">
                 <p class="text-xs uppercase text-slate-500">Total points</p>
                 <p class="text-4xl font-bold">{{ $hiker->totalPoints() }}</p>
+                <p class="mt-2 flex items-center gap-2 text-sm">
+                    <x-admin.badge :classes="$hiker->tier()->badgeClasses()">{{ $hiker->tier()->label() }}</x-admin.badge>
+                    <span class="text-slate-500">Rank #{{ $position }}</span>
+                </p>
+                @if ($hiker->pointsToNextTier() !== null)
+                    <p class="mt-1 text-xs text-slate-500">{{ $hiker->pointsToNextTier() }} points to {{ $hiker->tier()->next()?->label() }}</p>
+                @endif
                 <dl class="mt-4 space-y-1 text-sm">
+                    <div class="flex justify-between"><dt class="text-slate-500">Distance hiked</dt><dd>{{ rtrim(rtrim(number_format($hiker->totalDistanceKm(), 1), '0'), '.') }} km</dd></div>
                     <div class="flex justify-between"><dt class="text-slate-500">Phone</dt><dd>{{ $hiker->phone }}</dd></div>
                     @if ($hiker->email)<div class="flex justify-between gap-2"><dt class="text-slate-500">Email</dt><dd class="truncate">{{ $hiker->email }}</dd></div>@endif
                 </dl>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domain\Loyalty\Enums\RankTier;
 use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
 use Database\Factories\HikerFactory;
@@ -72,5 +73,36 @@ class Hiker extends Model
     public function totalPoints(): int
     {
         return (int) ($this->attributes['total_points'] ?? $this->pointTransactions()->sum('points'));
+    }
+
+    public function tier(): RankTier
+    {
+        return RankTier::forPoints($this->totalPoints());
+    }
+
+    /**
+     * Points still needed for the next tier; null at the top tier.
+     */
+    public function pointsToNextTier(): ?int
+    {
+        $next = $this->tier()->next();
+
+        return $next ? $next->minPoints() - $this->totalPoints() : null;
+    }
+
+    /**
+     * Km of completed (attended) hikes; uses total_distance_km from the Leaderboard query when present.
+     */
+    public function totalDistanceKm(): float
+    {
+        if (array_key_exists('total_distance_km', $this->attributes)) {
+            return (float) $this->attributes['total_distance_km'];
+        }
+
+        return (float) $this->registrations()
+            ->join('events', 'events.id', '=', 'event_registrations.event_id')
+            ->where('event_registrations.status', RegistrationStatus::Confirmed)
+            ->where('event_registrations.attendance', Attendance::Attended)
+            ->sum('events.distance_km');
     }
 }

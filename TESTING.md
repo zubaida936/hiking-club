@@ -117,7 +117,7 @@ To check the mobile menu, make the browser narrower than 1024 px (or press F12 �
 | Registrations — events overview | http://localhost:8080/admin/registrations (Upcoming / Past tabs: seats, approvals, waitlist, paid, attended) | Super Admin, Admin, Guide |
 | Registrations — one event | click an event there, or "Manage registrations" on the event edit screen → `/admin/events/{id}/registrations`: filter by pickup point / status / search, approve, edit, cancel, mark paid, attendance, WhatsApp list, Export CSV | Admin: everything · Guide: view, WhatsApp list, CSV, attendance |
 | Registrations — edit a booking | "Edit" on a row → `/admin/registrations/{id}/edit` | Super Admin, Admin |
-| Points — hikers by points | http://localhost:8080/admin/points (search by name or phone) | Super Admin, Admin |
+| Points — hikers by rank | http://localhost:8080/admin/points (rank, tier, points, hikes, km; search by name or phone) | Super Admin, Admin |
 | Points — one hiker | click a hiker → history (every line with reason), bookings, "Adjust points" form | Super Admin, Admin |
 
 To try the Guide view of registrations, create a user with the Guide role in Staff & roles and log in as them.
@@ -130,6 +130,10 @@ booking 5+ days before the hike day, +10 to the friend whose number a new hiker 
 hiker completes a first hike. Clearing attendance, marking unpaid or cancelling adds a reversing line. Values are in
 `config/points.php`; after changing them run `docker compose exec app php artisan points:sync`. Demo data: the two
 past hikes have 12 checked-in demo hikers (e.g. Rima Haddad).
+
+**Rank tiers:** Pathfinder 0+, Trekker 80+, Mountaineer 200+, Highlander 400+, Elite 700+ points (`config/points.php` →
+`tiers`). Equal points are ranked by km of completed hikes. A hiker's page shows their tier, rank and points to the next
+tier. To see a higher tier quickly, add points with "Adjust points".
 
 Uploaded images are served from `http://localhost:8080/storage/...` (files live in `storage/app/public`).
 
@@ -181,6 +185,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Meeting points & pickup times | https://app.clickup.com/t/z8q7hbmper |
 | Manage registrations & attendance | https://app.clickup.com/t/z8q7hbmpfq |
 | Points engine | https://app.clickup.com/t/z8q7hbmpf3 |
+| Rank tiers | https://app.clickup.com/t/z8q7hbmpf4 |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

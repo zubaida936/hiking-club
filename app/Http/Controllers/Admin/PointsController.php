@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Domain\Loyalty\Actions\AdjustPoints;
+use App\Domain\Loyalty\Enums\RankTier;
+use App\Domain\Loyalty\Leaderboard;
 use App\Http\Controllers\Controller;
 use App\Models\Hiker;
 use Illuminate\Http\RedirectResponse;
@@ -13,29 +15,30 @@ use Illuminate\View\View;
 class PointsController extends Controller
 {
     /**
-     * Hikers by points, most first.
+     * Hikers in rank order: points, then distance hiked.
      */
-    public function index(Request $request): View
+    public function index(Request $request, Leaderboard $leaderboard): View
     {
         Gate::authorize('viewAny', Hiker::class);
 
         $search = $request->string('q')->trim()->toString();
         $digits = (string) preg_replace('/\D/', '', $search);
 
-        $hikers = Hiker::query()
-            ->withPointTotals()
+        $hikers = $leaderboard->query()
             ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q
                 ->where('name', 'like', "%{$search}%")
                 ->when(strlen($digits) >= 3, fn ($q) => $q->orWhere('phone', 'like', "%{$digits}%"))))
-            ->orderByDesc('total_points')
-            ->orderBy('name')
             ->paginate(config('cms.per_page'))
             ->withQueryString();
 
-        return view('admin.points.index', ['hikers' => $hikers]);
+        return view('admin.points.index', [
+            'hikers' => $hikers,
+            'positions' => $leaderboard->positions(),
+            'tiers' => RankTier::cases(),
+        ]);
     }
 
-    public function show(Hiker $hiker): View
+    public function show(Hiker $hiker, Leaderboard $leaderboard): View
     {
         Gate::authorize('viewAny', Hiker::class);
 
@@ -43,6 +46,7 @@ class PointsController extends Controller
 
         return view('admin.points.show', [
             'hiker' => $hiker,
+            'position' => $leaderboard->positionOf($hiker),
             'transactions' => $hiker->pointTransactions()->with(['registration.event', 'creator'])->latest('id')->get(),
             'bookings' => $hiker->registrations()->with('event')->latest('id')->get(),
         ]);

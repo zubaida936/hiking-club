@@ -28,4 +28,14 @@ return [
     // Only paid hikes count (free hikes always count). Set false while payment isn't tracked.
     'paid_only' => true,
 
+    // Rank tiers: the points a hiker needs to reach each one (ClickUp "Rank tiers").
+    // Hikers with equal points are ranked by total distance hiked.
+    'tiers' => [
+        'pathfinder' => 0,
+        'trekker' => 80,
+        'mountaineer' => 200,
+        'highlander' => 400,
+        'elite' => 700,
+    ],
+
 ];
