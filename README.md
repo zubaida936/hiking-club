@@ -36,6 +36,14 @@ docker compose exec app vendor/bin/pint           # code style
 docker compose exec app vendor/bin/phpstan analyse # static analysis (Larastan level 6)
 ```
 
+A pre-push hook runs Pint and Larastan before every push (tests stay in CI). Enable it once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+It needs the stack running (`docker compose up -d`); `git push --no-verify` skips it.
+
 ## Docker services
 
 `app` (PHP 8.4-FPM), `nginx`, `mysql`, `redis` (cache, sessions, queues), `queue` (worker),

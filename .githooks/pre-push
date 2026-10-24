@@ -1,0 +1,26 @@
+#!/bin/sh
+# Runs the CI style and static-analysis checks before every push, so a Pint or
+# Larastan failure is caught locally instead of on GitHub. Tests are left to CI
+# (they take minutes). Enable once per clone:  git config core.hooksPath .githooks
+# Skip in an emergency:  git push --no-verify
+
+# Git Bash on Windows would rewrite container paths; harmless elsewhere.
+export MSYS_NO_PATHCONV=1
+
+if ! docker compose exec -T app true >/dev/null 2>&1; then
+    echo "pre-push: the app container is not running. Start it with 'docker compose up -d'," >&2
+    echo "          or push with --no-verify to skip the checks." >&2
+    exit 1
+fi
+
+echo "pre-push: Pint..."
+if ! docker compose exec -T app vendor/bin/pint --test; then
+    echo "pre-push: style issues found. Fix them with 'docker compose exec app vendor/bin/pint', commit, and push again." >&2
+    exit 1
+fi
+
+echo "pre-push: Larastan..."
+if ! docker compose exec -T app vendor/bin/phpstan analyse --no-progress; then
+    echo "pre-push: Larastan found errors (see above). Fix them, commit, and push again." >&2
+    exit 1
+fi
