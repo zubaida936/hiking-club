@@ -53,7 +53,8 @@ function xMember(array $hikerAttributes = []): User
 
 describe('landing page', function () {
     it('explains X Events and lists the upcoming ones', function () {
-        Event::factory()->published()->create(['title' => 'X30 Tannourine to Douma', 'is_xtreme' => true]);
+        // Sooner than "Easy Sunday", so the layout's "Next hike" bar never shows it.
+        Event::factory()->published()->create(['title' => 'X30 Tannourine to Douma', 'is_xtreme' => true, 'starts_on' => now()->addDays(10)->toDateString()]);
         Event::factory()->published()->create(['title' => 'Easy Sunday', 'is_xtreme' => false, 'starts_on' => now()->addDays(50)->toDateString()]);
 
         $this->get(route('x-events'))
