@@ -36,7 +36,8 @@ return [
         .'with transport, experienced guides and a crew that looks after each other on the trail.',
 
     /*
-    | Seasonal hero carousel. Each slide: season label, heading, text, CTA label + route name.
+    | Seasonal hero carousel placeholders, shown only while CMS → Hero slides has no active
+    | slide. Each slide: season label, heading, text, CTA label + route name.
     | 'image' is optional (path under public/); slides without one use a gradient.
     */
     'hero' => [

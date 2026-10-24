@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property string $token
  * @property ?Carbon $confirmed_at
  * @property ?Carbon $unsubscribed_at
+ * @property Carbon $created_at
  */
 class Subscriber extends Model
 {
@@ -56,5 +57,18 @@ class Subscriber extends Model
     public function awaitsConfirmation(): bool
     {
         return $this->email !== null && $this->confirmed_at === null && $this->isActive();
+    }
+
+    /**
+     * For the CMS list. Phone numbers need no confirmation (they are only stored).
+     */
+    public function statusLabel(): string
+    {
+        return match (true) {
+            ! $this->isActive() => 'Unsubscribed',
+            $this->email === null => 'Phone only',
+            $this->confirmed_at !== null => 'Confirmed',
+            default => 'Awaiting confirmation',
+        };
     }
 }

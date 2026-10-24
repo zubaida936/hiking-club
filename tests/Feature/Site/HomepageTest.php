@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Event;
+use App\Models\HeroSlide;
+use Illuminate\Support\Facades\Storage;
 
 it('shows the homepage sections in order', function () {
     $this->get('/')
@@ -16,14 +18,31 @@ it('shows the homepage sections in order', function () {
         ]);
 });
 
-it('shows every hero slide with its call to action', function () {
-    $response = $this->get('/')->assertOk();
+it('shows the placeholder hero slides while the CMS has none', function () {
+    HeroSlide::factory()->create(['heading' => 'Hidden slide', 'is_active' => false]);
+
+    $response = $this->get('/')->assertOk()->assertDontSee('Hidden slide');
 
     foreach (config('site.hero') as $slide) {
-        $response->assertSee($slide['heading'])->assertSee($slide['cta']);
+        $response->assertSee($slide['heading'])->assertSee($slide['cta'])->assertSee(route($slide['route']));
     }
 
     $response->assertSee('aria-label="Next slide"', false);
+});
+
+it('shows the active CMS hero slides in order instead of the placeholders', function () {
+    HeroSlide::factory()->create(['heading' => 'Second slide', 'position' => 2, 'cta_label' => 'Visit the shop', 'cta_url' => '/shop']);
+    HeroSlide::factory()->create(['heading' => 'First slide', 'position' => 1, 'eyebrow' => '❄️ Winter', 'image_path' => 'hero/first.jpg']);
+    HeroSlide::factory()->create(['heading' => 'No button', 'position' => 3, 'cta_label' => null, 'cta_url' => null]);
+    HeroSlide::factory()->create(['heading' => 'Hidden slide', 'is_active' => false]);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSeeInOrder(['❄️ Winter', 'First slide', 'Second slide', 'Visit the shop', 'No button'])
+        ->assertSee(url('/shop'))
+        ->assertSee(Storage::disk('public')->url('hero/first.jpg'))
+        ->assertDontSee('Hidden slide')
+        ->assertDontSee(config('site.hero')[0]['heading']);
 });
 
 it('features the nearest published upcoming event as the next challenge', function () {

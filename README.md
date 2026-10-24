@@ -66,6 +66,7 @@ Recommended: protect `main` and require the CI checks to pass before merging.
 - [docs/rewards.md](docs/rewards.md): what each rank unlocks and how rewards are used.
 - [docs/x-events.md](docs/x-events.md): applying, reviewing and booking X Events.
 - [docs/shop.md](docs/shop.md): products, stock, cart, checkout, order steps and how to test the shop.
+- [docs/content.md](docs/content.md): guide articles, gallery, homepage slides, team and newsletter subscribers in the CMS.
 - [docs/open-decisions.md](docs/open-decisions.md): decisions the club still has to take, placeholders to replace, known gaps.
 
 ## Architecture

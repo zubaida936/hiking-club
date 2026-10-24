@@ -12,6 +12,11 @@
         ['label' => 'Members', 'route' => 'admin.members.index', 'active' => ['admin.members.index'], 'can' => Permission::ManageMembers],
         ['label' => 'Points', 'route' => 'admin.points.index', 'active' => 'admin.points.*', 'can' => Permission::ManageLoyalty],
         ['label' => 'Rewards used', 'route' => 'admin.members.rewards', 'active' => 'admin.members.rewards', 'can' => Permission::ManageLoyalty],
+        ['label' => 'Guide articles', 'route' => 'admin.articles.index', 'active' => 'admin.articles.*', 'can' => Permission::ManageContent],
+        ['label' => 'Gallery', 'route' => 'admin.albums.index', 'active' => 'admin.albums.*', 'can' => Permission::ManageMedia],
+        ['label' => 'Homepage slides', 'route' => 'admin.hero-slides.index', 'active' => 'admin.hero-slides.*', 'can' => Permission::ManageContent],
+        ['label' => 'Team', 'route' => 'admin.team.index', 'active' => 'admin.team.*', 'can' => Permission::ManageContent],
+        ['label' => 'Subscribers', 'route' => 'admin.subscribers.index', 'active' => 'admin.subscribers.*', 'can' => Permission::ManageSubscribers],
         ['label' => 'Staff & roles', 'route' => 'admin.staff.index', 'active' => 'admin.staff.*', 'can' => Permission::ManageStaff],
     ];
 @endphp

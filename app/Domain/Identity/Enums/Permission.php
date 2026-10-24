@@ -17,4 +17,6 @@ enum Permission: string
     case ManageShop = 'shop.manage';
     case ManageContent = 'content.manage';
     case ManageMedia = 'media.manage';
+    // Newsletter subscriber list: personal data, so not part of content editing.
+    case ManageSubscribers = 'subscribers.manage';
 }

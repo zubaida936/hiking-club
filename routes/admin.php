@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\AlbumController;
+use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PointsController;
@@ -10,6 +13,8 @@ use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\StaffUserController;
+use App\Http\Controllers\Admin\SubscriberController;
+use App\Http\Controllers\Admin\TeamMemberController;
 use App\Http\Controllers\Admin\XApplicationController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +59,18 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('{order:id}/status', 'status')->name('status');
         Route::post('{order:id}/cancel', 'cancel')->name('cancel');
         Route::post('{order:id}/payment', 'payment')->name('payment');
+    });
+
+    // Content: guide articles, gallery, homepage hero, team, newsletter subscribers.
+    Route::resource('articles', ArticleController::class)->except('show');
+    Route::resource('albums', AlbumController::class)->except('show');
+    Route::resource('hero-slides', HeroSlideController::class)->except('show');
+    Route::resource('team', TeamMemberController::class)->except('show')->parameters(['team' => 'member']);
+    Route::controller(SubscriberController::class)->prefix('subscribers')->name('subscribers.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('export', 'export')->name('export');
+        Route::post('{subscriber:id}/unsubscribe', 'unsubscribe')->name('unsubscribe');
+        Route::delete('{subscriber:id}', 'destroy')->name('destroy');
     });
 
     Route::controller(XApplicationController::class)->prefix('x-applications')->name('x-applications.')->group(function () {

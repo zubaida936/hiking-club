@@ -4,6 +4,7 @@ namespace App\Domain\Registrations\Exports;
 
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Support\Csv;
 use Illuminate\Support\Collection;
 
 /**
@@ -33,7 +34,7 @@ final class RegistrationExport
         ]];
 
         foreach ($this->registrations as $r) {
-            $rows[] = array_map($this->safeCell(...), [
+            $rows[] = [
                 $r->reference,
                 $r->status->label(),
                 $r->name,
@@ -49,24 +50,18 @@ final class RegistrationExport
                 (string) $r->payment_reference,
                 (string) $r->attendance?->label(),
                 $r->created_at->setTimezone($timezone)->format('Y-m-d H:i'),
-            ]);
+            ];
         }
 
         return $rows;
     }
 
     /**
-     * Writes the CSV (UTF-8 with BOM, so Excel shows Arabic names and emoji correctly).
-     *
      * @param  resource  $handle
      */
     public function writeCsv($handle): void
     {
-        fwrite($handle, "\xEF\xBB\xBF");
-
-        foreach ($this->rows() as $row) {
-            fputcsv($handle, $row, escape: '');
-        }
+        Csv::write($handle, $this->rows());
     }
 
     public function filename(): string
@@ -106,13 +101,5 @@ final class RegistrationExport
         $lines[] = "Total: {$total}";
 
         return implode("\n", $lines);
-    }
-
-    /**
-     * Spreadsheet apps run cells starting with = + - @ as formulas; a leading ' keeps them text.
-     */
-    private function safeCell(string $value): string
-    {
-        return $value !== '' && str_contains("=+-@\t\r", $value[0]) ? "'".$value : $value;
     }
 }

@@ -1,5 +1,7 @@
 @props(['slides'])
 
+{{-- $slides: App\Domain\Content\HomepageHero::slides() --}}
+
 {{-- Autoplays every 6 s and pauses on hover/focus; arrows and dots to navigate. --}}
 <section class="relative isolate overflow-hidden bg-brand-900 text-white" aria-roledescription="carousel" aria-label="Seasonal highlights"
          x-data="{
@@ -17,7 +19,7 @@
              class="relative flex min-h-[70vh] items-center" role="group" aria-roledescription="slide" aria-label="{{ $i + 1 }} of {{ count($slides) }}">
             @if ($slide['image'])
                 {{-- First slide is the largest above-the-fold image: load it first; the rest lazily. --}}
-                <img src="{{ asset($slide['image']) }}" alt="" width="1920" height="1080" decoding="async"
+                <img src="{{ $slide['image'] }}" alt="" width="1920" height="1080" decoding="async"
                      @if ($i === 0) fetchpriority="high" @else loading="lazy" @endif
                      class="absolute inset-0 -z-10 size-full object-cover">
                 <div class="absolute inset-0 -z-10 bg-brand-900/60"></div>
@@ -37,13 +39,19 @@
             @endif
 
             <div class="mx-auto w-full max-w-7xl px-4 py-24 sm:px-6">
-                <p class="font-display text-sm font-semibold uppercase tracking-[0.25em] text-accent-400">{{ $slide['season'] }}</p>
+                @if ($slide['eyebrow'])
+                    <p class="font-display text-sm font-semibold uppercase tracking-[0.25em] text-accent-400">{{ $slide['eyebrow'] }}</p>
+                @endif
                 <h2 class="mt-4 max-w-3xl font-display text-4xl font-bold uppercase leading-tight tracking-wide sm:text-6xl">{{ $slide['heading'] }}</h2>
-                <p class="mt-4 max-w-xl text-lg text-white/85">{{ $slide['text'] }}</p>
-                <a href="{{ route($slide['route']) }}"
-                   class="mt-10 inline-block rounded-full bg-accent-500 px-8 py-3 font-display font-bold uppercase tracking-wide hover:bg-accent-600">
-                    {{ $slide['cta'] }}
-                </a>
+                @if ($slide['text'])
+                    <p class="mt-4 max-w-xl text-lg text-white/85">{{ $slide['text'] }}</p>
+                @endif
+                @if ($slide['cta'] && $slide['url'])
+                    <a href="{{ $slide['url'] }}"
+                       class="mt-10 inline-block rounded-full bg-accent-500 px-8 py-3 font-display font-bold uppercase tracking-wide hover:bg-accent-600">
+                        {{ $slide['cta'] }}
+                    </a>
+                @endif
             </div>
         </div>
     @endforeach

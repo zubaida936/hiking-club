@@ -1,7 +1,7 @@
 # Open decisions, placeholders and known gaps
 
 Things found while building the site that need a decision from the club, real content, or a later feature.
-Update this file when one is settled. Last reviewed: 2026-10-23.
+Update this file when one is settled. Last reviewed: 2026-10-24.
 
 ## Decisions needed
 
@@ -25,6 +25,7 @@ Update this file when one is settled. Last reviewed: 2026-10-23.
 - Club Whish / OMT accounts shown to hikers: `PAYMENT_WHISH_*`, `PAYMENT_OMT_*` in `.env`.
 - Payment note for old bookings without a method and the booking terms: `config/site.php` → `booking`.
 - Default share image `public/images/og-default.jpg` and homepage texts in `config/site.php`.
+- Homepage carousel: add real slides with photos in CMS → Homepage slides (until then the 3 placeholder slides show).
 
 ## Known gaps (planned in other ClickUp tasks)
 
@@ -58,6 +59,14 @@ Update this file when one is settled. Last reviewed: 2026-10-23.
   "new order" emails (`SHOP_NOTIFY_EMAIL`), the real products and photos, and the shop terms. Cancelled paid orders
   are refunded by hand ("Refund due"). Stock is not held while items sit in a cart, only once the order is placed;
   unpaid orders don't expire, so staff cancel them by hand to free the stock. No shop discounts / rank rewards yet.
+
+- **Content** (articles, gallery, homepage slides, team, subscribers) is edited in the CMS, see
+  [docs/content.md](content.md). The public Guides, Gallery and About pages that show articles, albums and the team
+  are still "coming soon" ("7. Content Pages" in ClickUp). Choices to confirm: the subscriber list is limited to
+  Admins (personal data; Content Editors don't see it), articles have no topic/category field yet (add one with the
+  Guides page if the list needs filtering), photos have no captions, and gallery uploads are capped by the server at
+  20 photos / 25 MB per batch (raise `upload_max_filesize`, `post_max_size`, `max_file_uploads` and nginx
+  `client_max_body_size` to change it).
 
 ## Local development notes
 

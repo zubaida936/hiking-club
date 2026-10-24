@@ -24,7 +24,9 @@
 
 <x-site.layout>
     <h1 class="sr-only">{{ config('app.name') }}</h1>
-    <x-site.hero-carousel :slides="config('site.hero')" />
+    @if ($heroSlides !== [])
+        <x-site.hero-carousel :slides="$heroSlides" />
+    @endif
 
     {{-- About --}}
     <section id="about" class="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">

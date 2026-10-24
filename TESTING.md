@@ -28,7 +28,7 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 
 | Page | Link | Status |
 |---|---|---|
-| Home | http://localhost:8080/ | Hero carousel, About, Next Challenge, X Events, Top 10 Hikers (live leaderboard), newsletter sign-up, contact. Texts/contact details are placeholders in `config/site.php` |
+| Home | http://localhost:8080/ | Hero carousel (slides from CMS → Homepage slides, or the `config/site.php` placeholders while none is shown), About, Next Challenge, X Events, Top 10 Hikers (live leaderboard), newsletter sign-up, contact. Texts/contact details are placeholders in `config/site.php` |
 | Leaderboard | http://localhost:8080/leaderboard | Up to 100 hikers by points (ties by km), with rank tier, hikes and km. Names shown as "Rima H."; hikers without points or who chose "Hide me" on My account are not listed. Logged-in members see their own place |
 | About | http://localhost:8080/about | Coming soon |
 | Events | http://localhost:8080/events | Upcoming events (soonest first) and Past events with Load More; filter by level or month, e.g. http://localhost:8080/events?level=2 or http://localhost:8080/events?month=2026-11 |
@@ -148,6 +148,11 @@ To check the mobile menu, make the browser narrower than 1024 px (or press F12 �
 | Shop orders | http://localhost:8080/admin/orders: filter by status, search name / phone / reference; an order → items, customer + WhatsApp link, delivery, steps (Being prepared → Ready → Completed), Mark paid / unpaid, Cancel (reason, email, stock back; paid → "Refund due") | Super Admin, Admin |
 | Points — hikers by rank | http://localhost:8080/admin/points (rank, tier, points, hikes, km; search by name or phone) | Super Admin, Admin |
 | Points — one hiker | click a hiker → history (every line with reason), bookings, rewards (uses, "Mark handed over" for gift card / winter bonus), "Adjust points" form | Super Admin, Admin |
+| Guide articles | http://localhost:8080/admin/articles: filter Published / Scheduled / Drafts, "+ New article" (Markdown text, author, cover photo, publish date: future = scheduled) → http://localhost:8080/admin/articles/create, Edit, Delete | Super Admin, Admin, Content Editor |
+| Gallery | http://localhost:8080/admin/albums: albums with cover and photo count, "+ New album" → http://localhost:8080/admin/albums/create (link to a hike, upload up to 20 photos per batch, Cover / Remove per photo, Show in the gallery). From a hike: http://localhost:8080/admin/albums/create?event=1 | Super Admin, Admin, Content Editor |
+| Homepage slides | http://localhost:8080/admin/hero-slides: the homepage carousel (heading, text, button text + link, background photo, order, shown / hidden), "+ New slide" → http://localhost:8080/admin/hero-slides/create. Without an active slide the homepage shows the placeholders from `config/site.php` | Super Admin, Admin, Content Editor |
+| Team | http://localhost:8080/admin/team: name, role, bio, portrait, order, shown / hidden (for the About page), "+ New team member" → http://localhost:8080/admin/team/create | Super Admin, Admin, Content Editor |
+| Subscribers | http://localhost:8080/admin/subscribers: newsletter sign-ups with counts, filter (confirmed / awaiting / phone / unsubscribed), search email or phone, Download CSV (http://localhost:8080/admin/subscribers/export), Unsubscribe, Delete | Super Admin, Admin |
 
 To try the Guide view of registrations, create a user with the Guide role in Staff & roles and log in as them.
 Attendance buttons appear from the hike day (Lebanon time): to test them now, set an event's date to today in the CMS.
