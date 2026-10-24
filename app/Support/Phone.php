@@ -18,4 +18,20 @@ final class Phone
 
         return $phone !== '' ? $phone : null;
     }
+
+    /**
+     * The digits to match against phone numbers in a CMS search, e.g. "70 123" -> "70123".
+     * Null unless the search looks like part of a phone number (at least 3 digits, no letters),
+     * so a reference like "K7F3Q2MZ" or an email doesn't also match phones containing "732".
+     */
+    public static function searchDigits(string $search): ?string
+    {
+        if (preg_match('/^\+?[0-9\s\-().]+$/', $search) !== 1) {
+            return null;
+        }
+
+        $digits = (string) preg_replace('/\D/', '', $search);
+
+        return strlen($digits) >= 3 ? $digits : null;
+    }
 }

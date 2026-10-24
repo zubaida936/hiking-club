@@ -90,7 +90,8 @@ describe('overview and list', function () {
 
     it('filters by pickup point and finds hikers by name, phone or reference', function () {
         $rima = booking($this->event, ['name' => 'Rima Haddad', 'phone' => '+96170123456', 'reference' => 'K7F3Q2MZ', 'pickup_point' => 'Sour', 'pickup_time' => '05:50:00']);
-        $karim = booking($this->event, ['name' => 'Karim Saad', 'pickup_point' => 'Beirut - Jnah', 'pickup_time' => '07:30:00']);
+        // His phone contains "732", the digits of Rima's reference: a reference search must not match it.
+        $karim = booking($this->event, ['name' => 'Karim Saad', 'phone' => '+96171732000', 'pickup_point' => 'Beirut - Jnah', 'pickup_time' => '07:30:00']);
 
         $this->actingAs($this->admin)->get(route('admin.events.registrations', $this->event))
             ->assertSeeInOrder(['Sour 05:50', '1', 'Beirut - Jnah 07:30', '1']);

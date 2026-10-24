@@ -10,6 +10,7 @@ use App\Domain\Rewards\Exceptions\RewardException;
 use App\Domain\Rewards\HikerRewards;
 use App\Http\Controllers\Controller;
 use App\Models\Hiker;
+use App\Support\Phone;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -25,12 +26,12 @@ class PointsController extends Controller
         Gate::authorize('viewAny', Hiker::class);
 
         $search = $request->string('q')->trim()->toString();
-        $digits = (string) preg_replace('/\D/', '', $search);
+        $digits = Phone::searchDigits($search);
 
         $hikers = $leaderboard->query()
             ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q
                 ->where('name', 'like', "%{$search}%")
-                ->when(strlen($digits) >= 3, fn ($q) => $q->orWhere('phone', 'like', "%{$digits}%"))))
+                ->when($digits !== null, fn ($q) => $q->orWhere('phone', 'like', "%{$digits}%"))))
             ->paginate(config('cms.per_page'))
             ->withQueryString();
 

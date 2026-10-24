@@ -9,6 +9,7 @@ use App\Domain\Rewards\RewardCatalog;
 use App\Http\Controllers\Controller;
 use App\Models\Hiker;
 use App\Models\RewardRedemption;
+use App\Support\Phone;
 use App\Support\WhatsApp;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -27,7 +28,7 @@ class MemberController extends Controller
         Gate::authorize('manageMembers', Hiker::class);
 
         $search = $request->string('q')->trim()->toString();
-        $digits = (string) preg_replace('/\D/', '', $search);
+        $digits = Phone::searchDigits($search);
         $account = (string) $request->query('account');
 
         $hikers = Hiker::query()
@@ -37,7 +38,7 @@ class MemberController extends Controller
             ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q
                 ->where('name', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%")
-                ->when(strlen($digits) >= 3, fn ($q) => $q->orWhere('phone', 'like', "%{$digits}%"))))
+                ->when($digits !== null, fn ($q) => $q->orWhere('phone', 'like', "%{$digits}%"))))
             ->when($account === 'active', fn ($q) => $q->whereHas('user', fn (Builder $u) => $u->where('is_active', true)))
             ->when($account === 'deactivated', fn ($q) => $q->whereHas('user', fn (Builder $u) => $u->where('is_active', false)))
             ->when($account === 'none', fn ($q) => $q->whereNull('user_id'))

@@ -7,6 +7,7 @@ use App\Domain\Shop\Enums\OrderStatus;
 use App\Domain\Shop\Exceptions\ShopException;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Support\Phone;
 use App\Support\WhatsApp;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class OrderController extends Controller
 
         $status = OrderStatus::tryFrom((string) $request->query('status'));
         $search = $request->string('q')->trim()->toString();
-        $digits = (string) preg_replace('/\D/', '', $search);
+        $digits = Phone::searchDigits($search);
 
         return view('admin.orders.index', [
             'orders' => Order::query()
@@ -31,7 +32,7 @@ class OrderController extends Controller
                 ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('reference', strtoupper($search))
-                    ->when(strlen($digits) >= 3, fn ($q) => $q->orWhere('phone', 'like', "%{$digits}%"))))
+                    ->when($digits !== null, fn ($q) => $q->orWhere('phone', 'like', "%{$digits}%"))))
                 ->latest('id')
                 ->paginate(config('cms.per_page'))
                 ->withQueryString(),

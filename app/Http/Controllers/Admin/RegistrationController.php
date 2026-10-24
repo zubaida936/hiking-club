@@ -17,6 +17,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RegistrationRequest;
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Support\Phone;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -186,7 +187,7 @@ class RegistrationController extends Controller
         $status = RegistrationStatus::tryFrom((string) $request->query('status'));
         $pickup = $request->string('pickup')->toString();
         $search = $request->string('q')->trim()->toString();
-        $digits = (string) preg_replace('/\D/', '', $search);
+        $digits = Phone::searchDigits($search);
 
         return EventRegistration::query()->whereBelongsTo($event)
             // Default view hides cancelled bookings, except those still waiting for a refund.
@@ -197,7 +198,7 @@ class RegistrationController extends Controller
             ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q
                 ->where('name', 'like', "%{$search}%")
                 ->orWhere('reference', strtoupper($search))
-                ->when(strlen($digits) >= 3, fn ($q) => $q->orWhere('phone', 'like', "%{$digits}%"))))
+                ->when($digits !== null, fn ($q) => $q->orWhere('phone', 'like', "%{$digits}%"))))
             ->orderBy('created_at')
             ->orderBy('id');
     }
