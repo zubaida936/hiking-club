@@ -79,3 +79,33 @@ Things to know
 - Further speed-up: the biggest remaining gain would be moving the project into
   the WSL Linux filesystem (for example \\wsl$\Ubuntu\home\...), so your own
   code doesn't cross that boundary either.
+
+Slow first load after the node container starts (2026-10-24)
+=============================================================
+
+Why
+---
+The HTML is fast from the first request; the browser waits on the stylesheet.
+Vite builds each file on its first request, and Tailwind has to scan the
+project files on the Windows drive to find the classes in use, which crosses
+the slow Windows/Linux boundary described above. Measured:
+
+                              1st load   2nd / 3rd load
+  /up (Laravel boot only)     0.17 s     0.10 s / 0.12 s
+  /admin/login (HTML)         0.16 s     0.15 s / 0.16 s
+  admin.css from Vite         34 s       0.007 s / 0.007 s
+
+The result is kept in memory, so it only happens again after the node
+container restarts (docker compose up, restart, or a vite.config.js change).
+
+Ways to fix it (most effective first)
+-------------------------------------
+1. Move the project into the WSL Linux filesystem (see "Further speed-up"
+   above). Fixes the root cause: the build would take a second or two, and
+   the polling file watcher in vite.config.js would no longer be needed.
+2. Warm the stylesheets when the node container starts: once Vite is up,
+   request resources/css/admin.css and resources/css/app.css in the
+   background, so the build happens before anyone opens the site.
+3. Limit what Tailwind scans with @source rules in the CSS files (only
+   resources/views and resources/js). Shortens the build, but doesn't
+   remove the first-load wait.
