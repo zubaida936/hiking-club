@@ -79,6 +79,9 @@
     @elseif (! $upcoming)
         <div class="bg-slate-100 px-4 py-4 text-slate-700 sm:px-6" role="status">
             <p class="mx-auto max-w-7xl"><strong>This hike has already taken place.</strong>
+                @if ($album)
+                    <a href="{{ route('gallery.show', $album->slug) }}" class="font-semibold text-brand-700 underline">See the photos</a> ·
+                @endif
                 <a href="{{ route('events.index') }}" class="font-semibold text-brand-700 underline">See upcoming hikes</a></p>
         </div>
     @endif

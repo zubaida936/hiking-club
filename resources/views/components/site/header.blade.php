@@ -12,7 +12,7 @@
                     <div class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape="open = false">
                         <button type="button" @click="open = ! open" :aria-expanded="open" aria-haspopup="true"
                                 @class([
-                                    'flex items-center gap-1 rounded px-3 py-2 font-display text-sm font-semibold uppercase tracking-wide hover:text-accent-400',
+                                    'flex items-center gap-1 rounded px-2 py-2 xl:px-3 font-display text-sm font-semibold uppercase tracking-wide hover:text-accent-400',
                                     'text-accent-400' => $active,
                                 ])>
                             {{ $item['label'] }}
@@ -36,7 +36,7 @@
                 @else
                     <a href="{{ route($item['route']) }}" @if ($active) aria-current="page" @endif
                        @class([
-                           'rounded px-3 py-2 font-display text-sm font-semibold uppercase tracking-wide hover:text-accent-400',
+                           'rounded px-2 py-2 xl:px-3 font-display text-sm font-semibold uppercase tracking-wide hover:text-accent-400',
                            'text-accent-400' => $active,
                        ])>
                         {{ $item['label'] }}

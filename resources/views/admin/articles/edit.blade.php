@@ -5,6 +5,7 @@
         <div class="mt-6 flex flex-wrap gap-2">
             <x-admin.button>Save article</x-admin.button>
             <x-admin.button variant="secondary" :href="route('admin.articles.index')">Back to articles</x-admin.button>
+            <x-admin.button variant="secondary" :href="route('guide.articles.show', $article->slug)" target="_blank">{{ $article->isPublished() ? 'View on the site' : 'Preview' }}</x-admin.button>
         </div>
     </form>
     <form method="POST" action="{{ route('admin.articles.destroy', $article) }}" class="mt-6"

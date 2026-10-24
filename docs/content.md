@@ -37,10 +37,33 @@ Code: `app/Domain/Content` (save actions, `HomepageHero`), models `Article`, `Al
 
 ## Where the content is shown
 
-- Homepage slides: live on the homepage now.
-- Articles, albums and team members are stored and edited here; the public pages that show them are separate ClickUp
-  tasks ("7. Content Pages": Guides / blog, Photo gallery, About page). Use `Article::published()`,
-  `Album::published()` and `TeamMember::shown()` there; `Article::bodyHtml()` gives the safe HTML of the text.
+- **Homepage slides** → the homepage carousel.
+- **Guide articles** → `/guides` (cards with cover, date, author, title, summary, Read More; 9 per page) and
+  `/guides/{slug}` (cover header, author, date, reading time, the text, "More guides"; Article structured data for
+  search engines). Menu: Hiker's Guide → Guides.
+- **Gallery** → `/gallery` (published albums that have photos, newest first, 12 per page) and `/gallery/{slug}`
+  (photo grid; click a photo for the lightbox: arrows / swipe to move, Esc to close). A past hike's page shows
+  "See the photos" once it has a published album with photos; the album links back to the hike. Menu: Gallery.
+- **Team** → the About page (`/about`), "Meet the Team" (hidden while nobody is listed).
+- Drafts, scheduled articles and hidden albums return 404 to visitors. Staff who can edit them see them with a
+  "Preview" banner (and noindex): use **Preview** on the CMS edit screen.
+- Published articles and albums are in `sitemap.xml`.
+
+The About page texts (story, founding year, "What We Offer", reviews) are placeholders in `config/site.php` →
+`about_page`, see [open-decisions.md](open-decisions.md).
+
+## Pages edited in config (not in the CMS)
+
+| Page | What it shows | Edit in |
+|---|---|---|
+| About `/about` | Story, founding year, What We Offer, Meet the Team (CMS), reviews, club numbers (past hikes, hikers who attended) | `config/site.php` → `about_page`; `SITE_FOUNDED_YEAR`, `SITE_GOOGLE_REVIEWS_URL` ("Read our Google reviews" button, hidden when empty) |
+| Equipment Guide `/equipment` | "What You Need for Each Adventure": Hiking, Snowshoeing, Rafting, Camping tabs (`/equipment#camping` opens a tab), tick-off checklists; Hiking filters by difficulty level ("Level 3+" items appear from that level); "Shop →" links to the shop category when it has products for sale | `config/equipment.php` (item: name, tip, from level, shop category slug) |
+| Contact `/contact` | Contact form, WhatsApp, phone, email, address + "Open in Google Maps", social links | `SITE_*` in `.env`; `SITE_MAPS_URL` for the club's own map link (empty = map search for `SITE_ADDRESS`) |
+
+**Contact form:** name, email, optional phone, message. It is emailed (queue) to `SITE_EMAIL` with the sender as
+Reply-To, so replying in the inbox answers them; if they gave a phone, the email has an "Answer on WhatsApp" button.
+Messages are not stored on the site. Spam protection: hidden honeypot field + max 5 messages per minute per visitor.
+After deploying, restart the queue (`docker compose restart queue`) so it knows the new email.
 
 ## Testing it locally
 

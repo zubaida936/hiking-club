@@ -17,7 +17,7 @@ class ArticleFactory extends Factory
 
         return [
             'title' => $title,
-            'slug' => Str::slug($title),
+            'slug' => fn (array $attributes) => Str::slug($attributes['title']),
             'excerpt' => null,
             'body' => fake()->paragraphs(3, true),
             'author_name' => fake()->name(),

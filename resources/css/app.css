@@ -28,3 +28,20 @@
 [x-cloak] {
     display: none !important;
 }
+
+/* Text of guide articles (Markdown rendered by Article::bodyHtml()). */
+.article-body {
+    @apply text-lg leading-relaxed text-slate-700;
+
+    & > * + * { @apply mt-5; }
+    & h2 { @apply mt-10 font-display text-2xl font-bold uppercase tracking-wide text-brand-900; }
+    & h3 { @apply mt-8 font-display text-xl font-semibold text-brand-900; }
+    & a { @apply font-medium text-brand-600 underline underline-offset-2 hover:text-brand-800; }
+    & strong { @apply font-semibold text-slate-900; }
+    & ul { @apply list-disc space-y-2 pl-6; }
+    & ol { @apply list-decimal space-y-2 pl-6; }
+    & blockquote { @apply border-l-4 border-accent-500 pl-4 italic text-slate-600; }
+    & img { @apply rounded-xl; }
+    & hr { @apply my-10 border-slate-200; }
+    & code { @apply rounded bg-slate-100 px-1.5 py-0.5 text-base; }
+}

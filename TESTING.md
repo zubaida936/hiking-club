@@ -30,17 +30,18 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 |---|---|---|
 | Home | http://localhost:8080/ | Hero carousel (slides from CMS → Homepage slides, or the `config/site.php` placeholders while none is shown), About, Next Challenge, X Events, Top 10 Hikers (live leaderboard), newsletter sign-up, contact. Texts/contact details are placeholders in `config/site.php` |
 | Leaderboard | http://localhost:8080/leaderboard | Up to 100 hikers by points (ties by km), with rank tier, hikes and km. Names shown as "Rima H."; hikers without points or who chose "Hide me" on My account are not listed. Logged-in members see their own place |
-| About | http://localhost:8080/about | Coming soon |
+| About | http://localhost:8080/about | Story and founding year, What We Offer, Meet the Team (CMS → Team), reviews (+ "Read our Google reviews" when `SITE_GOOGLE_REVIEWS_URL` is set), club numbers once there are past hikes / attended hikers. Texts are placeholders in `config/site.php` → `about_page` |
+| Gallery | http://localhost:8080/gallery | Published albums with photos (CMS → Gallery). An album: http://localhost:8080/gallery/{slug} with lightbox (click a photo, arrows / swipe, Esc). Past hikes with an album show "See the photos" |
 | Events | http://localhost:8080/events | Upcoming events (soonest first) and Past events with Load More; filter by level or month, e.g. http://localhost:8080/events?level=2 or http://localhost:8080/events?month=2026-11 |
 | Event detail | http://localhost:8080/events/horch-ehden-nature-reserve (or click "View Details" on any card) | Everything about one hike: level, effort, distance, elevation, fee, seats left, itinerary, meeting points, included / what to bring, technical details, route map + GPX download, WhatsApp inquiry. Cancelled example: http://localhost:8080/events/hadath-el-jebbe-to-tannourine-el-tahta. Drafts return 404 |
 | X Events | http://localhost:8080/x-events | Landing page (requirements, 3 steps, upcoming X events) and the application form http://localhost:8080/x-events/apply. Only approved hikers (or Elite) can book X events, logged in: see docs/x-events.md |
 | Shop | http://localhost:8080/shop | Products with price / sale / stock badges, category filter, e.g. http://localhost:8080/shop?category=footwear. Product page (sizes, photos, Add to cart): http://localhost:8080/shop/club-t-shirt (demo data, see docs/shop.md) |
 | Checkout | http://localhost:8080/checkout (from the cart) | Pickup or delivery (+$4), payment method, terms → order page `/orders/{secret}` with payment instructions / "Pay now" and the order status |
 | Rank System | http://localhost:8080/rank-system | Coming soon |
-| Contact | http://localhost:8080/contact | Coming soon |
+| Contact | http://localhost:8080/contact | Contact form (emailed to `SITE_EMAIL`, see Mailpit; Reply-To = sender), WhatsApp, phone, email, address + Open in Google Maps, social links |
 | Hiker's Guide → Difficulty Calculator | http://localhost:8080/difficulty-calculator | Enter km, elevation gain (and loss): live effort score, level, description and points; formula, level table and limitations; upcoming hikes of that level. Shareable, e.g. http://localhost:8080/difficulty-calculator?km=8&gain=220&loss=320 |
-| Hiker's Guide → Equipment Guide | http://localhost:8080/equipment | Coming soon |
-| Hiker's Guide → Guides | http://localhost:8080/guides | Coming soon |
+| Hiker's Guide → Equipment Guide | http://localhost:8080/equipment | Checklists for Hiking (pick a difficulty level: more items appear for harder hikes), Snowshoeing, Rafting, Camping (e.g. http://localhost:8080/equipment#camping), "Shop →" links when the shop has products in that category. Lists in `config/equipment.php` |
+| Hiker's Guide → Guides | http://localhost:8080/guides | Published articles (CMS → Guide articles), 9 per page. An article: http://localhost:8080/guides/how-much-water-to-carry-on-a-day-hike (demo data). Drafts give 404 unless you are logged into the CMS as content staff (Preview banner) |
 | Cart (cart icon) | http://localhost:8080/cart | Lines with size, quantity (update / remove), subtotal; the header icon shows the item count |
 | Privacy Policy (footer) | http://localhost:8080/privacy-policy | Coming soon |
 
@@ -233,6 +234,8 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | X Events (landing, application form, review, manage) | https://app.clickup.com/t/z8q7hbmpf9 · https://app.clickup.com/t/z8q7hbmpfa · https://app.clickup.com/t/z8q7hbmpfb · https://app.clickup.com/t/z8q7hbmpft |
 | Event reminders & notifications | https://app.clickup.com/t/z8q7hbmpex |
 | Shop (listing, product page, cart & checkout, payments & orders, CMS) | https://app.clickup.com/t/z8q7hbmpfc · https://app.clickup.com/t/z8q7hbmpfd · https://app.clickup.com/t/z8q7hbmpfe · https://app.clickup.com/t/z8q7hbmpff · https://app.clickup.com/t/z8q7hbmpfu |
+| Manage content (CMS: articles, gallery, homepage slides, team, subscribers) | https://app.clickup.com/t/z8q7hbmpfv |
+| Content pages (About, Contact, Guides, Equipment guide, Photo gallery) | https://app.clickup.com/t/z8q7hbmpfg · https://app.clickup.com/t/z8q7hbmpfh · https://app.clickup.com/t/z8q7hbmpfj · https://app.clickup.com/t/z8q7hbmpfk · https://app.clickup.com/t/z8q7hbmpfm |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

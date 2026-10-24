@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Site\AboutController;
 use App\Http\Controllers\Site\AccountController;
 use App\Http\Controllers\Site\Auth\ActivationController;
 use App\Http\Controllers\Site\Auth\InviteController;
@@ -7,8 +8,12 @@ use App\Http\Controllers\Site\Auth\MemberSessionController;
 use App\Http\Controllers\Site\Auth\PasswordResetController;
 use App\Http\Controllers\Site\CartController;
 use App\Http\Controllers\Site\CheckoutController;
+use App\Http\Controllers\Site\ContactController;
 use App\Http\Controllers\Site\DifficultyCalculatorController;
+use App\Http\Controllers\Site\EquipmentController;
 use App\Http\Controllers\Site\EventController;
+use App\Http\Controllers\Site\GalleryController;
+use App\Http\Controllers\Site\GuideController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\LeaderboardController;
 use App\Http\Controllers\Site\NewsletterController;
@@ -24,6 +29,15 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('events', [EventController::class, 'index'])->name('events.index');
 Route::get('leaderboard', LeaderboardController::class)->name('leaderboard');
 Route::get('difficulty-calculator', DifficultyCalculatorController::class)->name('guide.difficulty');
+
+Route::get('about', AboutController::class)->name('about');
+Route::get('guides', [GuideController::class, 'index'])->name('guide.articles');
+Route::get('guides/{article:slug}', [GuideController::class, 'show'])->name('guide.articles.show');
+Route::get('gallery', [GalleryController::class, 'index'])->name('gallery.index');
+Route::get('gallery/{album:slug}', [GalleryController::class, 'show'])->name('gallery.show');
+Route::get('equipment', EquipmentController::class)->name('guide.equipment');
+Route::get('contact', [ContactController::class, 'show'])->name('contact');
+Route::post('contact', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.send');
 
 Route::get('shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('shop/{product:slug}', [ShopController::class, 'show'])->name('shop.show');
@@ -118,11 +132,7 @@ Route::controller(NewsletterController::class)->prefix('newsletter')->name('news
 // Placeholder pages so every header link works today. Each feature replaces its own line
 // with a real controller route (keep the route name: the header links by name).
 $placeholders = [
-    'about' => ['about', 'About'],
     'rank-system' => ['rank-system', 'Rank System'],
-    'contact' => ['contact', 'Contact'],
-    'equipment' => ['guide.equipment', 'Equipment Guide'],
-    'guides' => ['guide.articles', 'Guides'],
     'privacy-policy' => ['legal.privacy', 'Privacy Policy'],
 ];
 

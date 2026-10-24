@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
+use App\Models\Album;
+use App\Models\Article;
 use App\Models\Event;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
@@ -13,7 +15,7 @@ class SeoController extends Controller
      * Public pages that have real content. "Coming soon" placeholders are left out
      * (they are noindex); add a page's route name here when its feature ships.
      */
-    private const PAGES = ['home', 'events.index', 'x-events', 'leaderboard', 'guide.difficulty'];
+    private const PAGES = ['home', 'about', 'events.index', 'gallery.index', 'x-events', 'leaderboard', 'guide.difficulty', 'guide.equipment', 'guide.articles', 'contact'];
 
     public function sitemap(): Response
     {
@@ -28,6 +30,14 @@ class SeoController extends Controller
 
         foreach (Event::published()->orderByDesc('starts_on')->select(['id', 'slug', 'updated_at'])->lazy() as $event) {
             $urls[] = ['loc' => route('events.show', $event), 'lastmod' => $event->updated_at?->toAtomString()];
+        }
+
+        foreach (Article::published()->latest('published_at')->select(['id', 'slug', 'updated_at'])->lazy() as $article) {
+            $urls[] = ['loc' => route('guide.articles.show', $article->slug), 'lastmod' => $article->updated_at?->toAtomString()];
+        }
+
+        foreach (Album::published()->has('photos')->latest('id')->select(['id', 'slug', 'updated_at'])->lazy() as $album) {
+            $urls[] = ['loc' => route('gallery.show', $album->slug), 'lastmod' => $album->updated_at?->toAtomString()];
         }
 
         return response()

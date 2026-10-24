@@ -17,7 +17,7 @@ class AlbumFactory extends Factory
 
         return [
             'title' => $title,
-            'slug' => Str::slug($title),
+            'slug' => fn (array $attributes) => Str::slug($attributes['title']),
             'event_id' => null,
             'description' => null,
             'taken_on' => now()->subWeeks(2)->toDateString(),

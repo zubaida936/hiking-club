@@ -26,6 +26,14 @@ Update this file when one is settled. Last reviewed: 2026-10-24.
 - Payment note for old bookings without a method and the booking terms: `config/site.php` → `booking`.
 - Default share image `public/images/og-default.jpg` and homepage texts in `config/site.php`.
 - Homepage carousel: add real slides with photos in CMS → Homepage slides (until then the 3 placeholder slides show).
+- **About page:** the story, founding year (`SITE_FOUNDED_YEAR`, 2018 placeholder), "What We Offer" texts and the 3
+  testimonials are invented placeholders (`config/site.php` → `about_page`); replace the testimonials with real quotes
+  (with the hikers' permission). Team members: CMS → Team. Set `SITE_GOOGLE_REVIEWS_URL` to show "Read our Google
+  reviews". Showing live Google reviews on the page would need a Google Places API key (not built).
+- **Equipment guide** lists (`config/equipment.php`) are a first draft: guides should check them, especially rafting
+  (operator, river) and what the club rents (snowshoes, tents).
+- **Contact:** the club's real map link (`SITE_MAPS_URL`) and address; contact-form messages go to `SITE_EMAIL` (not
+  stored on the site, no CMS inbox).
 
 ## Known gaps (planned in other ClickUp tasks)
 
@@ -61,10 +69,9 @@ Update this file when one is settled. Last reviewed: 2026-10-24.
   unpaid orders don't expire, so staff cancel them by hand to free the stock. No shop discounts / rank rewards yet.
 
 - **Content** (articles, gallery, homepage slides, team, subscribers) is edited in the CMS, see
-  [docs/content.md](content.md). The public Guides, Gallery and About pages that show articles, albums and the team
-  are still "coming soon" ("7. Content Pages" in ClickUp). Choices to confirm: the subscriber list is limited to
-  Admins (personal data; Content Editors don't see it), articles have no topic/category field yet (add one with the
-  Guides page if the list needs filtering), photos have no captions, and gallery uploads are capped by the server at
+  [docs/content.md](content.md), and shown on /guides, /gallery and /about. Choices to confirm: the subscriber list is
+  limited to Admins (personal data; Content Editors don't see it), articles have no topic/category filter yet (add one
+  if the Guides list grows), photos have no captions, and gallery uploads are capped by the server at
   20 photos / 25 MB per batch (raise `upload_max_filesize`, `post_max_size`, `max_file_uploads` and nginx
   `client_max_body_size` to change it).
 

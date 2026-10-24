@@ -1,7 +1,8 @@
 <x-admin.layout title="Team">
     <div class="mb-4 flex flex-wrap items-center gap-3">
         <p class="text-sm text-slate-600">Guides and organizers shown on the About page, in this order.</p>
-        <div class="ml-auto">
+        <div class="ml-auto flex gap-2">
+            <x-admin.button variant="secondary" :href="route('about')" target="_blank">View About page</x-admin.button>
             <x-admin.button :href="route('admin.team.create')">+ New team member</x-admin.button>
         </div>
     </div>

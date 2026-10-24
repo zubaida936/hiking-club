@@ -80,6 +80,14 @@ class Article extends Model
     }
 
     /**
+     * Estimated reading time at about 200 words a minute.
+     */
+    public function readingMinutes(): int
+    {
+        return max(1, (int) round(str_word_count(strip_tags($this->body)) / 200));
+    }
+
+    /**
      * The excerpt, or the start of the body as plain text (Blade escapes it when shown).
      */
     public function summary(int $length = 200): string

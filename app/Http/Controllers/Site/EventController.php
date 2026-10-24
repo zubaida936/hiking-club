@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Domain\Events\Enums\DifficultyLevel;
 use App\Http\Controllers\Controller;
+use App\Models\Album;
 use App\Models\Event;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -61,6 +62,8 @@ class EventController extends Controller
 
         return view('site.events.show', [
             'event' => $event,
+            // Past hikes link to their photos once an album is published.
+            'album' => Album::published()->whereBelongsTo($event)->has('photos')->latest('id')->first(['id', 'slug']),
             'whatsappMessage' => "Hi! I have a question about \"{$event->title}\" on {$event->starts_on->format('D, j M Y')}: ".route('events.show', $event),
         ]);
     }
