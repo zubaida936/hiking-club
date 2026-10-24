@@ -46,9 +46,9 @@ it('marks the current page in the menu', function () {
 });
 
 it('titles placeholder pages after the section', function () {
-    $this->get(route('rank-system'))
+    $this->get(route('legal.privacy'))
         ->assertOk()
-        ->assertSee('<title>Rank System · '.config('app.name').'</title>', false)
+        ->assertSee('<title>Privacy Policy · '.config('app.name').'</title>', false)
         ->assertSee('This page is on its way');
 });
 

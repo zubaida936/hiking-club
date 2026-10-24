@@ -18,6 +18,9 @@ Update this file when one is settled. Last reviewed: 2026-10-24.
   hikers with points are listed; members can hide themselves on My account ("Hide me"). Full names or an opt-in
   instead of opt-out are one-line changes (`Hiker::publicName()`, `hikers.show_on_leaderboard` default).
 - **Leaderboard period:** points are counted for all time (no seasons / yearly reset yet).
+- **Rank System terms** (`/rank-system`, `resources/views/site/rank-system.blade.php`): written from how the system
+  works today, plus two promises to confirm: points don't expire, and the club may correct points and change the
+  system (announced on the page). Rewards can't be exchanged for cash or transferred.
 
 ## Placeholders to replace before launch
 

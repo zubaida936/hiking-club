@@ -29,6 +29,8 @@ What each rank unlocks and how rewards are used. Catalog: `config/rewards.php`; 
 
 ## Where to see them
 
+- **Everyone:** the public **Rank System** page (`/rank-system`) lists every rank, reward and "how you get it" straight
+  from `config/points.php` and `config/rewards.php` (`Reward::howItWorks()`), plus how points are earned and the terms.
 - **Member:** My account → Rewards: available (and uses left), locked (with what's missing), used.
 - **Booking form:** "Use a reward?" with the price after each reward (only rewards valid for that hike).
 - **Organizers:** CMS → Points → hiker → Rewards (uses, dates, bookings, notes, hand-over form);

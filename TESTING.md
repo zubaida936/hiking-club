@@ -37,7 +37,7 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 | X Events | http://localhost:8080/x-events | Landing page (requirements, 3 steps, upcoming X events) and the application form http://localhost:8080/x-events/apply. Only approved hikers (or Elite) can book X events, logged in: see docs/x-events.md |
 | Shop | http://localhost:8080/shop | Products with price / sale / stock badges, category filter, e.g. http://localhost:8080/shop?category=footwear. Product page (sizes, photos, Add to cart): http://localhost:8080/shop/club-t-shirt (demo data, see docs/shop.md) |
 | Checkout | http://localhost:8080/checkout (from the cart) | Pickup or delivery (+$4), payment method, terms → order page `/orders/{secret}` with payment instructions / "Pay now" and the order status |
-| Rank System | http://localhost:8080/rank-system | Coming soon |
+| Rank System | http://localhost:8080/rank-system | The 5 ranks with their points and rewards, points per level + early-booking and invite bonuses (with an example), leaderboard, terms. Logged in: your rank, points and progress to the next rank. All numbers come from `config/points.php` and `config/rewards.php` |
 | Contact | http://localhost:8080/contact | Contact form (emailed to `SITE_EMAIL`, see Mailpit; Reply-To = sender), WhatsApp, phone, email, address + Open in Google Maps, social links |
 | Hiker's Guide → Difficulty Calculator | http://localhost:8080/difficulty-calculator | Enter km, elevation gain (and loss): live effort score, level, description and points; formula, level table and limitations; upcoming hikes of that level. Shareable, e.g. http://localhost:8080/difficulty-calculator?km=8&gain=220&loss=320 |
 | Hiker's Guide → Equipment Guide | http://localhost:8080/equipment | Checklists for Hiking (pick a difficulty level: more items appear for harder hikes), Snowshoeing, Rafting, Camping (e.g. http://localhost:8080/equipment#camping), "Shop →" links when the shop has products in that category. Lists in `config/equipment.php` |
@@ -236,6 +236,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Shop (listing, product page, cart & checkout, payments & orders, CMS) | https://app.clickup.com/t/z8q7hbmpfc · https://app.clickup.com/t/z8q7hbmpfd · https://app.clickup.com/t/z8q7hbmpfe · https://app.clickup.com/t/z8q7hbmpff · https://app.clickup.com/t/z8q7hbmpfu |
 | Manage content (CMS: articles, gallery, homepage slides, team, subscribers) | https://app.clickup.com/t/z8q7hbmpfv |
 | Content pages (About, Contact, Guides, Equipment guide, Photo gallery) | https://app.clickup.com/t/z8q7hbmpfg · https://app.clickup.com/t/z8q7hbmpfh · https://app.clickup.com/t/z8q7hbmpfj · https://app.clickup.com/t/z8q7hbmpfk · https://app.clickup.com/t/z8q7hbmpfm |
+| Rank System info page | https://app.clickup.com/t/z8q7hbmpf6 |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

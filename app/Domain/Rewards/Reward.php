@@ -57,6 +57,22 @@ final readonly class Reward
     }
 
     /**
+     * How a member gets the reward, for the public Rank System page.
+     */
+    public function howItWorks(): string
+    {
+        $note = match ($this->kind) {
+            self::DISCOUNT => 'Choose it on the booking form when you book'.($this->uses > 1 ? " ({$this->uses} uses)" : '').'.',
+            self::BONUS_POINTS => 'Added to your points automatically when you reach the rank.',
+            self::PERK => 'Handed over by the organizers.',
+            self::XTREME => 'Your X event bookings are confirmed straight away.',
+            default => 'Coming soon.',
+        };
+
+        return $this->minCompletedHikes > 0 ? "After {$this->minCompletedHikes} completed hikes. {$note}" : $note;
+    }
+
+    /**
      * Rewards with a limited number of uses that are tracked.
      */
     public function isCountable(): bool

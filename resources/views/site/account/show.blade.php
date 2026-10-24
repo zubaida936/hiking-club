@@ -183,7 +183,7 @@
                             </li>
                         @endforeach
                     </ul>
-                    <p class="mt-3 text-xs text-slate-500">Rewards are personal, one-time unless stated, and can't be combined (one per booking). A reward used on a booking you cancel is given back.</p>
+                    <p class="mt-3 text-xs text-slate-500">Rewards are personal, one-time unless stated, and can't be combined (one per booking). A reward used on a booking you cancel is given back. <a href="{{ route('rank-system') }}" class="font-medium text-brand-600 underline">How the rank system works</a></p>
                 </section>
             </div>
 

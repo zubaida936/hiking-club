@@ -44,7 +44,7 @@ describe('meta tags', function () {
             ->assertSee('<meta name="robots" content="noindex, follow">', false)
             ->assertDontSee('rel="canonical"', false);
     })->with([
-        'coming soon page' => fn () => route('rank-system'),
+        'coming soon page' => fn () => route('legal.privacy'),
         'unsubscribe page' => fn () => route('newsletter.unsubscribe', Subscriber::factory()->create()->token),
     ]);
 
@@ -74,7 +74,7 @@ describe('sitemap.xml', function () {
             ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
             ->assertSee('<loc>'.route('home').'</loc>', false)
             ->assertSee('<loc>'.route('about').'</loc>', false)
-            ->assertDontSee(route('rank-system'), false);
+            ->assertDontSee(route('legal.privacy'), false);
     });
 
     it('lists published events', function () {

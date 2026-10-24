@@ -18,6 +18,7 @@ use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\LeaderboardController;
 use App\Http\Controllers\Site\NewsletterController;
 use App\Http\Controllers\Site\PaymentController;
+use App\Http\Controllers\Site\RankSystemController;
 use App\Http\Controllers\Site\RegistrationController;
 use App\Http\Controllers\Site\SeoController;
 use App\Http\Controllers\Site\ShopController;
@@ -28,6 +29,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class)->name('home');
 Route::get('events', [EventController::class, 'index'])->name('events.index');
 Route::get('leaderboard', LeaderboardController::class)->name('leaderboard');
+Route::get('rank-system', RankSystemController::class)->name('rank-system');
 Route::get('difficulty-calculator', DifficultyCalculatorController::class)->name('guide.difficulty');
 
 Route::get('about', AboutController::class)->name('about');
@@ -132,7 +134,6 @@ Route::controller(NewsletterController::class)->prefix('newsletter')->name('news
 // Placeholder pages so every header link works today. Each feature replaces its own line
 // with a real controller route (keep the route name: the header links by name).
 $placeholders = [
-    'rank-system' => ['rank-system', 'Rank System'],
     'privacy-policy' => ['legal.privacy', 'Privacy Policy'],
 ];
 

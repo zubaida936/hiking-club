@@ -2,7 +2,7 @@
     <section class="bg-brand-800 px-4 py-16 text-center text-white sm:px-6">
         <p class="font-display text-sm font-semibold uppercase tracking-[0.2em] text-accent-400">Rank system</p>
         <h1 class="mt-2 font-display text-4xl font-bold uppercase tracking-wide sm:text-5xl">Leaderboard</h1>
-        <p class="mx-auto mt-4 max-w-2xl text-white/80">Every completed hike earns points. Equal points are ranked by distance hiked.</p>
+        <p class="mx-auto mt-4 max-w-2xl text-white/80">Every completed hike earns points. Equal points are ranked by distance hiked. <a href="{{ route('rank-system') }}" class="font-semibold text-white underline underline-offset-4 hover:text-accent-400">How it works</a></p>
     </section>
 
     <div class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
