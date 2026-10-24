@@ -32,6 +32,11 @@ export default defineConfig({
         // load assets from localhost (browsers block requests to 0.0.0.0).
         host: '0.0.0.0',
         origin: 'http://localhost:5173',
+        // laravel-vite-plugin uses `origin` as the CORS allow-list unless `cors` is set,
+        // which would block the app (APP_URL, :8080) from loading the dev assets.
+        cors: {
+            origin: [/^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/],
+        },
         hmr: {
             host: 'localhost',
         },
