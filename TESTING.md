@@ -33,6 +33,7 @@ Every header link works. Pages marked *coming soon* show a placeholder until the
 | About | http://localhost:8080/about | Story and founding year, What We Offer, Meet the Team (CMS → Team), reviews (+ "Read our Google reviews" when `SITE_GOOGLE_REVIEWS_URL` is set), club numbers once there are past hikes / attended hikers. Texts are placeholders in `config/site.php` → `about_page` |
 | Gallery | http://localhost:8080/gallery | Published albums with photos (CMS → Gallery). An album: http://localhost:8080/gallery/{slug} with lightbox (click a photo, arrows / swipe, Esc). Past hikes with an album show "See the photos" |
 | Events | http://localhost:8080/events | Upcoming events (soonest first) and Past events with Load More; filter by level or month, e.g. http://localhost:8080/events?level=2 or http://localhost:8080/events?month=2026-11 |
+| Earlier adventures (events archive) | http://localhost:8080/events/archive | Past hikes grouped by month, newest first, 3 months at a time with "Show more months"; month selector (e.g. http://localhost:8080/events/archive?month=2026-09). Linked from Past Events on /events |
 | Event detail | http://localhost:8080/events/horch-ehden-nature-reserve (or click "View Details" on any card) | Everything about one hike: level, effort, distance, elevation, fee, seats left, itinerary, meeting points, included / what to bring, technical details, route map + GPX download, WhatsApp inquiry. Cancelled example: http://localhost:8080/events/hadath-el-jebbe-to-tannourine-el-tahta. Drafts return 404 |
 | X Events | http://localhost:8080/x-events | Landing page (requirements, 3 steps, upcoming X events) and the application form http://localhost:8080/x-events/apply. Only approved hikers (or Elite) can book X events, logged in: see docs/x-events.md |
 | Shop | http://localhost:8080/shop | Products with price / sale / stock badges, category filter, e.g. http://localhost:8080/shop?category=footwear. Product page (sizes, photos, Add to cart): http://localhost:8080/shop/club-t-shirt (demo data, see docs/shop.md) |
@@ -237,6 +238,7 @@ Each feature task has `TC-xx` subtasks — close each one when it passes.
 | Manage content (CMS: articles, gallery, homepage slides, team, subscribers) | https://app.clickup.com/t/z8q7hbmpfv |
 | Content pages (About, Contact, Guides, Equipment guide, Photo gallery) | https://app.clickup.com/t/z8q7hbmpfg · https://app.clickup.com/t/z8q7hbmpfh · https://app.clickup.com/t/z8q7hbmpfj · https://app.clickup.com/t/z8q7hbmpfk · https://app.clickup.com/t/z8q7hbmpfm |
 | Rank System info page | https://app.clickup.com/t/z8q7hbmpf6 |
+| Events archive by month | https://app.clickup.com/t/z8q7hbmpew |
 | Difficulty formula & levels | see "3. Difficulty System" list in ClickUp |
 
 ## Useful commands

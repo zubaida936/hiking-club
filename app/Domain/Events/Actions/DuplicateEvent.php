@@ -25,7 +25,7 @@ final class DuplicateEvent
             ]);
 
             $copy->title = Str::limit($source->title.' (copy)', 150, '');
-            $copy->slug = UniqueSlug::for(Event::class, $copy->title);
+            $copy->slug = UniqueSlug::for(Event::class, $copy->title, reserved: Event::RESERVED_SLUGS);
             $copy->status = EventStatus::Draft;
             $copy->created_by = $actor->id;
             $copy->updated_by = $actor->id;

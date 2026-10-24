@@ -15,7 +15,7 @@ class SeoController extends Controller
      * Public pages that have real content. "Coming soon" placeholders are left out
      * (they are noindex); add a page's route name here when its feature ships.
      */
-    private const PAGES = ['home', 'about', 'events.index', 'gallery.index', 'x-events', 'leaderboard', 'rank-system', 'guide.difficulty', 'guide.equipment', 'guide.articles', 'contact'];
+    private const PAGES = ['home', 'about', 'events.index', 'events.archive', 'gallery.index', 'x-events', 'leaderboard', 'rank-system', 'guide.difficulty', 'guide.equipment', 'guide.articles', 'contact'];
 
     public function sitemap(): Response
     {

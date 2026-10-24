@@ -11,16 +11,18 @@ final class UniqueSlug
     /**
      * Build a slug from $source that is unique in $model's table (soft-deleted
      * rows included, since the unique index covers them), appending -2, -3…
+     * $reserved slugs are treated as taken (e.g. a fixed page under the same URL).
      *
      * @param  class-string<Model>  $model
+     * @param  list<string>  $reserved
      */
-    public static function for(string $model, string $source, ?int $ignoreId = null, string $column = 'slug'): string
+    public static function for(string $model, string $source, ?int $ignoreId = null, string $column = 'slug', array $reserved = []): string
     {
         $base = Str::slug($source) ?: 'item';
         $slug = $base;
         $i = 2;
 
-        while (self::exists($model, $column, $slug, $ignoreId)) {
+        while (in_array($slug, $reserved, true) || self::exists($model, $column, $slug, $ignoreId)) {
             $slug = "{$base}-{$i}";
             $i++;
         }

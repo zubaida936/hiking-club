@@ -69,6 +69,9 @@
                         <x-site.event-card :event="$event" :past="true" />
                     @endforeach
                 </div>
+                <p class="mt-8 text-center">
+                    <a href="{{ route('events.archive') }}" class="font-display font-semibold uppercase tracking-wide text-brand-600 hover:text-brand-800">Browse earlier adventures by month &rarr;</a>
+                </p>
                 @if ($nextPage)
                     <div class="mt-10 text-center">
                         <a href="{{ request()->fullUrlWithQuery(['page' => $nextPage]) }}#past" @click.prevent="load"

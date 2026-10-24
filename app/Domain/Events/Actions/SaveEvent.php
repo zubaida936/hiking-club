@@ -45,7 +45,7 @@ final class SaveEvent
         $event->fill([
             'title' => $data->title,
             // An empty slug keeps the current one on update, so public links stay stable.
-            'slug' => UniqueSlug::for(Event::class, $data->slug ?: ($event->exists ? $event->slug : $data->title), $event->id),
+            'slug' => UniqueSlug::for(Event::class, $data->slug ?: ($event->exists ? $event->slug : $data->title), $event->id, reserved: Event::RESERVED_SLUGS),
             'season_tag' => $data->seasonTag,
             'location' => $data->location,
             'starts_on' => $data->startsOn->toDateString(),

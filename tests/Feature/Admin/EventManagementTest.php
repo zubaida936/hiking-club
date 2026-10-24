@@ -95,6 +95,18 @@ describe('create & update', function () {
         expect(Event::latest('id')->first()->slug)->toBe('horch-ehden-nature-reserve-2');
     });
 
+    it('never gives an event the URL of the month archive', function () {
+        $this->actingAs($this->admin)->post(route('admin.events.store'), eventPayload(['title' => 'Archive', 'slug' => 'archive']))
+            ->assertSessionHasErrors('slug');
+
+        $this->actingAs($this->admin)->post(route('admin.events.store'), eventPayload(['title' => 'Archive']));
+        $event = Event::where('title', 'Archive')->sole();
+        expect($event->slug)->toBe('archive-2');
+
+        $this->actingAs($this->admin)->post(route('admin.events.duplicate', $event));
+        expect(Event::pluck('slug')->all())->not->toContain('archive');
+    });
+
     it('validates input', function (array $overrides, string $field) {
         $this->actingAs($this->admin)
             ->post(route('admin.events.store'), eventPayload($overrides))

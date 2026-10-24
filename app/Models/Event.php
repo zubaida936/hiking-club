@@ -53,6 +53,11 @@ class Event extends Model
     use HasFactory, SoftDeletes;
 
     /**
+     * Slugs taken by fixed pages under /events/{slug} (the month archive).
+     */
+    public const RESERVED_SLUGS = ['archive'];
+
+    /**
      * Everything is written through the Events domain actions, which pass
      * explicit attribute arrays; nothing is filled from raw request input.
      *

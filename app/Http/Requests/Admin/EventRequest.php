@@ -24,7 +24,7 @@ class EventRequest extends FormRequest
 
         return [
             'title' => ['required', 'string', 'max:150'],
-            'slug' => ['nullable', 'string', 'max:170', 'alpha_dash:ascii', Rule::unique('events', 'slug')->ignore($event)],
+            'slug' => ['nullable', 'string', 'max:170', 'alpha_dash:ascii', Rule::notIn(Event::RESERVED_SLUGS), Rule::unique('events', 'slug')->ignore($event)],
             'season_tag' => ['nullable', 'string', 'max:40'],
             'location' => ['required', 'string', 'max:120'],
             'starts_on' => ['required', 'date_format:Y-m-d'],

@@ -24,6 +24,51 @@ class EventController extends Controller
      */
     private const MAX_PAST_PAGES = 50;
 
+    /**
+     * Months of the archive shown per "Show more months" step (same no-JS approach as Load More).
+     */
+    public const ARCHIVE_MONTHS_PER_STEP = 3;
+
+    private const MAX_ARCHIVE_STEPS = 40;
+
+    /**
+     * "Earlier adventures": past hikes grouped by month, newest month first.
+     * ?month=YYYY-MM shows a single month; ?step=N shows N × ARCHIVE_MONTHS_PER_STEP months.
+     */
+    public function archive(Request $request): View
+    {
+        // Every month that had published hikes, newest first, with the number of hikes.
+        /** @var array<string, int> $months */
+        $months = Event::published()->past()
+            ->selectRaw("DATE_FORMAT(starts_on, '%Y-%m') as ym, COUNT(*) as total")
+            ->groupBy('ym')
+            ->orderByDesc('ym')
+            ->pluck('total', 'ym')
+            ->map(fn ($total) => (int) $total)
+            ->all();
+
+        $selected = array_key_exists((string) $request->query('month'), $months) ? (string) $request->query('month') : null;
+        $step = min(max($request->integer('step', 1), 1), self::MAX_ARCHIVE_STEPS);
+        $shown = $selected !== null ? [$selected] : array_slice(array_keys($months), 0, $step * self::ARCHIVE_MONTHS_PER_STEP);
+
+        $events = $shown === [] ? collect() : Event::published()->past()
+            ->whereBetween('starts_on', [
+                Carbon::createFromFormat('!Y-m', (string) end($shown))->startOfMonth()->toDateString(),
+                Carbon::createFromFormat('!Y-m', $shown[0])->endOfMonth()->toDateString(),
+            ])
+            ->orderByDesc('starts_on')
+            ->orderByDesc('id')
+            ->get()
+            ->groupBy(fn (Event $event) => $event->starts_on->format('Y-m'));
+
+        return view('site.events.archive', [
+            'groups' => collect($shown)->mapWithKeys(fn (string $ym) => [$ym => $events->get($ym, collect())])->filter(fn ($group) => $group->isNotEmpty()),
+            'months' => $months,
+            'selected' => $selected,
+            'nextStep' => $selected === null && count($shown) < count($months) && $step < self::MAX_ARCHIVE_STEPS ? $step + 1 : null,
+        ]);
+    }
+
     public function index(Request $request): View
     {
         // Unknown filter values are ignored rather than rejected: these are shareable public URLs.

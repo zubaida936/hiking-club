@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('events', [EventController::class, 'index'])->name('events.index');
+Route::get('events/archive', [EventController::class, 'archive'])->name('events.archive');
 Route::get('leaderboard', LeaderboardController::class)->name('leaderboard');
 Route::get('rank-system', RankSystemController::class)->name('rank-system');
 Route::get('difficulty-calculator', DifficultyCalculatorController::class)->name('guide.difficulty');
