@@ -1,6 +1,6 @@
 # Hosting & deployment options
 
-Researched 2026-10-28. Prices are monthly, before VAT, and come from vendor pages and 2026 comparison articles.
+Researched 2026-10-28. For a $0 start, see "Fully free setup" below. Prices are monthly, before VAT, and come from vendor pages and 2026 comparison articles.
 They change often (Hetzner raised prices in April 2026), so check the vendor's pricing page before buying.
 
 ## What the site needs in production
@@ -86,13 +86,80 @@ fights the current architecture.
 | Transactional email (SMTP) | Free tiers: Brevo ~300/day, Resend ~3,000/month; Mailgun/Postmark paid |
 | Off-site backups | Hetzner Storage Box or S3-compatible storage (Backblaze B2, Cloudflare R2) ~€1–4 |
 
-## Recommendation
+## Recommendation (paid)
 
 **Hetzner CX22-class VPS + Coolify (or plain Compose) + Cloudflare free + Brevo/Resend free.**
 That's about **€5–7/month plus the domain**. It reuses the Docker image and GitHub pipeline we already have, and every
 piece except the server is open source or free.
 
 If nobody at the club wants to touch a server, use **Laravel Cloud** or **Forge + Hetzner** (~$20–40/month).
+
+## Fully free setup (no domain yet): Cloudflare + Brevo
+
+The club wants to start at $0 with Cloudflare and Brevo, and no domain for now. This works. Each piece and its limits:
+
+| Piece | Free choice | Limits / notes |
+|---|---|---|
+| Code, CI, image | GitHub + GitHub Actions + GHCR | Unlimited Actions minutes on a public repo; a private repo gets ~2,000 min/month and 500 MB of package storage on the free plan |
+| Server | **Oracle Cloud Always Free** (Ampere ARM, reported 2 OCPU / 12 GB since mid-2026, 200 GB disk) | Card needed at sign-up. Free ARM capacity is often "out of stock" (try another region / retry). Idle free instances can be reclaimed, so keep the site running. The image must also be built for **arm64** (see below) |
+| ↳ fallback | Google Cloud e2-micro (Always Free, us-west1 / us-central1 / us-east1) | Only 1 GB RAM and 30 GB disk: add swap, tune MySQL down. US regions, so it's slower from Lebanon. Billing account required |
+| Server management | Coolify (self-hosted) or plain Compose | Free, open source |
+| Public address (no domain) | see "Getting a URL without a domain" below | |
+| HTTPS | Let's Encrypt (via Coolify/Caddy) or Cloudflare | Free |
+| Email | **Brevo free** | 300 emails/day, SMTP relay |
+| Backups | Cloudflare R2 (10 GB free, no egress fees) | S3-compatible, so Coolify's backup and Laravel's `s3` disk work with it |
+
+**Total: $0/month.** The trade-offs: no SLA, Oracle's free-tier policies can change, and someone at the club is the "ops person".
+
+### What Cloudflare can and can't do here
+
+- **It can't run the site.** Cloudflare Pages and Workers run static files and JavaScript, not PHP/Laravel with MySQL.
+- **Cloudflare Tunnel** (`cloudflared` on the server) publishes the site without opening ports, and hides the server IP.
+  - *Quick Tunnel* (no account, no domain): you get a random `https://<words>.trycloudflare.com` URL, which is enough for a demo
+    or for the club to click around. Cloudflare says it's **not for production**: the URL changes on every restart,
+    there's no uptime guarantee, it caps at 200 concurrent requests, and these URLs get indexed by Google.
+  - *Named tunnel* with a fixed public URL: this needs a domain added to Cloudflare. Most of Cloudflare's value (stable URL, CDN,
+    DDoS protection, free SSL, caching) starts once the club has a domain.
+- **R2** is usable today without a domain, for backups and optionally uploads.
+
+### Getting a URL without a domain
+
+| Option | URL looks like | Good for |
+|---|---|---|
+| Cloudflare Quick Tunnel | `https://random-words.trycloudflare.com` (changes on restart) | demos and testing only |
+| sslip.io / nip.io (Coolify sets this up automatically) | `http(s)://<server-ip>.sslip.io` | testing; ugly but stable |
+| DuckDNS (free subdomain) | `https://hikingclub.duckdns.org` + Let's Encrypt | a stable, free URL until a real domain is bought |
+
+Laravel puts `APP_URL` into emails (booking links, invites, password links, order pages), so a URL that changes
+breaks old links. Use a stable one (DuckDNS) as soon as real hikers get emails.
+
+### Brevo without a domain
+
+- Laravel `.env`: `MAIL_MAILER=smtp`, `MAIL_HOST=smtp-relay.brevo.com`, `MAIL_PORT=587`, `MAIL_USERNAME=<Brevo SMTP login>`,
+  `MAIL_PASSWORD=<Brevo SMTP key>`, `MAIL_FROM_ADDRESS=<verified sender>`, `MAIL_FROM_NAME="${APP_NAME}"`.
+- Brevo only sends from a **verified sender**. Without a domain, that has to be an existing address (e.g. the club's Gmail).
+  Gmail/Yahoo enforce DMARC on their own domains, and reports say Brevo rewrites unauthenticated senders (e.g. to
+  `@brevosend.com`). So expect mails to show a strange From or land in **spam**. That's fine for testing, but not
+  for launch.
+- 300 mails/day covers bookings, reminders and password codes for a club this size. Big newsletters would need a
+  paid plan or have to be split across days.
+- When the domain is bought: add it in Brevo, put the DKIM/SPF/DMARC records in Cloudflare DNS (free), and switch
+  `MAIL_FROM_ADDRESS` to e.g. `noreply@<domain>`.
+
+### Changes needed in the repo for this setup
+
+1. `cd.yml`: build a multi-arch image so it runs on Oracle ARM. Add `docker/setup-qemu-action` and set
+   `platforms: linux/amd64,linux/arm64` on `build-push-action`.
+2. `compose.prod.yaml` with low-memory MySQL settings (`innodb_buffer_pool_size` ~256 MB if on the 1 GB Google VM).
+3. Optional `cloudflared` service in `compose.prod.yaml` for the Quick Tunnel, swapped for a named tunnel once there's a domain.
+
+### Upgrade path (when the club is ready)
+
+1. Buy a domain (~$10–15/year) and add it to Cloudflare (free plan). That gives a named tunnel or proxied DNS,
+   with HTTPS, CDN and a hidden server IP.
+2. Authenticate the domain in Brevo, so email stops going to spam.
+3. If Oracle capacity or reliability becomes a problem, move the same image to Hetzner (~€5–7/month, option A).
+   Nothing in the app changes.
 
 ## Work left once a host is chosen
 
