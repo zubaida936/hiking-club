@@ -21,6 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // The site always runs behind a proxy (Cloudflare, Codespaces, a load balancer): build links from its
+        // X-Forwarded-* headers so they keep the public https host instead of http://localhost.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'admin' => EnsureCanAccessAdmin::class,
             'active' => EnsureUserIsActive::class,

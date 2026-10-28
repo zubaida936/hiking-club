@@ -1,0 +1,19 @@
+{
+    // GitHub Codespaces demo of the full stack (compose.yaml), see codespaces-demo.txt.
+    // Create: repo -> Code -> Codespaces -> Create codespace on main, then make port 8080 Public.
+    "name": "Hiking Club demo",
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "hostRequirements": { "cpus": 2, "memory": "8gb" },
+
+    // setup.sh runs once (env, key, database + demo data, assets); start.sh on every start, the first included.
+    "postCreateCommand": "bash .devcontainer/setup.sh",
+    "postStartCommand": "bash .devcontainer/start.sh",
+
+    "forwardPorts": [8080, 8025, 8081],
+    "portsAttributes": {
+        "8080": { "label": "Website", "onAutoForward": "notify" },
+        "8025": { "label": "Mailpit (keep private)", "onAutoForward": "silent" },
+        "8081": { "label": "phpMyAdmin (keep private)", "onAutoForward": "silent" }
+    },
+    "otherPortsAttributes": { "onAutoForward": "ignore" }
+}
