@@ -9,7 +9,7 @@ Update this file when one is settled. Last reviewed: 2026-10-24.
 |---|---|---|
 | **Online payment provider access** (Whish Money / OMT Pay) | Chosen provider, but neither has a public merchant API: the club needs a merchant agreement to get API docs + credentials. Until then online payment runs only on the test gateway. | [docs/payments.md](payments.md) → "Going live" |
 | **SMS / WhatsApp provider** (e.g. Twilio, WhatsApp Business API) | Password-reset codes can only go by email today; members without an email must ask on WhatsApp. Booking confirmations by SMS/WhatsApp need it too. | `config/members.php` → `code_channels` (add a class implementing `App\Domain\Members\Codes\CodeChannel`) |
-| **Branding, hosting, languages** | Club name, logo, colours, domain, Arabic (RTL)? The site runs on placeholders. | `resources/css/app.css`, logo component, `config/site.php`, `public/images/og-default.jpg` |
+| **Branding, hosting, languages** | Club name, logo, colours, domain, Arabic (RTL)? The site runs on placeholders. Hosting options & prices: [docs/hosting.md](hosting.md). | `resources/css/app.css`, logo component, `config/site.php`, `public/images/og-default.jpg` |
 | **Legal texts** (privacy policy, terms) | Postponed. The booking form shows short placeholder terms and links to a "coming soon" privacy page. A cookie banner is needed if Google Analytics is enabled for EU visitors. | `config/site.php` → `booking.terms`, route `legal.privacy` |
 
 ## Choices made that the club may want to revisit
