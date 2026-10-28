@@ -94,6 +94,42 @@ piece except the server is open source or free.
 
 If nobody at the club wants to touch a server, use **Laravel Cloud** or **Forge + Hetzner** (~$20–40/month).
 
+## Demo only (show the club, no hosting yet)
+
+For a demo the site doesn't need to be online 24/7, only while someone is looking at it. Demo data comes from
+`php artisan migrate --seed` (demo events, shop, content, admin user).
+
+| Option | Cost | URL | Good / bad |
+|---|---|---|---|
+| **Your PC + Cloudflare Quick Tunnel** (recommended) | Free, no account | `https://<random>.trycloudflare.com` | Ready in ~5 minutes on the stack we already run. Works only while the PC and Docker are on; the URL changes each start |
+| **GitHub Codespaces** | Free: 120 core-hours/month (≈60 h on a 2-core machine) + 15 GB storage | `https://<codespace>-8080.app.github.dev` (set the port to *Public*) | Runs in GitHub's cloud, so your PC can be off. It sleeps after 30 min idle (configurable up to 4 h), so someone must start it before the demo. 2-core/8 GB is enough for the stack |
+| ngrok (free) | Free, account | `https://<name>.ngrok-free.app` (one fixed dev domain) | Stable URL, but visitors first see an ngrok warning page, and there's a 1 GB/month traffic cap |
+| Railway trial / Render free | Free credit / free web service | `*.up.railway.app`, `*.onrender.com` | Needs the deploy setup anyway. Render's free tier sleeps and has no MySQL, so it's more work than the two options above |
+
+### Demo from your PC (Cloudflare Quick Tunnel)
+
+1. `docker compose up -d` and `docker compose run --rm node npm run build`. Use built assets: with the Vite dev
+   server running (`public/hot` present), outside browsers would try to load CSS/JS from `localhost:5173`.
+2. Start the tunnel: `docker run --rm cloudflare/cloudflared tunnel --url http://host.docker.internal:8080`.
+   It prints the `https://….trycloudflare.com` URL. Share it while it runs; Ctrl+C ends the demo.
+3. Set `APP_URL` in `.env` to that URL (emails and absolute links use it), then `php artisan config:clear`.
+
+### Demo in GitHub Codespaces
+
+1. Repo → **Code → Codespaces → Create codespace on main** (2-core). Docker works inside Codespaces.
+2. In the terminal: `cp .env.example .env`, `docker compose up -d`, `docker compose exec app php artisan key:generate`,
+   `docker compose exec app php artisan migrate --seed`, `docker compose run --rm node npm run build`.
+3. **Ports** tab → port 8080 → *Port visibility: Public*, then copy the URL into `APP_URL`.
+4. Stop the codespace after the demo (stopped codespaces only use storage). Unused ones are deleted after 30 days.
+
+A `.devcontainer/devcontainer.json` could automate steps 1–2 later.
+
+### Needed in the app for both demos
+
+Both demos put a proxy (the tunnel or Codespaces) in front of Laravel. Laravel doesn't trust proxies yet
+(`bootstrap/app.php`), so it would generate `http://` / `localhost` links and the browser blocks mixed content.
+Fix: `$middleware->trustProxies(at: '*');` in `withMiddleware()`. Production behind Cloudflare or Coolify needs it too.
+
 ## Fully free setup (no domain yet): Cloudflare + Brevo
 
 The club wants to start at $0 with Cloudflare and Brevo, and no domain for now. This works. Each piece and its limits:
