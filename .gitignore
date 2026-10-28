@@ -27,4 +27,5 @@ Homestead.yaml
 Thumbs.db
 
 # Local notes (not for the repo)
-video-script.txt
+*.txt
+*.md
