@@ -1078,8 +1078,7 @@ export interface components {
             delivery_city?: string | null;
             delivery_address?: string | null;
             notes?: string | null;
-            /** @enum {string} */
-            payment_method: "online" | "whish" | "omt" | "cash";
+            payment_method: components["schemas"]["PaymentMethod"];
             /** @enum {unknown} */
             terms?: "yes" | "on" | "1" | 1 | "true" | true;
             website?: string;
@@ -1265,6 +1264,11 @@ export interface components {
             ordered_at: string;
             web_url: string;
         };
+        /**
+         * PaymentMethod
+         * @enum {string}
+         */
+        PaymentMethod: "whish" | "omt" | "cash" | "online";
         /** PointTransactionResource */
         PointTransactionResource: {
             id: number;

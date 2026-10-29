@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Domain\Payments\Enums\PaymentMethod;
 use App\Http\Requests\Site\CheckoutRequest as SiteCheckoutRequest;
+use Closure;
+use Illuminate\Validation\Rule;
 
 /**
  * App checkout: the website's checkout fields and rules, plus the cart the app keeps on the phone.
@@ -14,7 +17,19 @@ class CheckoutRequest extends SiteCheckoutRequest
      */
     public function rules(): array
     {
-        return parent::rules() + self::itemRules();
+        $rules = parent::rules() + self::itemRules();
+
+        // Same check as the website (only methods offered right now), written so the API docs and the app's
+        // generated types always list every method: Rule::in(available()) would make them depend on the .env.
+        if (PaymentMethod::available() !== []) {
+            $rules['payment_method'] = ['bail', 'required', Rule::enum(PaymentMethod::class), function (string $attribute, mixed $value, Closure $fail) {
+                if (! PaymentMethod::tryFrom((string) $value)?->isAvailable()) {
+                    $fail(__('validation.in', ['attribute' => 'payment method']));
+                }
+            }];
+        }
+
+        return $rules;
     }
 
     /**

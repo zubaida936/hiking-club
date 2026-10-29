@@ -174,6 +174,23 @@ describe('ordering', function () {
         $this->postJson(route('api.v1.shop.orders.store'), apiOrder([]))->assertJsonValidationErrors('items');
     });
 
+    it('accepts only the payment methods offered right now', function () {
+        $cap = Product::factory()->withStock()->create();
+        $items = [['variant_id' => apiVariant($cap)->id, 'quantity' => 1]];
+
+        // Online payment is off (no gateway): refused like an unknown method, with one message.
+        $this->postJson(route('api.v1.shop.orders.store'), apiOrder($items, ['payment_method' => 'online']))
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.payment_method', ['The selected payment method is invalid.']);
+        $this->postJson(route('api.v1.shop.orders.store'), apiOrder($items, ['payment_method' => 'bitcoin']))
+            ->assertJsonPath('errors.payment_method', ['The selected payment method is invalid.']);
+        $this->postJson(route('api.v1.shop.orders.store'), apiOrder($items, ['payment_method' => null]))
+            ->assertJsonPath('errors.payment_method', ['Choose how you will pay.']);
+
+        config(['payments.online_gateway' => 'test']);
+        $this->postJson(route('api.v1.shop.orders.store'), apiOrder($items, ['payment_method' => 'online']))->assertCreated();
+    });
+
     it('lists my orders', function () {
         $user = User::factory()->create(['phone' => '+96170123456']);
         $user->assignRole(Role::Member->value);
