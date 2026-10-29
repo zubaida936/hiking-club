@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\LeaderboardController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\RankSystemController;
+use App\Http\Controllers\Api\V1\XEventsController;
 use App\Http\Middleware\UseApiGuard;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +55,12 @@ Route::prefix('v1')->name('api.v1.')->middleware([UseApiGuard::class, 'active', 
     Route::get('rank-system', RankSystemController::class)->name('rank-system');
     Route::get('difficulty/levels', [DifficultyController::class, 'levels'])->name('difficulty.levels');
     Route::get('difficulty/calculate', [DifficultyController::class, 'calculate'])->name('difficulty.calculate');
+
+    Route::controller(XEventsController::class)->prefix('x-events')->name('x-events.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('application-form', 'form')->name('application-form');
+        Route::post('applications', 'apply')->middleware('throttle:5,1')->name('apply');
+    });
 
     // Booking works for guests too (like the website); a token adds the member's details, rewards and X access.
     Route::controller(BookingController::class)->group(function () {
