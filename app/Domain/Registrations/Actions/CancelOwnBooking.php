@@ -54,7 +54,10 @@ final class CancelOwnBooking
         return self::deadline($registration)->subMinute()->setTimezone(config('site.timezone'))->format('D j M, H:i');
     }
 
-    private static function deadline(EventRegistration $registration): CarbonImmutable
+    /**
+     * Until when the member can cancel online (UTC).
+     */
+    public static function deadline(EventRegistration $registration): CarbonImmutable
     {
         $event = $registration->event;
 

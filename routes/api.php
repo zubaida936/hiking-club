@@ -3,8 +3,10 @@
 use App\Http\Controllers\Api\V1\Auth\ActivationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\TokenController;
+use App\Http\Controllers\Api\V1\BookingController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\MeController;
+use App\Http\Middleware\UseApiGuard;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,25 +15,39 @@ use Illuminate\Support\Facades\Route;
 | keep calling the old one until members update.
 */
 
-Route::prefix('v1')->name('api.v1.')->middleware('throttle:api')->group(function () {
+// UseApiGuard: $request->user() is the token's member (or null); `active` turns away deactivated accounts.
+Route::prefix('v1')->name('api.v1.')->middleware([UseApiGuard::class, 'active', 'throttle:api'])->group(function () {
     Route::prefix('auth')->name('auth.')->group(function () {
         Route::post('login', [TokenController::class, 'store'])->name('login');
         Route::post('activate', [ActivationController::class, 'store'])->middleware('throttle:5,1')->name('activate');
         Route::post('password/forgot', [PasswordResetController::class, 'send'])->middleware('throttle:3,1')->name('password.forgot');
         Route::post('password/reset', [PasswordResetController::class, 'reset'])->middleware('throttle:10,1')->name('password.reset');
 
-        Route::middleware(['auth:sanctum', 'active'])->group(function () {
+        Route::middleware('auth:sanctum')->group(function () {
             Route::post('logout', [TokenController::class, 'destroy'])->name('logout');
             Route::post('logout-all', [TokenController::class, 'destroyAll'])->name('logout-all');
         });
     });
 
-    Route::get('me', MeController::class)->middleware(['auth:sanctum', 'active'])->name('me');
+    Route::get('me', MeController::class)->middleware('auth:sanctum')->name('me');
 
     Route::controller(EventController::class)->prefix('events')->name('events.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('past', 'past')->name('past');
         Route::get('months', 'months')->name('months');
         Route::get('{event:slug}', 'show')->name('show');
+    });
+
+    // Booking works for guests too (like the website); a token adds the member's details, rewards and X access.
+    Route::controller(BookingController::class)->group(function () {
+        Route::get('events/{event:slug}/booking-form', 'form')->name('events.booking-form');
+        Route::post('events/{event:slug}/bookings', 'store')->middleware('throttle:5,1')->name('events.bookings.store');
+
+        Route::prefix('bookings/{registration:token}')->name('bookings.')->group(function () {
+            Route::get('/', 'show')->name('show');
+            Route::post('pay', 'pay')->middleware('throttle:10,1')->name('pay');
+            Route::post('transfer', 'transfer')->middleware('throttle:10,1')->name('transfer');
+            Route::post('cancel', 'cancel')->middleware('auth:sanctum')->name('cancel');
+        });
     });
 });
