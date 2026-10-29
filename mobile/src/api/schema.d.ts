@@ -1648,7 +1648,27 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
-                            [key: string]: unknown;
+                            key: string;
+                            label: string;
+                            kind: string;
+                            rank: {
+                                key: string;
+                                label: string;
+                            };
+                            how_it_works: string;
+                            unlocked: boolean;
+                            locked_reason: string | null;
+                            /** @description null for rewards that aren't counted (e.g. X events access). */
+                            uses_left: number | null;
+                            used: {
+                                event: {
+                                    slug: string;
+                                    title: string;
+                                } | null;
+                                discount_cents: number;
+                                note: string | null;
+                                used_at: string;
+                            }[];
                         }[];
                     };
                 };

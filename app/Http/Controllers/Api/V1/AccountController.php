@@ -19,6 +19,7 @@ use App\Models\PointTransaction;
 use App\Models\RewardRedemption;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -103,33 +104,44 @@ class AccountController extends Controller
      *
      * Every reward of the rank system: unlocked or not (and why), uses left, and where I used it.
      * Discounts are chosen on the booking form; perks are handed over by the organizers.
-     *
-     * @return array{data: list<array<string, mixed>>}
      */
-    public function rewards(Request $request, HikerRewards $rewards): array
+    public function rewards(Request $request, HikerRewards $rewards): JsonResponse
     {
         $hiker = $this->hiker($request);
 
-        return ['data' => $hiker === null ? [] : array_map(fn (array $state) => [
-            'key' => $state['reward']->key,
-            'label' => $state['reward']->label,
-            'kind' => $state['reward']->kind,
-            'rank' => ['key' => $state['reward']->tier->value, 'label' => $state['reward']->tier->label()],
-            'how_it_works' => $state['reward']->howItWorks(),
-            'unlocked' => $state['unlocked'],
-            'locked_reason' => $state['locked_reason'],
-            // null for rewards that aren't counted (e.g. X events access).
-            'uses_left' => $state['reward']->isCountable() ? $state['uses_left'] : null,
-            'used' => $state['redemptions']->map(fn (RewardRedemption $use) => [
-                'event' => $use->registration === null ? null : [
-                    'slug' => $use->registration->event->slug,
-                    'title' => $use->registration->event->title,
-                ],
-                'discount_cents' => $use->discount_cents,
-                'note' => $use->note,
-                'used_at' => $use->created_at->toIso8601String(),
-            ])->values()->all(),
-        ], $rewards->statesFor($hiker))];
+        // Plain loops, explicit casts and no @return shape, so the API docs (and the app's types) type every field.
+        // (collect()->map() here made the docs tool type *other* endpoints' collection lists as string[].)
+        $data = [];
+        foreach ($hiker === null ? [] : $rewards->statesFor($hiker) as $state) {
+            $used = [];
+            foreach ($state['redemptions'] as $use) {
+                /** @var RewardRedemption $use */
+                $used[] = [
+                    'event' => $use->registration === null ? null : [
+                        'slug' => $use->registration->event->slug,
+                        'title' => $use->registration->event->title,
+                    ],
+                    'discount_cents' => (int) $use->discount_cents,
+                    'note' => $use->note === null ? null : (string) $use->note,
+                    'used_at' => $use->created_at->toIso8601String(),
+                ];
+            }
+
+            $data[] = [
+                'key' => $state['reward']->key,
+                'label' => $state['reward']->label,
+                'kind' => $state['reward']->kind,
+                'rank' => ['key' => $state['reward']->tier->value, 'label' => $state['reward']->tier->label()],
+                'how_it_works' => $state['reward']->howItWorks(),
+                'unlocked' => (bool) $state['unlocked'],
+                'locked_reason' => $state['locked_reason'] === null ? null : (string) $state['locked_reason'],
+                // null for rewards that aren't counted (e.g. X events access).
+                'uses_left' => $state['reward']->isCountable() ? (int) $state['uses_left'] : null,
+                'used' => $used,
+            ];
+        }
+
+        return response()->json(['data' => $data]);
     }
 
     /**

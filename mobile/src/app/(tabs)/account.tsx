@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { Link } from 'expo-router';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/auth/auth-context';
@@ -44,6 +45,16 @@ export default function AccountScreen() {
       {member ? (
         <ScreenScroll onRefresh={() => refresh.mutate()} refreshing={refresh.isPending}>
           <MemberProfile member={member} />
+          {member.hiker ? (
+            <View style={styles.links}>
+              <Link href="/my-points">
+                <ThemedText type="linkPrimary">{strings.points.link}</ThemedText>
+              </Link>
+              <Link href="/my-rewards">
+                <ThemedText type="linkPrimary">{strings.rewards.link}</ThemedText>
+              </Link>
+            </View>
+          ) : null}
           <MyUpcomingBookings />
           <Button title={strings.account.logout} onPress={() => logout.mutate()} loading={logout.isPending} variant="secondary" />
         </ScreenScroll>
@@ -60,4 +71,5 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
   text: { textAlign: 'center' },
+  links: { gap: Spacing.two },
 });

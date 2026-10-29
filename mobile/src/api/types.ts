@@ -15,6 +15,9 @@ export type EventDetail = components['schemas']['EventDetailResource'];
 export type BookingForm = ResponseOf<'v1.events.booking-form'>['data'];
 export type Booking = components['schemas']['BookingResource'];
 export type BookingList = ResponseOf<'v1.me.bookings'>;
+export type PointLine = components['schemas']['PointTransactionResource'];
+export type PointList = ResponseOf<'v1.me.points'>;
+export type RewardState = ResponseOf<'v1.me.rewards'>['data'][number];
 export type AppConfig = ResponseOf<'v1.app-config'>['data'];
 export type Member = components['schemas']['MemberResource'];
 /** Login, activation and password reset all answer with a new token and the member. */

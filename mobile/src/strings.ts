@@ -118,6 +118,22 @@ export const strings = {
     toPay: (amount: string) => `To pay: ${amount}`,
     payLater: 'Pay after confirmation',
   },
+  points: {
+    link: 'My points history',
+    title: 'My points history',
+    empty: 'No points yet. You earn points for every hike you complete.',
+    amount: (points: number) => (points > 0 ? `+${points}` : String(points)),
+  },
+  rewards: {
+    link: 'My rewards',
+    title: 'My rewards',
+    empty: 'No rewards yet.',
+    available: (uses: number | null) => (uses === null ? 'Unlocked' : uses === 1 ? 'Available: 1 use left' : `Available: ${uses} uses left`),
+    usedUp: 'Used',
+    usedOn: (title: string, date: string) => `Used on ${title} (${date})`,
+    usedAt: (date: string) => `Used on ${date}`,
+    rank: (label: string) => `${label} rank`,
+  },
   login: {
     title: 'Log in',
     intro: 'Log in with the phone number you book hikes with.',
