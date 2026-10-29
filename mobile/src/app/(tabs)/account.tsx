@@ -57,6 +57,9 @@ export default function AccountScreen() {
           ) : null}
           <MyUpcomingBookings />
           <Button title={strings.account.logout} onPress={() => logout.mutate()} loading={logout.isPending} variant="secondary" />
+          <Link href="/delete-account" style={styles.deleteLink}>
+            <ThemedText type="small" themeColor="danger">{strings.deleteAccount.link}</ThemedText>
+          </Link>
         </ScreenScroll>
       ) : (
         <ScreenScroll>
@@ -72,4 +75,5 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
   text: { textAlign: 'center' },
   links: { gap: Spacing.two },
+  deleteLink: { alignSelf: 'center', marginTop: Spacing.four },
 });

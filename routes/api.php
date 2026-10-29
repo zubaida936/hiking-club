@@ -51,6 +51,7 @@ Route::prefix('v1')->name('api.v1.')->middleware([UseApiGuard::class, 'active', 
         Route::get('rewards', 'rewards')->name('rewards');
         Route::get('orders', 'orders')->name('orders');
         Route::put('leaderboard', 'leaderboard')->name('leaderboard');
+        Route::delete('/', 'destroy')->middleware('throttle:5,1')->name('destroy');
     });
 
     Route::controller(EventController::class)->prefix('events')->name('events.')->group(function () {

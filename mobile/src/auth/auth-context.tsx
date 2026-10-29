@@ -18,6 +18,8 @@ type AuthState = {
   signIn: (result: LoginResult) => Promise<void>;
   /** Log out this phone: the server revokes the token, the app forgets it. */
   signOut: () => Promise<void>;
+  /** Forget the login on this phone only (after the account was deleted: the token is gone on the server). */
+  forgetLogin: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -88,8 +90,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       reloadMember: () => void refetch(),
       signIn,
       signOut,
+      forgetLogin: forget,
     }),
-    [token, member, memberError, refetch, signIn, signOut],
+    [token, member, memberError, refetch, signIn, signOut, forget],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

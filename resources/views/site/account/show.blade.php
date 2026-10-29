@@ -223,5 +223,10 @@
                 </section>
             </div>
         @endif
+
+        <p class="mt-16 border-t border-slate-100 pt-6 text-sm text-slate-500">
+            <a href="{{ route('account.delete') }}" class="font-semibold text-red-700 hover:underline">Delete my account</a>
+            · <a href="{{ route('delete-account') }}" class="hover:underline">what happens to my data</a>
+        </p>
     </div>
 </x-site.layout>

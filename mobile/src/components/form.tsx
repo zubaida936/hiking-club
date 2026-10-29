@@ -99,12 +99,14 @@ type ButtonProps = {
   title: string;
   onPress: () => void;
   loading?: boolean;
-  variant?: 'primary' | 'secondary';
+  /** danger: a red, filled button for actions that can't be undone. */
+  variant?: 'primary' | 'secondary' | 'danger';
 };
 
 export function Button({ title, onPress, loading = false, variant = 'primary' }: ButtonProps) {
   const theme = useTheme();
-  const primary = variant === 'primary';
+  const filled = variant !== 'secondary';
+  const fill = variant === 'danger' ? theme.danger : theme.accent;
 
   return (
     <Pressable
@@ -115,13 +117,13 @@ export function Button({ title, onPress, loading = false, variant = 'primary' }:
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
-        primary ? { backgroundColor: theme.accent } : { borderColor: theme.accent, borderWidth: 1 },
+        filled ? { backgroundColor: fill } : { borderColor: theme.accent, borderWidth: 1 },
         (pressed || loading) && styles.dimmed,
       ]}>
       {loading ? (
-        <ActivityIndicator color={primary ? '#ffffff' : theme.accent} />
+        <ActivityIndicator color={filled ? '#ffffff' : theme.accent} />
       ) : (
-        <ThemedText type="smallBold" style={{ color: primary ? '#ffffff' : theme.accent }}>
+        <ThemedText type="smallBold" style={{ color: filled ? '#ffffff' : theme.accent }}>
           {title}
         </ThemedText>
       )}

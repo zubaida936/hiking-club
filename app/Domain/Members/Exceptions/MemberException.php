@@ -25,6 +25,21 @@ final class MemberException extends DomainException
         return new self('This is a staff account: manage it in Staff & roles.');
     }
 
+    public static function staffCannotDeleteSelf(): self
+    {
+        return new self('Staff accounts are deleted by a super admin (CMS → Staff & roles).');
+    }
+
+    public static function wrongPassword(): self
+    {
+        return new self('This password is not right.');
+    }
+
+    public static function hasOpenBookings(): self
+    {
+        return new self('You still have upcoming bookings or open shop orders. Cancel them first (or message us on WhatsApp), then delete your account.');
+    }
+
     public static function noAccount(): self
     {
         return new self('This hiker has no account yet: send an invite link instead.');

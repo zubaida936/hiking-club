@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Site;
 
 use App\Domain\Loyalty\Leaderboard;
+use App\Domain\Members\Actions\DeleteAccount;
 use App\Domain\Members\Actions\SetLeaderboardVisibility;
+use App\Domain\Members\Exceptions\MemberException;
 use App\Domain\Registrations\Actions\CancelOwnBooking;
 use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
@@ -11,8 +13,10 @@ use App\Domain\Registrations\Exceptions\RegistrationException;
 use App\Domain\Rewards\HikerRewards;
 use App\Http\Controllers\Controller;
 use App\Models\EventRegistration;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
@@ -68,6 +72,34 @@ class AccountController extends Controller
         $action->handle($hiker, $visible);
 
         return back()->with('success', $visible ? 'You are shown on the leaderboard.' : 'You are hidden from the public leaderboard.');
+    }
+
+    public function confirmDelete(): View
+    {
+        return view('site.account.delete');
+    }
+
+    /**
+     * Delete the account (DeleteAccount: anonymises bookings and orders, deletes the login), then log out.
+     */
+    public function destroy(Request $request, DeleteAccount $action): RedirectResponse
+    {
+        $request->validate(['password' => ['required', 'string']]);
+
+        /** @var User $user */
+        $user = $request->user();
+
+        try {
+            $action->handle($user, $request->string('password')->toString());
+        } catch (MemberException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('delete-account')->with('status', 'Your account is deleted. Thank you for hiking with us!');
     }
 
     public function cancelBooking(Request $request, EventRegistration $registration, CancelOwnBooking $action): RedirectResponse

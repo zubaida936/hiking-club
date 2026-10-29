@@ -42,6 +42,7 @@ export default function RootLayout() {
               <Stack.Screen name="my-hikes" options={{ title: strings.myBookings.completed }} />
               <Stack.Screen name="my-points" options={{ title: strings.points.title }} />
               <Stack.Screen name="my-rewards" options={{ title: strings.rewards.title }} />
+              <Stack.Screen name="delete-account" options={{ title: strings.deleteAccount.title }} />
             </Stack>
           </VersionGate>
         </ThemeProvider>

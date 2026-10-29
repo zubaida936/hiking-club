@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\Members\Actions\DeleteAccount;
 use App\Domain\Members\Actions\SetLeaderboardVisibility;
 use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 /**
  * The member dashboard of the website (My account), for the app. An account without a hiker profile
@@ -142,6 +144,25 @@ class AccountController extends Controller
         }
 
         return response()->json(['data' => $data]);
+    }
+
+    /**
+     * Delete my account.
+     *
+     * Needs the password. Deletes the login (every device is logged out), points, rewards and X applications,
+     * and removes the member's personal details from their past bookings and orders (kept anonymised for the
+     * club's records). Refused (422) for staff, with a wrong password, or while the member still has upcoming
+     * bookings or open shop orders.
+     */
+    public function destroy(Request $request, DeleteAccount $action): Response
+    {
+        $request->validate(['password' => ['required', 'string']]);
+
+        /** @var User $user */
+        $user = $request->user();
+        $action->handle($user, $request->string('password')->toString());
+
+        return response()->noContent();
     }
 
     /**

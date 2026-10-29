@@ -119,8 +119,13 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('account', [AccountController::class, 'show'])->name('account');
     Route::post('account/bookings/{registration}/cancel', [AccountController::class, 'cancelBooking'])->name('account.bookings.cancel');
     Route::post('account/leaderboard', [AccountController::class, 'leaderboardVisibility'])->name('account.leaderboard');
+    Route::get('account/delete', [AccountController::class, 'confirmDelete'])->name('account.delete');
+    Route::post('account/delete', [AccountController::class, 'destroy'])->middleware('throttle:5,1')->name('account.delete.destroy');
     Route::post('logout', [MemberSessionController::class, 'destroy'])->name('logout');
 });
+
+// Public: how to delete an account and what happens to the data (Google Play asks for this page).
+Route::view('delete-account', 'site.delete-account')->name('delete-account');
 
 Route::get('sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::get('robots.txt', [SeoController::class, 'robots'])->name('robots');

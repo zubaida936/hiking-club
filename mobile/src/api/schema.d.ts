@@ -106,6 +106,33 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The logged-in member
+         * @description With their points and rank when they have a hiker profile.
+         */
+        get: operations["v1.me"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete my account
+         * @description Needs the password. Deletes the login (every device is logged out), points, rewards and X applications,
+         *     and removes the member's personal details from their past bookings and orders (kept anonymised for the
+         *     club's records). Refused (422) for staff, with a wrong password, or while the member still has upcoming
+         *     bookings or open shop orders.
+         */
+        delete: operations["v1.me.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/activate": {
         parameters: {
             query?: never;
@@ -600,26 +627,6 @@ export interface paths {
          *     hidden or without points) and their row has `is_me`.
          */
         get: operations["v1.leaderboard"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * The logged-in member
-         * @description With their points and rank when they have a hiker profile.
-         */
-        get: operations["v1.me"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1758,6 +1765,51 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "v1.me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `MemberResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MemberResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "v1.me.destroy": {
+        parameters: {
+            query: {
+                password: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     "v1.auth.activate": {
         parameters: {
             query?: never;
@@ -2606,29 +2658,6 @@ export interface operations {
                 };
             };
             422: components["responses"]["ValidationException"];
-        };
-    };
-    "v1.me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description `MemberResource` */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["MemberResource"];
-                    };
-                };
-            };
-            401: components["responses"]["AuthenticationException"];
         };
     };
     "v1.shop.orders.store": {
