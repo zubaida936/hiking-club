@@ -15,9 +15,12 @@ use App\Domain\Registrations\Events\AttendanceMarked;
 use App\Domain\Registrations\Events\RegistrationChanged;
 use App\Domain\Registrations\Listeners\CancelBookingsOfCancelledEvent;
 use App\Models\User;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event as EventBus;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -43,6 +46,9 @@ class AppServiceProvider extends ServiceProvider
         Model::shouldBeStrict(! $this->app->isProduction());
 
         Gate::before(fn (User $user) => $user->hasRole(Role::SuperAdmin->value) ? true : null);
+
+        // Default limit for the app's API calls; sensitive endpoints add their own stricter throttle.
+        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()));
 
         // Domain listeners live in their module, outside app/Listeners, so register them here.
         EventBus::listen(EventPublished::class, AnnounceNewEvent::class);

@@ -48,13 +48,23 @@ class MemberLoginRequest extends FormRequest
             'is_active' => true,
         ];
 
-        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
+        if (! $this->attempt($credentials)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages(['phone' => "This phone number and password don't match an account."]);
         }
 
         RateLimiter::clear($this->throttleKey());
+    }
+
+    /**
+     * Website: log in with a session.
+     *
+     * @param  array<string, mixed>  $credentials
+     */
+    protected function attempt(array $credentials): bool
+    {
+        return Auth::attempt($credentials, $this->boolean('remember'));
     }
 
     /**

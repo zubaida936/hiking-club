@@ -62,8 +62,9 @@ class InviteController extends Controller
 
         $request->validate(['password' => ['required', 'confirmed', Password::min((int) config('members.password_min_length'))]]);
 
-        // A new password also signs out "remember me" sessions elsewhere, and invalidates this link.
+        // A new password also signs out "remember me" sessions and app logins elsewhere, and invalidates this link.
         $user->forceFill(['password' => $request->string('password')->toString(), 'remember_token' => null])->save();
+        $user->tokens()->delete();
 
         Auth::login($user);
         $request->session()->regenerate();

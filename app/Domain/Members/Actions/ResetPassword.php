@@ -22,7 +22,8 @@ final class ResetPassword
             throw MemberException::invalidCode();
         }
 
-        // Clearing the remember token signs out "remember me" sessions on other devices.
+        // Clearing the remember token signs out "remember me" sessions on other devices; the app logins too.
         $user->forceFill(['password' => $password, 'remember_token' => null])->save();
+        $user->tokens()->delete();
     }
 }

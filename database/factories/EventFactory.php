@@ -16,7 +16,7 @@ class EventFactory extends Factory
 {
     public function definition(): array
     {
-        $title = fake()->unique()->randomElement([
+        $title = fake()->randomElement([
             'Horch Ehden Nature Reserve', 'Qadisha Valley Descent', 'Tannourine Cedars Loop',
             'Jabal Moussa Biosphere', 'Chouf Cedars Ridge', 'Baskinta Literary Trail',
             'Qornet es Sawda Summit', 'Wadi Qannoubine', 'Akoura Hidden Trail', 'Bisri Valley Walk',

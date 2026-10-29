@@ -23,5 +23,9 @@ final class SetAccountActive
         }
 
         $user->forceFill(['is_active' => $active, 'remember_token' => $active ? $user->remember_token : null])->save();
+
+        if (! $active) {
+            $user->tokens()->delete();
+        }
     }
 }
