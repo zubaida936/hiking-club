@@ -1058,7 +1058,8 @@ export interface components {
                 can_cancel: boolean;
                 until: string | null;
             };
-            points_to_earn: string | 0;
+            /** @description (int): the API docs otherwise guess a string here. */
+            points_to_earn: number;
             /** @description Completed hikes in my bookings: the points this booking actually earned. */
             earned_points?: number;
             booked_at: string;
@@ -1832,10 +1833,21 @@ export interface operations {
                                 name: string;
                                 pickup_time: string;
                             }[];
-                            /** @description Required for paid hikes (unless a 100% reward is chosen); empty for free hikes. */
-                            payment_methods: unknown[];
+                            /**
+                             * @description Required for paid hikes (unless a 100% reward is chosen); empty for free hikes.
+                             *     (collect()->map() rather than array_map(): the API docs can type the items then.)
+                             */
+                            payment_methods: {
+                                key: string;
+                                label: string;
+                            }[];
                             /** @description Discounts the member can use on this hike: send its key as `reward`. */
-                            rewards: unknown[];
+                            rewards: {
+                                key: string;
+                                label: string;
+                                percent: number;
+                                fee_after: string | "Free";
+                            }[];
                             terms: string;
                             points_to_earn: number;
                             /** @description The logged-in member's details, to fill in the form. */

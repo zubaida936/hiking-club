@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, Pressable, Share, StyleSheet } from 'react-native';
 
 import { ApiError, apiFetch } from '@/api/client';
@@ -52,6 +52,13 @@ export default function HikeScreen() {
       ) : (
         <ScreenScroll>
           <EventDetailView event={event} />
+          {/* Open for booking: a free seat, or a waitlist when full (the booking form explains the rest). */}
+          {event.registration.open && (!event.seats.sold_out || event.registration.waitlist_open) ? (
+            <Button
+              title={event.seats.sold_out ? strings.hike.joinWaitlist : strings.hike.reserve}
+              onPress={() => router.push(`/book/${event.slug}`)}
+            />
+          ) : null}
         </ScreenScroll>
       )}
     </>

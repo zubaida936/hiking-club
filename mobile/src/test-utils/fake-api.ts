@@ -2,13 +2,16 @@
  * Test helpers: a fake API behind `fetch`, and sample API data.
  * (Outside __tests__ so Jest doesn't run it as a test file.)
  */
-import type { Event, EventDetail, Member } from '@/api/types';
+import type { Booking, BookingForm, Event, EventDetail, Member } from '@/api/types';
 
 type Route = { status: number; body?: unknown };
 type Call = { method: string; path: string; body: unknown; auth: string | undefined };
 
-/** Replaces `fetch` with a fake API: "METHOD /path" => answer. Every request is recorded in the returned list. */
-export function fakeApi(routes: Record<string, Route>): Call[] {
+/**
+ * Replaces `fetch` with a fake API: "METHOD /path" => answer (or a function giving the answer, for answers that
+ * change, e.g. a booking that becomes paid). Every request is recorded in the returned list.
+ */
+export function fakeApi(routes: Record<string, Route | (() => Route)>): Call[] {
   const calls: Call[] = [];
 
   global.fetch = jest.fn(async (url: string | URL | Request, init?: RequestInit) => {
@@ -17,7 +20,8 @@ export function fakeApi(routes: Record<string, Route>): Call[] {
     const headers = (init?.headers ?? {}) as Record<string, string>;
     calls.push({ method, path, body: init?.body ? JSON.parse(String(init.body)) : undefined, auth: headers.Authorization });
 
-    const route = routes[`${method} ${path}`] ?? { status: 404, body: { message: 'Not found' } };
+    const answer = routes[`${method} ${path}`] ?? { status: 404, body: { message: 'Not found' } };
+    const route = typeof answer === 'function' ? answer() : answer;
     return new Response(route.body === undefined ? null : JSON.stringify(route.body), { status: route.status });
   }) as typeof fetch;
 
@@ -93,4 +97,60 @@ export function sampleEventDetail(overrides: Partial<EventDetail> = {}): EventDe
     album_slug: null,
     ...overrides,
   } as EventDetail;
+}
+
+export function sampleBookingForm(overrides: Partial<BookingForm> = {}): BookingForm {
+  return {
+    event_slug: 'horch-ehden',
+    open: true,
+    waitlist: false,
+    x_locked: false,
+    requires_level_acknowledgement: false,
+    level_label: 'Level 1 · Foundation',
+    fee: { cents: 3000, formatted: '$30' },
+    meeting_points: [
+      { id: 11, name: 'Beirut - Jnah', pickup_time: '07:30' },
+      { id: 12, name: 'Jounieh', pickup_time: '08:00' },
+    ],
+    payment_methods: [
+      { key: 'whish', label: 'Whish Money transfer' },
+      { key: 'cash', label: 'Cash on the day' },
+    ],
+    rewards: [],
+    terms: 'I take part at my own risk.',
+    points_to_earn: 8,
+    member: null,
+    ...overrides,
+  } as BookingForm;
+}
+
+export function sampleBooking(overrides: Partial<Booking> = {}): Booking {
+  return {
+    reference: 'K7F3Q2MZ',
+    token: 'secret-booking-token',
+    status: { key: 'confirmed', label: 'Confirmed' },
+    waitlist_position: null,
+    event: sampleEvent(),
+    name: 'Karim Saad',
+    phone: '+96171222333',
+    email: null,
+    pickup: { point: 'Beirut - Jnah', time: '07:30' },
+    emergency_contact: { name: 'Maya Saad', phone: '+9613444555' },
+    notes: null,
+    amount_due: { cents: 3000, formatted: '$30' },
+    reward_used: null,
+    payment: {
+      state: 'due',
+      method: { key: 'whish', label: 'Whish Money transfer' },
+      paid_at: null,
+      refund_due: false,
+      instructions: { type: 'transfer', provider: 'Whish Money', account_name: 'Hiking Club', account_number: '+961 70 000 000', note: 'K7F3Q2MZ', reported_transaction_number: null },
+    },
+    cancellation: { cancelled_at: null, reason: null, can_cancel: false, until: null },
+    points_to_earn: 8,
+    booked_at: '2026-10-29T10:00:00+00:00',
+    web_url: 'http://localhost:8080/bookings/secret-booking-token',
+    whatsapp_url: null,
+    ...overrides,
+  } as Booking;
 }

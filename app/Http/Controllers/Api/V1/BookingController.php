@@ -65,17 +65,18 @@ class BookingController extends Controller
                 'pickup_time' => $point->pickupTimeShort(),
             ])->all(),
             // Required for paid hikes (unless a 100% reward is chosen); empty for free hikes.
-            'payment_methods' => $paid ? array_map(fn (PaymentMethod $method) => [
+            // (collect()->map() rather than array_map(): the API docs can type the items then.)
+            'payment_methods' => collect($paid ? PaymentMethod::available() : [])->map(fn (PaymentMethod $method) => [
                 'key' => $method->value,
                 'label' => $method->label(),
-            ], PaymentMethod::available()) : [],
+            ])->values()->all(),
             // Discounts the member can use on this hike: send its key as `reward`.
-            'rewards' => $hiker === null ? [] : array_map(fn (Reward $reward) => [
+            'rewards' => collect($hiker === null ? [] : $rewards->discountsFor($hiker, $event))->map(fn (Reward $reward) => [
                 'key' => $reward->key,
                 'label' => $reward->label,
-                'percent' => $reward->percent,
+                'percent' => (int) $reward->percent,
                 'fee_after' => $this->formattedCents($event->fee_cents - $reward->discountCents($event->fee_cents)),
-            ], $rewards->discountsFor($hiker, $event)),
+            ])->values()->all(),
             'terms' => (string) config('site.booking.terms'),
             'points_to_earn' => $points->hikePoints($event),
             // The logged-in member's details, to fill in the form.

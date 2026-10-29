@@ -51,7 +51,8 @@ class BookingResource extends JsonResource
                 'can_cancel' => $canCancel && (bool) $request->user()?->can('cancelOwn', $this->resource),
                 'until' => $canCancel ? CancelOwnBooking::deadline($this->resource)->toIso8601String() : null,
             ],
-            'points_to_earn' => $this->isCancelled() ? 0 : app(PointsRules::class)->hikePoints($event),
+            // (int): the API docs otherwise guess a string here.
+            'points_to_earn' => $this->isCancelled() ? 0 : (int) app(PointsRules::class)->hikePoints($event),
             // Completed hikes in my bookings: the points this booking actually earned.
             'earned_points' => $this->whenHas('earned_points', fn ($points) => (int) $points),
             'booked_at' => $this->created_at->toIso8601String(),
