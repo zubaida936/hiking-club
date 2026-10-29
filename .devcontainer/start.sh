@@ -14,13 +14,28 @@ fi
 
 [ -f .env ] || cp .env.example .env
 
+# The default MySQL host port 33060 lies in Linux's ephemeral range: an outgoing connection of the
+# Codespaces agent can hold it, and then mysql fails with "address already in use". Use one below it.
+sed -i 's/^FORWARD_DB_PORT=33060$/FORWARD_DB_PORT=13306/' .env
+grep -q '^FORWARD_DB_PORT=' .env || echo 'FORWARD_DB_PORT=13306' >> .env
+
 if [ -n "${CODESPACE_NAME:-}" ]; then
     url="https://${CODESPACE_NAME}-8080.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-app.github.dev}"
     sed -i "s#^APP_URL=.*#APP_URL=${url}#" .env
 fi
 
 # Everything except "node": the demo serves built assets, visitors can't reach the Vite dev server.
-docker compose up -d app queue scheduler nginx mysql redis mailpit phpmyadmin
+services=(app queue scheduler nginx mysql redis mailpit phpmyadmin)
+
+# After a codespace was stopped, Docker can lose image layers ("RWLayer ... is unexpectedly nil",
+# "parent snapshot ... does not exist"). Then recreate the containers and rebuild the image;
+# named volumes (database, vendor) are kept.
+if ! docker compose up -d "${services[@]}" && ! { sleep 10; docker compose up -d "${services[@]}"; }; then
+    echo "Recreating containers after a broken Docker state..."
+    docker ps -aq --filter label=com.docker.compose.project=hiking | xargs -r docker rm -f
+    docker builder prune -af >/dev/null || true
+    docker compose up -d --build "${services[@]}"
+fi
 
 # A cached config would keep an old APP_URL.
 if [ -f vendor/autoload.php ]; then
