@@ -31,7 +31,21 @@ final class PlaceOrder
      */
     public function handle(Cart $cart, CheckoutData $data): Order
     {
-        $quantities = $cart->raw();
+        $order = $this->placeItems($cart->raw(), $data);
+        $cart->clear();
+
+        return $order;
+    }
+
+    /**
+     * Same as handle(), for a variant id => quantity list (the app's cart, kept on the phone).
+     *
+     * @param  array<int, int>  $quantities
+     *
+     * @throws ShopException
+     */
+    public function placeItems(array $quantities, CheckoutData $data): Order
+    {
         if ($quantities === []) {
             throw ShopException::cartEmpty();
         }
@@ -95,8 +109,6 @@ final class PlaceOrder
 
             return $order;
         });
-
-        $cart->clear();
 
         if ($order->email !== null) {
             Mail::to($order->email)->queue(new OrderPlacedMail($order));

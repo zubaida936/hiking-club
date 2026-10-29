@@ -51,7 +51,17 @@ final class Cart
      */
     public function lines(): Collection
     {
-        $items = $this->raw();
+        return self::linesFor($this->raw());
+    }
+
+    /**
+     * Cart lines for any variant id => quantity list (the app keeps its cart on the phone and sends it).
+     *
+     * @param  array<int, int>  $items
+     * @return Collection<int, array{variant: ProductVariant, quantity: int, unit_cents: int, line_cents: int, in_stock: bool}>
+     */
+    public static function linesFor(array $items): Collection
+    {
         if ($items === []) {
             return collect();
         }

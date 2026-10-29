@@ -9,10 +9,12 @@ use App\Domain\Rewards\HikerRewards;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\BookingResource;
 use App\Http\Resources\Api\V1\MemberResource;
+use App\Http\Resources\Api\V1\OrderResource;
 use App\Http\Resources\Api\V1\PointTransactionResource;
 use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\Hiker;
+use App\Models\Order;
 use App\Models\PointTransaction;
 use App\Models\RewardRedemption;
 use App\Models\User;
@@ -58,6 +60,24 @@ class AccountController extends Controller
             ->paginate(self::PER_PAGE);
 
         return BookingResource::collection($bookings);
+    }
+
+    /**
+     * My shop orders.
+     *
+     * Orders placed with my phone number, newest first.
+     */
+    public function orders(Request $request): AnonymousResourceCollection
+    {
+        $request->validate(['page' => ['sometimes', 'integer', 'min:1']]);
+
+        $orders = Order::query()
+            ->where('hiker_id', $this->hiker($request)->id ?? 0)
+            ->with('items')
+            ->latest('id')
+            ->paginate(self::PER_PAGE);
+
+        return OrderResource::collection($orders);
     }
 
     /**

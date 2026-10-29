@@ -9,7 +9,9 @@ use App\Http\Controllers\Api\V1\DifficultyController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\LeaderboardController;
 use App\Http\Controllers\Api\V1\MeController;
+use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\RankSystemController;
+use App\Http\Controllers\Api\V1\ShopController;
 use App\Http\Controllers\Api\V1\XEventsController;
 use App\Http\Middleware\UseApiGuard;
 use Illuminate\Support\Facades\Route;
@@ -41,6 +43,7 @@ Route::prefix('v1')->name('api.v1.')->middleware([UseApiGuard::class, 'active', 
         Route::get('bookings', 'bookings')->name('bookings');
         Route::get('points', 'points')->name('points');
         Route::get('rewards', 'rewards')->name('rewards');
+        Route::get('orders', 'orders')->name('orders');
         Route::put('leaderboard', 'leaderboard')->name('leaderboard');
     });
 
@@ -60,6 +63,21 @@ Route::prefix('v1')->name('api.v1.')->middleware([UseApiGuard::class, 'active', 
         Route::get('/', 'index')->name('index');
         Route::get('application-form', 'form')->name('application-form');
         Route::post('applications', 'apply')->middleware('throttle:5,1')->name('apply');
+    });
+
+    // Shop: the cart lives on the phone; POST shop/cart prices it, POST shop/orders places the order.
+    Route::controller(ShopController::class)->prefix('shop')->name('shop.')->group(function () {
+        Route::get('categories', 'categories')->name('categories');
+        Route::get('products', 'products')->name('products');
+        Route::get('products/{product:slug}', 'product')->name('products.show');
+        Route::post('cart', 'cart')->middleware('throttle:30,1')->name('cart');
+        Route::get('checkout-form', 'checkoutForm')->name('checkout-form');
+    });
+    Route::post('shop/orders', [OrderController::class, 'store'])->middleware('throttle:5,1')->name('shop.orders.store');
+    Route::controller(OrderController::class)->prefix('orders/{order:token}')->name('orders.')->group(function () {
+        Route::get('/', 'show')->name('show');
+        Route::post('pay', 'pay')->middleware('throttle:10,1')->name('pay');
+        Route::post('transfer', 'transfer')->middleware('throttle:10,1')->name('transfer');
     });
 
     // Booking works for guests too (like the website); a token adds the member's details, rewards and X access.
