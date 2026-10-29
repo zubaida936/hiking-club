@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AccountController;
+use App\Http\Controllers\Api\V1\AppConfigController;
 use App\Http\Controllers\Api\V1\Auth\ActivationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\TokenController;
@@ -27,6 +28,8 @@ use Illuminate\Support\Facades\Route;
 
 // UseApiGuard: $request->user() is the token's member (or null); `active` turns away deactivated accounts.
 Route::prefix('v1')->name('api.v1.')->middleware([UseApiGuard::class, 'active', 'throttle:api'])->group(function () {
+    Route::get('app-config', AppConfigController::class)->name('app-config');
+
     Route::prefix('auth')->name('auth.')->group(function () {
         Route::post('login', [TokenController::class, 'store'])->name('login');
         Route::post('activate', [ActivationController::class, 'store'])->middleware('throttle:5,1')->name('activate');

@@ -79,6 +79,47 @@ jobs:
       - run: cp .env.example .env && php artisan key:generate
       - run: php artisan test --coverage --min=70
 
+  mobile:
+    name: Mobile app (lint, types, tests, Android bundle)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      # Bundles the JavaScript for Android the way a release build does: catches import and config errors.
+      - run: npx expo export --platform android --output-dir /tmp/expo-export
+
+  api-types:
+    name: Mobile API types match the API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+      - uses: ramsey/composer-install@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: cp .env.example .env && php artisan key:generate
+      - run: php artisan scramble:export --path=storage/api.json
+      # Same generator and version as `npm run api:types` in mobile/. A difference means the API changed:
+      # run `npm run api:types` in the mobile container and commit mobile/src/api/schema.d.ts.
+      - run: npx --yes openapi-typescript@7.13.0 storage/api.json -o mobile/src/api/schema.d.ts
+      - run: git diff --exit-code mobile/src/api/schema.d.ts
+
   docker:
     name: Docker image builds
     runs-on: ubuntu-latest
