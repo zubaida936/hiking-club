@@ -121,6 +121,10 @@ jobs:
       DB_DATABASE: hiking_testing
       DB_USERNAME: hiking
       DB_PASSWORD: secret
+      # No Redis in this job (.env.example uses it): same in-memory drivers as phpunit.xml.
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
