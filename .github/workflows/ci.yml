@@ -102,6 +102,25 @@ jobs:
   api-types:
     name: Mobile API types match the API
     runs-on: ubuntu-latest
+    # Scramble reads the table columns to type some fields, so it needs the migrated schema.
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: hiking_testing
+          MYSQL_USER: hiking
+          MYSQL_PASSWORD: secret
+          MYSQL_ROOT_PASSWORD: root
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: hiking_testing
+      DB_USERNAME: hiking
+      DB_PASSWORD: secret
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -114,6 +133,7 @@ jobs:
         with:
           node-version: 24
       - run: cp .env.example .env && php artisan key:generate
+      - run: php artisan migrate --force
       - run: php artisan scramble:export --path=storage/api.json
       # Same generator and version as `npm run api:types` in mobile/. A difference means the API changed:
       # run `npm run api:types` in the mobile container and commit mobile/src/api/schema.d.ts.
