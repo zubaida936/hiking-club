@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AccountController;
 use App\Http\Controllers\Api\V1\Auth\ActivationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\TokenController;
@@ -30,6 +31,14 @@ Route::prefix('v1')->name('api.v1.')->middleware([UseApiGuard::class, 'active', 
     });
 
     Route::get('me', MeController::class)->middleware('auth:sanctum')->name('me');
+
+    // My account (the website's member dashboard).
+    Route::controller(AccountController::class)->prefix('me')->name('me.')->middleware('auth:sanctum')->group(function () {
+        Route::get('bookings', 'bookings')->name('bookings');
+        Route::get('points', 'points')->name('points');
+        Route::get('rewards', 'rewards')->name('rewards');
+        Route::put('leaderboard', 'leaderboard')->name('leaderboard');
+    });
 
     Route::controller(EventController::class)->prefix('events')->name('events.')->group(function () {
         Route::get('/', 'index')->name('index');

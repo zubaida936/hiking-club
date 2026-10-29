@@ -52,6 +52,8 @@ class BookingResource extends JsonResource
                 'until' => $canCancel ? CancelOwnBooking::deadline($this->resource)->toIso8601String() : null,
             ],
             'points_to_earn' => $this->isCancelled() ? 0 : app(PointsRules::class)->hikePoints($event),
+            // Completed hikes in my bookings: the points this booking actually earned.
+            'earned_points' => $this->whenHas('earned_points', fn ($points) => (int) $points),
             'booked_at' => $this->created_at->toIso8601String(),
             'web_url' => route('registrations.show', $this->resource),
             'whatsapp_url' => WhatsApp::link("Hi! I booked \"{$event->title}\" on {$event->starts_on->format('D, j M Y')}. My booking reference is {$this->reference}."),

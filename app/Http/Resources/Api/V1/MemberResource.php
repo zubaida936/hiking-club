@@ -2,6 +2,9 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Domain\Loyalty\Leaderboard;
+use App\Domain\Registrations\Enums\Attendance;
+use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Models\Hiker;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -21,7 +24,10 @@ class MemberResource extends JsonResource
     public static function forUser(User $user): self
     {
         $user->load('hiker');
-        $user->hiker?->loadSum('pointTransactions as total_points', 'points');
+        $user->hiker?->loadSum('pointTransactions as total_points', 'points')
+            ->loadCount(['registrations as hikes_completed' => fn ($q) => $q
+                ->where('status', RegistrationStatus::Confirmed)
+                ->where('attendance', Attendance::Attended)]);
 
         return new self($user);
     }
@@ -49,6 +55,10 @@ class MemberResource extends JsonResource
                     'points_needed' => $hiker->pointsToNextTier(),
                 ],
                 'rank_progress_percent' => $hiker->tierProgressPercent(),
+                // Place on the public leaderboard; null when hidden or without points.
+                'leaderboard_position' => app(Leaderboard::class)->publicPositionOf($hiker),
+                'hikes_completed' => (int) $hiker->getAttribute('hikes_completed'),
+                'distance_km' => round($hiker->totalDistanceKm(), 1),
                 'show_on_leaderboard' => $hiker->show_on_leaderboard,
                 'x_events_approved' => $hiker->x_approved_at !== null,
             ],
