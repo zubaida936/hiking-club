@@ -13,7 +13,7 @@ describe('hikes list', () => {
       ...appConfigRoute,
       'GET /events': list([sampleEvent(), sampleEvent({ id: 2, slug: 'chouf', title: 'Chouf Cedars Ridge', seats: { capacity: 20, left: 0, sold_out: true } })]),
     });
-    await renderRouter('./src/app', { initialUrl: '/' });
+    await renderRouter('./src/app', { initialUrl: '/hikes' });
 
     expect(await screen.findByText('Horch Ehden Nature Reserve')).toBeOnTheScreen();
     expect(screen.getByText('4 seats left')).toBeOnTheScreen();
@@ -22,10 +22,9 @@ describe('hikes list', () => {
   });
 
   it('shows the error message with a retry button', async () => {
-    global.fetch = jest.fn(async () => {
-      throw new TypeError('Network request failed');
-    }) as typeof fetch;
-    await renderRouter('./src/app', { initialUrl: '/' });
+    // Only the hikes list is offline (the Home tab is rendered too and would show its own error).
+    fakeApi({ ...appConfigRoute, 'GET /events': 'offline', 'GET /home': { status: 200, body: { data: { slides: [], next_event: null, top_hikers: [] } } } });
+    await renderRouter('./src/app', { initialUrl: '/hikes' });
 
     // The app retries network trouble twice before showing the error.
     expect(await screen.findByText("Can't reach the server. Check your internet connection and try again.", {}, { timeout: 10000 })).toBeOnTheScreen();
@@ -44,7 +43,7 @@ describe('hikes filters', () => {
         { month: '2026-09', label: 'September 2026', upcoming: 0, past: 4 },
       ] } },
     });
-    await renderRouter('./src/app', { initialUrl: '/' });
+    await renderRouter('./src/app', { initialUrl: '/hikes' });
 
     // Upcoming months only, soonest first.
     expect(await screen.findByRole('button', { name: 'November 2026' })).toBeOnTheScreen();
@@ -68,7 +67,7 @@ describe('hikes filters', () => {
   it('searches once typing stops, and offers to clear filters when nothing matches', async () => {
     let events = [sampleEvent()];
     const calls = fakeApi({ ...appConfigRoute, 'GET /events': () => list(events) });
-    await renderRouter('./src/app', { initialUrl: '/' });
+    await renderRouter('./src/app', { initialUrl: '/hikes' });
     await screen.findByText('Horch Ehden Nature Reserve');
 
     events = [];
@@ -92,7 +91,7 @@ describe('hike detail', () => {
       'GET /events': list([sampleEvent()]),
       'GET /events/horch-ehden': { status: 200, body: { data: sampleEventDetail({ updates: [{ message: 'Bring a rain jacket.', posted_at: '2026-10-30T09:00:00+00:00' }] }) } },
     });
-    await renderRouter('./src/app', { initialUrl: '/' });
+    await renderRouter('./src/app', { initialUrl: '/hikes' });
 
     await fireEvent.press(await screen.findByRole('link', { name: /Horch Ehden Nature Reserve/ }));
 

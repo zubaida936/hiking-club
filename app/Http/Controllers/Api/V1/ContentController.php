@@ -20,7 +20,6 @@ use App\Models\TeamMember;
 use App\Support\SocialLinks;
 use App\Support\WhatsApp;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * The website's content pages for the app: home, about, equipment guide, contact and the newsletter.
@@ -35,23 +34,34 @@ class ContentController extends Controller
      * and the top 10 hikers. Slide `url`s are website links: the app can open the matching screen.
      *
      * @unauthenticated
-     *
-     * @return array{data: array<string, mixed>}
      */
-    public function home(Request $request, HomepageHero $hero, Leaderboard $leaderboard): array
+    public function home(HomepageHero $hero, Leaderboard $leaderboard): JsonResponse
     {
         $next = Event::nextUpcoming()?->loadSeatCount();
 
-        return ['data' => [
-            'slides' => $hero->slides(),
-            'next_event' => $next ? (new EventResource($next))->resolve($request) : null,
+        // A loop with casts (not the hero's plain arrays as they are), so the API docs type every slide field.
+        $slides = [];
+        foreach ($hero->slides() as $slide) {
+            $slides[] = [
+                'eyebrow' => $slide['eyebrow'] === null ? null : (string) $slide['eyebrow'],
+                'heading' => (string) $slide['heading'],
+                'text' => $slide['text'] === null ? null : (string) $slide['text'],
+                'cta' => $slide['cta'] === null ? null : (string) $slide['cta'],
+                'url' => $slide['url'] === null ? null : (string) $slide['url'],
+                'image' => $slide['image'] === null ? null : (string) $slide['image'],
+            ];
+        }
+
+        return response()->json(['data' => [
+            'slides' => $slides,
+            'next_event' => $next ? new EventResource($next) : null,
             'top_hikers' => $leaderboard->top(10)->values()->map(fn (Hiker $hiker, int $index) => [
                 'position' => $index + 1,
                 'name' => $hiker->publicName(),
                 'rank' => ['key' => $hiker->tier()->value, 'label' => $hiker->tier()->label()],
                 'points' => $hiker->totalPoints(),
             ])->all(),
-        ]];
+        ]]);
     }
 
     /**

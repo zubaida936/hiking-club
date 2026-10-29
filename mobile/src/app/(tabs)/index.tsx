@@ -1,153 +1,118 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
+import { Image } from 'expo-image';
+import { Link, router } from 'expo-router';
+import { ActivityIndicator, Linking, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { apiFetch } from '@/api/client';
-import type { EventList, ResponseOf } from '@/api/types';
-import { Chip } from '@/components/chip';
+import type { Home, Slide } from '@/api/types';
 import { EventCard } from '@/components/event-card';
+import { Button } from '@/components/form';
+import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { Spacing } from '@/constants/theme';
+import { appRouteFor } from '@/links';
 import { strings } from '@/strings';
 
-const LEVELS = [1, 2, 3, 4] as const;
-
-type Filters = { level: number | null; month: string | null; xtreme: boolean; search: string };
-
-/** Waits until typing stops before searching, so the API isn't called for every letter. */
-function useDebounced(value: string, delay = 400): string {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
-
-  return debounced;
-}
-
-/** Upcoming hikes (GET /events), with search and level / month / X events filters; loads more while scrolling. */
-export default function HikesScreen() {
-  const theme = useTheme();
-  const [typed, setTyped] = useState('');
-  const [filters, setFilters] = useState<Omit<Filters, 'search'>>({ level: null, month: null, xtreme: false });
-  const search = useDebounced(typed.trim());
-  const active = filters.level !== null || filters.month !== null || filters.xtreme || search !== '';
-
-  // Months that have upcoming hikes, for the month chips.
-  const { data: months } = useQuery({
-    queryKey: ['events', 'months'],
-    queryFn: () => apiFetch<ResponseOf<'v1.events.months'>>('/events/months').then((answer) => answer.data.filter((month) => month.upcoming > 0).reverse()),
+/** Home (GET /home): the homepage slides, the next hike and the top 10 hikers. */
+export default function HomeScreen() {
+  const { data, error, isPending, refetch, isRefetching } = useQuery({
+    queryKey: ['home'],
+    queryFn: () => apiFetch<{ data: Home }>('/home').then((answer) => answer.data),
   });
 
-  const { data, error, isPending, refetch, isRefetching, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ['events', 'upcoming', { ...filters, search }],
-    queryFn: ({ pageParam }) =>
-      apiFetch<EventList>('/events', {
-        query: {
-          level: filters.level ?? undefined,
-          month: filters.month ?? undefined,
-          xtreme: filters.xtreme ? 1 : undefined,
-          search: search || undefined,
-          page: pageParam > 1 ? pageParam : undefined,
-        },
-      }),
-    initialPageParam: 1,
-    getNextPageParam: (last) => (last.meta.current_page < last.meta.last_page ? last.meta.current_page + 1 : undefined),
-  });
+  if (isPending) {
+    return (
+      <ThemedView style={styles.center}>
+        <ActivityIndicator />
+      </ThemedView>
+    );
+  }
 
-  const toggle = <K extends keyof typeof filters>(key: K, value: (typeof filters)[K]) =>
-    setFilters((current) => ({ ...current, [key]: current[key] === value ? (key === 'xtreme' ? false : null) : value }));
-  const clear = () => {
-    setTyped('');
-    setFilters({ level: null, month: null, xtreme: false });
-  };
-
-  const header = (
-    <View style={styles.header}>
-      <ThemedText type="title">{strings.hikes.title}</ThemedText>
-      <TextInput
-        accessibilityLabel={strings.hikes.search}
-        placeholder={strings.hikes.searchPlaceholder}
-        placeholderTextColor={theme.textSecondary}
-        value={typed}
-        onChangeText={setTyped}
-        returnKeyType="search"
-        autoCorrect={false}
-        style={[styles.search, { color: theme.text, borderColor: theme.border }]}
-      />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-        <Chip label={strings.hikes.allLevels} selected={filters.level === null} onPress={() => setFilters((current) => ({ ...current, level: null }))} />
-        {LEVELS.map((level) => (
-          <Chip key={level} label={strings.hikes.level(level)} selected={filters.level === level} onPress={() => toggle('level', level)} />
-        ))}
-        <Chip label={strings.hikes.xOnly} selected={filters.xtreme} onPress={() => toggle('xtreme', true)} />
-      </ScrollView>
-      {months && months.length > 0 ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-          <Chip label={strings.hikes.anyMonth} selected={filters.month === null} onPress={() => setFilters((current) => ({ ...current, month: null }))} />
-          {months.map((month) => (
-            <Chip key={month.month} label={month.label} selected={filters.month === month.month} onPress={() => toggle('month', month.month)} />
-          ))}
-        </ScrollView>
-      ) : null}
-    </View>
-  );
+  if (error) {
+    return (
+      <ThemedView style={styles.center}>
+        <ThemedText style={styles.text}>{error.message}</ThemedText>
+        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
+      </ThemedView>
+    );
+  }
 
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        {error ? (
-          <>
-            {header}
-            <ThemedView style={styles.state}>
-              <ThemedText style={styles.center}>{error.message}</ThemedText>
-              <Pressable accessibilityRole="button" onPress={() => refetch()}>
-                <ThemedText type="linkPrimary">{strings.errors.retry}</ThemedText>
-              </Pressable>
-            </ThemedView>
-          </>
-        ) : (
-          <FlatList
-            data={data?.pages.flatMap((page) => page.data) ?? []}
-            keyExtractor={(event) => String(event.id)}
-            renderItem={({ item }) => <EventCard event={item} />}
-            ListHeaderComponent={header}
-            contentContainerStyle={styles.list}
-            keyboardShouldPersistTaps="handled"
-            ListEmptyComponent={
-              isPending ? (
-                <ActivityIndicator style={styles.state} />
-              ) : active ? (
-                <View style={styles.state}>
-                  <ThemedText style={styles.center}>{strings.hikes.noMatch}</ThemedText>
-                  <Pressable accessibilityRole="button" onPress={clear}>
-                    <ThemedText type="linkPrimary">{strings.hikes.clearFilters}</ThemedText>
-                  </Pressable>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <ScreenScroll onRefresh={() => void refetch()} refreshing={isRefetching}>
+        {data.slides.length > 0 ? <Slides slides={data.slides} /> : null}
+
+        <ThemedText type="subtitle">{strings.home.nextHike}</ThemedText>
+        {data.next_event ? <EventCard event={data.next_event} /> : <ThemedText themeColor="textSecondary">{strings.home.noNextHike}</ThemedText>}
+        <Link href="/hikes">
+          <ThemedText type="linkPrimary">{strings.home.allHikes}</ThemedText>
+        </Link>
+
+        {data.top_hikers.length > 0 ? (
+          <View style={styles.block}>
+            <ThemedText type="subtitle">{strings.home.topHikers}</ThemedText>
+            {data.top_hikers.map((hiker) => (
+              <ThemedView key={hiker.position} type="backgroundElement" style={styles.hiker}>
+                <ThemedText type="smallBold" style={styles.position}>{hiker.position}</ThemedText>
+                <View style={styles.flex}>
+                  <ThemedText>{hiker.name}</ThemedText>
+                  <ThemedText type="small" themeColor="textSecondary">{hiker.rank.label}</ThemedText>
                 </View>
-              ) : (
-                <ThemedText style={styles.center}>{strings.hikes.empty}</ThemedText>
-              )
-            }
-            onEndReached={() => hasNextPage && !isFetchingNextPage && void fetchNextPage()}
-            ListFooterComponent={isFetchingNextPage ? <ActivityIndicator /> : undefined}
-            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => void refetch()} />}
-          />
-        )}
-      </SafeAreaView>
-    </ThemedView>
+                <ThemedText type="smallBold">{strings.home.points(hiker.points)}</ThemedText>
+              </ThemedView>
+            ))}
+          </View>
+        ) : null}
+      </ScreenScroll>
+    </SafeAreaView>
+  );
+}
+
+/** Swipeable homepage slides. A slide's button opens the matching app screen, or the website. */
+function Slides({ slides }: { slides: Slide[] }) {
+  const { width } = useWindowDimensions();
+  const slideWidth = Math.min(width, 800) - Spacing.three * 2;
+
+  const open = (url: string) => {
+    const route = appRouteFor(url);
+    if (route) {
+      router.push(route);
+    } else {
+      void Linking.openURL(url);
+    }
+  };
+
+  return (
+    <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} snapToInterval={slideWidth + Spacing.two} decelerationRate="fast" contentContainerStyle={styles.slides}>
+      {slides.map((slide) => (
+        <View key={slide.heading} style={[styles.slide, { width: slideWidth }]}>
+          {slide.image ? <Image source={slide.image} style={StyleSheet.absoluteFill} contentFit="cover" accessibilityIgnoresInvertColors /> : null}
+          <View style={styles.shade} />
+          <View style={styles.slideText}>
+            {slide.eyebrow ? <ThemedText type="small" style={styles.light}>{slide.eyebrow}</ThemedText> : null}
+            <ThemedText type="subtitle" style={styles.light}>{slide.heading}</ThemedText>
+            {slide.text ? <ThemedText type="small" style={styles.light}>{slide.text}</ThemedText> : null}
+            {slide.cta && slide.url ? <Button title={slide.cta} onPress={() => open(slide.url as string)} /> : null}
+          </View>
+        </View>
+      ))}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, flexDirection: 'row', justifyContent: 'center' },
-  safeArea: { flex: 1, maxWidth: MaxContentWidth, paddingHorizontal: Spacing.three },
-  header: { gap: Spacing.two, marginTop: Spacing.three, marginBottom: Spacing.one },
-  search: { borderWidth: 1, borderRadius: 999, paddingHorizontal: Spacing.three, paddingVertical: Spacing.two, fontSize: 16 },
-  chips: { gap: Spacing.two, paddingVertical: Spacing.half },
-  list: { gap: Spacing.three, paddingBottom: BottomTabInset + Spacing.three },
-  state: { alignItems: 'center', justifyContent: 'center', gap: Spacing.three, paddingVertical: Spacing.five },
-  center: { textAlign: 'center' },
+  container: { flex: 1 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
+  text: { textAlign: 'center' },
+  slides: { gap: Spacing.two },
+  slide: { height: 260, borderRadius: Spacing.four, overflow: 'hidden', backgroundColor: '#1f3d2b', justifyContent: 'flex-end' },
+  shade: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: 'rgba(0,0,0,0.35)' },
+  slideText: { padding: Spacing.three, gap: Spacing.one },
+  light: { color: '#ffffff' },
+  block: { gap: Spacing.two },
+  hiker: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, borderRadius: Spacing.three, padding: Spacing.three },
+  position: { width: 24, textAlign: 'center' },
+  flex: { flex: 1 },
 });

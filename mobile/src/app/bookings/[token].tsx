@@ -153,7 +153,7 @@ export default function BookingScreen() {
         </View>
       ) : null}
 
-      <Button title={strings.booking.backToHikes} onPress={() => router.dismissTo('/')} variant="secondary" />
+      <Button title={strings.booking.backToHikes} onPress={() => router.dismissTo('/hikes')} variant="secondary" />
     </ScreenScroll>
   );
 }

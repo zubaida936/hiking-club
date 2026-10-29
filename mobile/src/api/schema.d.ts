@@ -2170,15 +2170,15 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
-                            slides: unknown[] | {
+                            slides: {
                                 eyebrow: string | null;
                                 heading: string;
                                 text: string | null;
                                 cta: string | null;
                                 url: string | null;
-                                image: null;
+                                image: string | null;
                             }[];
-                            next_event: unknown[] | null;
+                            next_event: components["schemas"]["EventResource"] | null;
                             top_hikers: {
                                 position: number;
                                 name: string;

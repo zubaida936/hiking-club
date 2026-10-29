@@ -19,6 +19,8 @@ export type PointLine = components['schemas']['PointTransactionResource'];
 export type PointList = ResponseOf<'v1.me.points'>;
 export type RewardState = ResponseOf<'v1.me.rewards'>['data'][number];
 export type AppConfig = ResponseOf<'v1.app-config'>['data'];
+export type Home = ResponseOf<'v1.home'>['data'];
+export type Slide = Home['slides'][number];
 export type Member = components['schemas']['MemberResource'];
 /** Login, activation and password reset all answer with a new token and the member. */
 export type LoginResult = ResponseOf<'v1.auth.login'>;

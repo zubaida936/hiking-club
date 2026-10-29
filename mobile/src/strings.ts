@@ -4,8 +4,16 @@
  */
 export const strings = {
   tabs: {
+    home: 'Home',
     hikes: 'Hikes',
     account: 'Account',
+  },
+  home: {
+    nextHike: 'Next hike',
+    noNextHike: 'No hike planned right now. Check back soon!',
+    allHikes: 'See all hikes',
+    topHikers: 'Top hikers',
+    points: (points: number) => `${points} pts`,
   },
   hikes: {
     title: 'Upcoming hikes',

@@ -11,7 +11,7 @@ type Call = { method: string; path: string; query: Record<string, string>; body:
  * Replaces `fetch` with a fake API: "METHOD /path" => answer (or a function giving the answer, for answers that
  * change, e.g. a booking that becomes paid). Every request is recorded in the returned list.
  */
-export function fakeApi(routes: Record<string, Route | (() => Route)>): Call[] {
+export function fakeApi(routes: Record<string, Route | (() => Route) | 'offline'>): Call[] {
   const calls: Call[] = [];
 
   global.fetch = jest.fn(async (url: string | URL | Request, init?: RequestInit) => {
@@ -22,6 +22,8 @@ export function fakeApi(routes: Record<string, Route | (() => Route)>): Call[] {
     calls.push({ method, path, query: Object.fromEntries(parsed.searchParams), body: init?.body ? JSON.parse(String(init.body)) : undefined, auth: headers.Authorization });
 
     const answer = routes[`${method} ${path}`] ?? { status: 404, body: { message: 'Not found' } };
+    // 'offline': the request never reaches the server (like a phone without signal).
+    if (answer === 'offline') throw new TypeError('Network request failed');
     const route = typeof answer === 'function' ? answer() : answer;
     return new Response(route.body === undefined ? null : JSON.stringify(route.body), { status: route.status });
   }) as typeof fetch;
