@@ -5,8 +5,11 @@ use App\Http\Controllers\Api\V1\Auth\ActivationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\TokenController;
 use App\Http\Controllers\Api\V1\BookingController;
+use App\Http\Controllers\Api\V1\DifficultyController;
 use App\Http\Controllers\Api\V1\EventController;
+use App\Http\Controllers\Api\V1\LeaderboardController;
 use App\Http\Controllers\Api\V1\MeController;
+use App\Http\Controllers\Api\V1\RankSystemController;
 use App\Http\Middleware\UseApiGuard;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +49,11 @@ Route::prefix('v1')->name('api.v1.')->middleware([UseApiGuard::class, 'active', 
         Route::get('months', 'months')->name('months');
         Route::get('{event:slug}', 'show')->name('show');
     });
+
+    Route::get('leaderboard', LeaderboardController::class)->name('leaderboard');
+    Route::get('rank-system', RankSystemController::class)->name('rank-system');
+    Route::get('difficulty/levels', [DifficultyController::class, 'levels'])->name('difficulty.levels');
+    Route::get('difficulty/calculate', [DifficultyController::class, 'calculate'])->name('difficulty.calculate');
 
     // Booking works for guests too (like the website); a token adds the member's details, rewards and X access.
     Route::controller(BookingController::class)->group(function () {
