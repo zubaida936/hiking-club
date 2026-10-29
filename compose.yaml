@@ -80,6 +80,8 @@ services:
       - "8082:8082"
     depends_on:
       - nginx
+    # Comes back by itself if Metro crashes (otherwise Expo Go only shows "failed to download remote update").
+    restart: unless-stopped
 
   mysql:
     image: mysql:8.4
