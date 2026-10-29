@@ -5,8 +5,11 @@ use App\Http\Controllers\Api\V1\Auth\ActivationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\TokenController;
 use App\Http\Controllers\Api\V1\BookingController;
+use App\Http\Controllers\Api\V1\ContentController;
 use App\Http\Controllers\Api\V1\DifficultyController;
 use App\Http\Controllers\Api\V1\EventController;
+use App\Http\Controllers\Api\V1\GalleryController;
+use App\Http\Controllers\Api\V1\GuideController;
 use App\Http\Controllers\Api\V1\LeaderboardController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\OrderController;
@@ -64,6 +67,20 @@ Route::prefix('v1')->name('api.v1.')->middleware([UseApiGuard::class, 'active', 
         Route::get('application-form', 'form')->name('application-form');
         Route::post('applications', 'apply')->middleware('throttle:5,1')->name('apply');
     });
+
+    // Content pages.
+    Route::controller(ContentController::class)->group(function () {
+        Route::get('home', 'home')->name('home');
+        Route::get('about', 'about')->name('about');
+        Route::get('equipment', 'equipment')->name('equipment');
+        Route::get('contact', 'contact')->name('contact');
+        Route::post('contact', 'sendContact')->middleware('throttle:5,1')->name('contact.send');
+        Route::post('newsletter', 'subscribe')->middleware('throttle:5,1')->name('newsletter.subscribe');
+    });
+    Route::get('guides', [GuideController::class, 'index'])->name('guides.index');
+    Route::get('guides/{article:slug}', [GuideController::class, 'show'])->name('guides.show');
+    Route::get('gallery', [GalleryController::class, 'index'])->name('gallery.index');
+    Route::get('gallery/{album:slug}', [GalleryController::class, 'show'])->name('gallery.show');
 
     // Shop: the cart lives on the phone; POST shop/cart prices it, POST shop/orders places the order.
     Route::controller(ShopController::class)->prefix('shop')->name('shop.')->group(function () {
