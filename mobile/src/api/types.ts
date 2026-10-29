@@ -14,6 +14,7 @@ export type EventList = ResponseOf<'v1.events.index'>;
 export type EventDetail = components['schemas']['EventDetailResource'];
 export type BookingForm = ResponseOf<'v1.events.booking-form'>['data'];
 export type Booking = components['schemas']['BookingResource'];
+export type BookingList = ResponseOf<'v1.me.bookings'>;
 export type AppConfig = ResponseOf<'v1.app-config'>['data'];
 export type Member = components['schemas']['MemberResource'];
 /** Login, activation and password reset all answer with a new token and the member. */

@@ -103,13 +103,17 @@ describe('booking form', () => {
     expect(screen.getByRole('button', { name: 'Book · Free' })).toBeOnTheScreen();
   });
 
-  it('explains closed hikes and locked X events', async () => {
-    fakeApi({ ...appConfigRoute, 'GET /events/x/booking-form': ok(sampleBookingForm({ x_locked: true })), 'GET /events/closed/booking-form': ok(sampleBookingForm({ open: false })) });
-
+  it('explains locked X events', async () => {
+    fakeApi({ ...appConfigRoute, 'GET /events/x/booking-form': ok(sampleBookingForm({ x_locked: true })) });
     await renderRouter('./src/app', { initialUrl: '/book/x' });
-    expect(await screen.findByText(/X Events are for hikers approved for X Events/)).toBeOnTheScreen();
 
+    expect(await screen.findByText(/X Events are for hikers approved for X Events/)).toBeOnTheScreen();
+  });
+
+  it('explains closed bookings', async () => {
+    fakeApi({ ...appConfigRoute, 'GET /events/closed/booking-form': ok(sampleBookingForm({ open: false })) });
     await renderRouter('./src/app', { initialUrl: '/book/closed' });
+
     expect(await screen.findByText('Bookings for this hike are closed.')).toBeOnTheScreen();
   });
 });

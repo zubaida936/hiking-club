@@ -36,7 +36,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
-    getToken().then((stored) => setToken(stored ?? null), () => setToken(null));
+    // Ignore the answer if the app (or a test) closed in the meantime.
+    let active = true;
+    getToken().then(
+      (stored) => active && setToken(stored ?? null),
+      () => active && setToken(null),
+    );
+    return () => {
+      active = false;
+    };
   }, []);
 
   const forget = useCallback(async () => {

@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -6,16 +6,21 @@ import { useAuth } from '@/auth/auth-context';
 import { Button } from '@/components/form';
 import { LoginForm } from '@/components/login-form';
 import { MemberProfile } from '@/components/member-profile';
+import { MyUpcomingBookings, upcomingBookingsKey } from '@/components/my-upcoming-bookings';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { strings } from '@/strings';
 
-/** Logged out: the login form. Logged in: the member's rank and points, and log out. */
+/** Logged out: the login form. Logged in: rank and points, my upcoming hikes, and log out. */
 export default function AccountScreen() {
   const { status, member, memberError, reloadMember, signOut } = useAuth();
+  const queryClient = useQueryClient();
   const logout = useMutation({ mutationFn: signOut });
+  const refresh = useMutation({
+    mutationFn: () => Promise.all([queryClient.invalidateQueries({ queryKey: ['me'] }), queryClient.invalidateQueries({ queryKey: upcomingBookingsKey })]),
+  });
 
   if (status === 'signedIn' && !member && memberError) {
     return (
@@ -36,9 +41,17 @@ export default function AccountScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScreenScroll>
-        {member ? <MemberProfile member={member} onLogout={() => logout.mutate()} loggingOut={logout.isPending} /> : <LoginForm />}
-      </ScreenScroll>
+      {member ? (
+        <ScreenScroll onRefresh={() => refresh.mutate()} refreshing={refresh.isPending}>
+          <MemberProfile member={member} />
+          <MyUpcomingBookings />
+          <Button title={strings.account.logout} onPress={() => logout.mutate()} loading={logout.isPending} variant="secondary" />
+        </ScreenScroll>
+      ) : (
+        <ScreenScroll>
+          <LoginForm />
+        </ScreenScroll>
+      )}
     </SafeAreaView>
   );
 }

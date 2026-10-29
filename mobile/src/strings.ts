@@ -107,6 +107,17 @@ export const strings = {
     noHikerProfile: 'Your points and bookings appear here after your first hike.',
     logout: 'Log out',
   },
+  myBookings: {
+    upcoming: 'My upcoming hikes',
+    upcomingEmpty: 'No upcoming bookings. Find your next hike in the Hikes tab.',
+    completedLink: 'My completed hikes',
+    completed: 'My completed hikes',
+    completedEmpty: 'Your completed hikes appear here once the organizers mark you present.',
+    earned: (points: number) => `+${points} points`,
+    paid: 'Paid',
+    toPay: (amount: string) => `To pay: ${amount}`,
+    payLater: 'Pay after confirmation',
+  },
   login: {
     title: 'Log in',
     intro: 'Log in with the phone number you book hikes with.',

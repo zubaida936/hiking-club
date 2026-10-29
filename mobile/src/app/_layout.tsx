@@ -39,6 +39,7 @@ export default function RootLayout() {
               <Stack.Screen name="events/[slug]" options={{ title: '' }} />
               <Stack.Screen name="book/[slug]" options={{ title: strings.book.title }} />
               <Stack.Screen name="bookings/[token]" options={{ title: strings.booking.reference }} />
+              <Stack.Screen name="my-hikes" options={{ title: strings.myBookings.completed }} />
             </Stack>
           </VersionGate>
         </ThemeProvider>

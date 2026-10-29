@@ -1,7 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
 import type { Member } from '@/api/types';
-import { Button } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
@@ -9,10 +8,10 @@ import { useTheme } from '@/hooks/use-theme';
 import { strings } from '@/strings';
 
 /**
- * The logged-in member: rank, points and progress (GET /me). Bookings, points history and rewards
- * come with the "Member dashboard / profile" task.
+ * The logged-in member: rank, points and progress (GET /me). Points history and rewards come with the
+ * "Points & rank history" and "Rewards & redemption" tasks.
  */
-export function MemberProfile({ member, onLogout, loggingOut }: { member: Member; onLogout: () => void; loggingOut: boolean }) {
+export function MemberProfile({ member }: { member: Member }) {
   const theme = useTheme();
   const hiker = member.hiker;
 
@@ -45,8 +44,6 @@ export function MemberProfile({ member, onLogout, loggingOut }: { member: Member
       ) : (
         <ThemedText themeColor="textSecondary">{strings.account.noHikerProfile}</ThemedText>
       )}
-
-      <Button title={strings.account.logout} onPress={onLogout} loading={loggingOut} variant="secondary" />
     </>
   );
 }

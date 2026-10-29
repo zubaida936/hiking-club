@@ -33,7 +33,9 @@ export default function BookingScreen() {
 
   const update = (fresh: Booking) => {
     queryClient.setQueryData(queryKey, fresh);
+    // Seats and "My upcoming hikes" changed too.
     void queryClient.invalidateQueries({ queryKey: ['events'] });
+    void queryClient.invalidateQueries({ queryKey: ['my', 'bookings'] });
   };
 
   const pay = useMutation({
