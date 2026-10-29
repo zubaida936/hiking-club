@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Members\Actions\DeleteAccount;
 use App\Domain\Members\Actions\SetLeaderboardVisibility;
+use App\Domain\Members\Actions\UpdateProfile;
 use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Domain\Rewards\HikerRewards;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Site\ProfileRequest;
 use App\Http\Resources\Api\V1\BookingResource;
 use App\Http\Resources\Api\V1\MemberResource;
 use App\Http\Resources\Api\V1\OrderResource;
@@ -147,6 +149,18 @@ class AccountController extends Controller
     }
 
     /**
+     * Update my profile.
+     *
+     * Name, email and emergency contact (used to fill in the booking form). Changing the email needs
+     * `current_password` (password-reset codes go there). The phone number is the login and can't be changed
+     * here: the organizers change it.
+     */
+    public function updateProfile(ProfileRequest $request, UpdateProfile $action): MemberResource
+    {
+        return MemberResource::forUser($action->handle($this->user($request), $request->toData()));
+    }
+
+    /**
      * Delete my account.
      *
      * Needs the password. Deletes the login (every device is logged out), points, rewards and X applications,
@@ -187,9 +201,14 @@ class AccountController extends Controller
 
     private function hiker(Request $request): ?Hiker
     {
+        return $this->user($request)->hiker;
+    }
+
+    private function user(Request $request): User
+    {
         /** @var User $user */
         $user = $request->user();
 
-        return $user->hiker;
+        return $user;
     }
 }

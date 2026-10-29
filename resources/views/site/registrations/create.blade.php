@@ -89,8 +89,8 @@
                     <legend class="font-display text-xl font-bold uppercase tracking-wide text-brand-900">Emergency contact</legend>
                     <p class="text-sm text-slate-500">Someone we can call if anything happens on the trail. They won't be contacted otherwise.</p>
                     <div class="grid gap-5 sm:grid-cols-2">
-                        <x-site.field name="emergency_contact_name" label="Name" required maxlength="120" />
-                        <x-site.field name="emergency_contact_phone" label="Phone" type="tel" required placeholder="+961 3 123 456" />
+                        <x-site.field name="emergency_contact_name" label="Name" :value="$member?->emergency_contact_name" required maxlength="120" />
+                        <x-site.field name="emergency_contact_phone" label="Phone" type="tel" :value="$member?->emergency_contact_phone" required placeholder="+961 3 123 456" />
                     </div>
                 </fieldset>
 

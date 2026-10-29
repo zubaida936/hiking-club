@@ -47,6 +47,11 @@ class MemberResource extends JsonResource
             'name' => $this->name,
             'phone' => $this->phone,
             'email' => $this->email,
+            // The member's own emergency contact (null until they set it in their profile).
+            'emergency_contact' => $hiker?->emergency_contact_name === null ? null : [
+                'name' => (string) $hiker->emergency_contact_name,
+                'phone' => $hiker->emergency_contact_phone === null ? null : (string) $hiker->emergency_contact_phone,
+            ],
             'hiker' => $hiker === null ? null : [
                 'points' => $hiker->totalPoints(),
                 'rank' => ['key' => $hiker->tier()->value, 'label' => $hiker->tier()->label()],

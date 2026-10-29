@@ -83,7 +83,7 @@ describe('booking form', () => {
       ...appConfigRoute,
       'GET /events/horch-ehden/booking-form': ok(
         sampleBookingForm({
-          member: { name: sampleMember.name, phone: sampleMember.phone, email: sampleMember.email },
+          member: { name: sampleMember.name, phone: sampleMember.phone, email: sampleMember.email, emergency_contact_name: 'Karim Haddad', emergency_contact_phone: '+9613111222' },
           rewards: [{ key: 'mountaineer_free_moderate', label: 'One free Moderate (Level 2) hike', percent: 100, fee_after: 'Free' }],
           requires_level_acknowledgement: true,
           level_label: 'Level 3 · Advanced',
@@ -93,6 +93,9 @@ describe('booking form', () => {
     await renderRouter('./src/app', { initialUrl: '/book/horch-ehden' });
 
     expect(await screen.findByDisplayValue('Rima Haddad')).toBeOnTheScreen();
+    // The emergency contact saved in the profile is filled in too.
+    expect(screen.getByDisplayValue('Karim Haddad')).toBeOnTheScreen();
+    expect(screen.getByDisplayValue('+9613111222')).toBeOnTheScreen();
     expect(screen.getByDisplayValue('+96170123456')).toBeOnTheScreen();
     expect(screen.getByRole('checkbox', { name: 'I confirm I meet the requirements for Level 3 · Advanced.' })).toBeOnTheScreen();
     expect(screen.getByText('How will you pay?')).toBeOnTheScreen();

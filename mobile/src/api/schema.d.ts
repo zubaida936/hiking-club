@@ -106,6 +106,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/me/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update my profile
+         * @description Name, email and emergency contact (used to fill in the booking form). Changing the email needs
+         *     `current_password` (password-reset codes go there). The phone number is the login and can't be changed
+         *     here: the organizers change it.
+         */
+        put: operations["v1.me.profile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me": {
         parameters: {
             query?: never;
@@ -1105,6 +1127,11 @@ export interface components {
             /** @description Honeypot: hidden from people, bots fill it in. */
             website?: string;
         };
+        /**
+         * DifficultyLevel
+         * @enum {integer}
+         */
+        DifficultyLevel: 1 | 2 | 3 | 4;
         /** EventDetailResource */
         EventDetailResource: {
             id: number;
@@ -1231,6 +1258,11 @@ export interface components {
             name: string;
             phone: string | null;
             email: string | null;
+            /** @description The member's own emergency contact (null until they set it in their profile). */
+            emergency_contact: {
+                name: string;
+                phone: string | null;
+            } | null;
             hiker: {
                 points: number;
                 rank: {
@@ -1398,6 +1430,20 @@ export interface components {
                 stock: number;
             }[];
             web_url: string;
+        };
+        /**
+         * ProfileRequest
+         * @description My profile (website My account and the app's PUT /me/profile). Changing the email needs the current
+         *     password: password-reset codes go to that email.
+         */
+        ProfileRequest: {
+            name: string;
+            /** Format: email */
+            email?: string | null;
+            emergency_contact_name?: string | null;
+            emergency_contact_phone?: string | null;
+            /** @description Only when the email changes. */
+            current_password?: string | null;
         };
         /** RegistrationRequest */
         RegistrationRequest: {
@@ -1765,6 +1811,34 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
+    "v1.me.profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description `MemberResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MemberResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     "v1.me": {
         parameters: {
             query?: never;
@@ -1927,6 +2001,8 @@ export interface operations {
                                 name: string;
                                 phone: string | null;
                                 email: string | null;
+                                emergency_contact_name: string | null;
+                                emergency_contact_phone: string | null;
                             } | null;
                         };
                     };
@@ -2344,7 +2420,13 @@ export interface operations {
     "v1.events.index": {
         parameters: {
             query?: {
+                level?: components["schemas"]["DifficultyLevel"];
+                month?: string;
+                /** @description Upcoming list only: true = only X events, false = no X events. */
                 xtreme?: boolean;
+                /** @description Words in the title or the place ("cedars", "Ehden"). */
+                search?: string | null;
+                page?: number;
             };
             header?: never;
             path?: never;
@@ -2388,11 +2470,20 @@ export interface operations {
                     };
                 };
             };
+            422: components["responses"]["ValidationException"];
         };
     };
     "v1.events.past": {
         parameters: {
-            query?: never;
+            query?: {
+                level?: components["schemas"]["DifficultyLevel"];
+                month?: string;
+                /** @description Upcoming list only: true = only X events, false = no X events. */
+                xtreme?: boolean;
+                /** @description Words in the title or the place ("cedars", "Ehden"). */
+                search?: string | null;
+                page?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2435,6 +2526,7 @@ export interface operations {
                     };
                 };
             };
+            422: components["responses"]["ValidationException"];
         };
     };
     "v1.events.months": {

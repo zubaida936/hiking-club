@@ -33,6 +33,58 @@ describe('hikes list', () => {
   });
 });
 
+describe('hikes filters', () => {
+  it('filters by level and X events, and shows the months that have hikes', async () => {
+    const calls = fakeApi({
+      ...appConfigRoute,
+      'GET /events': list([sampleEvent()]),
+      'GET /events/months': { status: 200, body: { data: [
+        { month: '2026-12', label: 'December 2026', upcoming: 2, past: 0 },
+        { month: '2026-11', label: 'November 2026', upcoming: 3, past: 1 },
+        { month: '2026-09', label: 'September 2026', upcoming: 0, past: 4 },
+      ] } },
+    });
+    await renderRouter('./src/app', { initialUrl: '/' });
+
+    // Upcoming months only, soonest first.
+    expect(await screen.findByRole('button', { name: 'November 2026' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'December 2026' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'September 2026' })).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Level 2' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'X Events only' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'November 2026' }));
+
+    await screen.findByText('Horch Ehden Nature Reserve');
+    expect(calls.filter((c) => c.path === '/events').at(-1)?.query).toEqual({ level: '2', xtreme: '1', month: '2026-11' });
+    expect(screen.getByRole('button', { name: 'Level 2' })).toBeSelected();
+
+    // Pressing a selected chip again removes that filter.
+    await fireEvent.press(screen.getByRole('button', { name: 'Level 2' }));
+    await screen.findByText('Horch Ehden Nature Reserve');
+    expect(calls.filter((c) => c.path === '/events').at(-1)?.query).toEqual({ xtreme: '1', month: '2026-11' });
+  });
+
+  it('searches once typing stops, and offers to clear filters when nothing matches', async () => {
+    let events = [sampleEvent()];
+    const calls = fakeApi({ ...appConfigRoute, 'GET /events': () => list(events) });
+    await renderRouter('./src/app', { initialUrl: '/' });
+    await screen.findByText('Horch Ehden Nature Reserve');
+
+    events = [];
+    await fireEvent.changeText(screen.getByLabelText('Search hikes'), 'qadisha');
+
+    expect(await screen.findByText('No hikes match these filters.')).toBeOnTheScreen();
+    expect(calls.filter((c) => c.path === '/events').at(-1)?.query).toEqual({ search: 'qadisha' });
+
+    events = [sampleEvent()];
+    await fireEvent.press(screen.getByRole('button', { name: 'Clear filters' }));
+
+    expect(await screen.findByText('Horch Ehden Nature Reserve')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Search hikes')).toHaveDisplayValue('');
+  });
+});
+
 describe('hike detail', () => {
   it('opens from the list and shows everything about the hike', async () => {
     fakeApi({

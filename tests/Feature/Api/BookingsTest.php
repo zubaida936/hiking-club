@@ -77,7 +77,7 @@ describe('booking form', function () {
         [, , $token] = bookingMember(points: 250); // Mountaineer: one free Level 2 hike
 
         $this->withToken($token)->getJson(route('api.v1.events.booking-form', $this->event))
-            ->assertJsonPath('data.member', ['name' => 'Rima Haddad', 'phone' => '+96170123456', 'email' => 'rima@example.com'])
+            ->assertJsonPath('data.member', ['name' => 'Rima Haddad', 'phone' => '+96170123456', 'email' => 'rima@example.com', 'emergency_contact_name' => null, 'emergency_contact_phone' => null])
             ->assertJsonPath('data.rewards', [['key' => 'mountaineer_free_moderate', 'label' => 'One free Moderate (Level 2) hike', 'percent' => 100, 'fee_after' => 'Free']]);
     });
 

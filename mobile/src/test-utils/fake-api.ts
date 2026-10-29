@@ -5,7 +5,7 @@
 import type { Booking, BookingForm, Event, EventDetail, Member } from '@/api/types';
 
 type Route = { status: number; body?: unknown };
-type Call = { method: string; path: string; body: unknown; auth: string | undefined };
+type Call = { method: string; path: string; query: Record<string, string>; body: unknown; auth: string | undefined };
 
 /**
  * Replaces `fetch` with a fake API: "METHOD /path" => answer (or a function giving the answer, for answers that
@@ -16,9 +16,10 @@ export function fakeApi(routes: Record<string, Route | (() => Route)>): Call[] {
 
   global.fetch = jest.fn(async (url: string | URL | Request, init?: RequestInit) => {
     const method = init?.method ?? 'GET';
-    const path = new URL(String(url)).pathname.replace(/^.*\/api\/v1/, '');
+    const parsed = new URL(String(url));
+    const path = parsed.pathname.replace(/^.*\/api\/v1/, '');
     const headers = (init?.headers ?? {}) as Record<string, string>;
-    calls.push({ method, path, body: init?.body ? JSON.parse(String(init.body)) : undefined, auth: headers.Authorization });
+    calls.push({ method, path, query: Object.fromEntries(parsed.searchParams), body: init?.body ? JSON.parse(String(init.body)) : undefined, auth: headers.Authorization });
 
     const answer = routes[`${method} ${path}`] ?? { status: 404, body: { message: 'Not found' } };
     const route = typeof answer === 'function' ? answer() : answer;
@@ -38,6 +39,7 @@ export const sampleMember: Member = {
   name: 'Rima Haddad',
   phone: '+96170123456',
   email: 'rima@example.com',
+  emergency_contact: null,
   hiker: {
     points: 140,
     rank: { key: 'trekker', label: 'Trekker' },

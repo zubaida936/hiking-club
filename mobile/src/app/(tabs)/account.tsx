@@ -45,6 +45,9 @@ export default function AccountScreen() {
       {member ? (
         <ScreenScroll onRefresh={() => refresh.mutate()} refreshing={refresh.isPending}>
           <MemberProfile member={member} />
+          <Link href="/edit-profile">
+            <ThemedText type="linkPrimary">{strings.profile.link}</ThemedText>
+          </Link>
           {member.hiker ? (
             <View style={styles.links}>
               <Link href="/my-points">

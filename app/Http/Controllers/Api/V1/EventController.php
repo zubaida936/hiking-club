@@ -2,18 +2,15 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Domain\Events\Enums\DifficultyLevel;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\EventFilterRequest;
 use App\Http\Resources\Api\V1\EventDetailResource;
 use App\Http\Resources\Api\V1\EventResource;
 use App\Models\Album;
 use App\Models\Event;
-use Closure;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Carbon;
-use Illuminate\Validation\Rule;
 
 /**
  * Published hikes, same rules as the website's events pages. Unlike the website, unknown
@@ -30,10 +27,10 @@ class EventController extends Controller
      *
      * @unauthenticated
      */
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(EventFilterRequest $request): AnonymousResourceCollection
     {
         $events = Event::published()->upcoming()
-            ->where($this->filters($request))
+            ->where($request->filters())
             ->when($request->has('xtreme'), fn (Builder $q) => $q->where('is_xtreme', $request->boolean('xtreme')))
             ->withSeatCounts()
             ->orderBy('starts_on')->orderBy('id')
@@ -49,10 +46,10 @@ class EventController extends Controller
      *
      * @unauthenticated
      */
-    public function past(Request $request): AnonymousResourceCollection
+    public function past(EventFilterRequest $request): AnonymousResourceCollection
     {
         $events = Event::published()->past()
-            ->where($this->filters($request))
+            ->where($request->filters())
             ->withSeatCounts()
             ->orderByDesc('starts_on')->orderByDesc('id')
             ->paginate(self::PER_PAGE);
@@ -107,30 +104,5 @@ class EventController extends Controller
             : Album::published()->whereBelongsTo($event)->has('photos')->latest('id')->value('slug');
 
         return (new EventDetailResource($event))->withAlbumSlug($albumSlug);
-    }
-
-    /**
-     * Level and month filters shared by the upcoming and past lists.
-     *
-     * @return Closure(Builder<Event>): Builder<Event>
-     */
-    private function filters(Request $request): Closure
-    {
-        $request->validate([
-            'level' => ['sometimes', Rule::enum(DifficultyLevel::class)],
-            'month' => ['sometimes', 'date_format:Y-m'],
-            'xtreme' => ['sometimes', 'boolean'],
-            'page' => ['sometimes', 'integer', 'min:1'],
-        ]);
-
-        $level = $request->has('level') ? DifficultyLevel::from($request->integer('level')) : null;
-        $month = $request->has('month') ? Carbon::createFromFormat('!Y-m', (string) $request->query('month')) : null;
-
-        return fn (Builder $q) => $q
-            ->when($level, fn (Builder $q) => $q->where('difficulty_level', $level))
-            ->when($month, fn (Builder $q) => $q->whereBetween('starts_on', [
-                $month->copy()->startOfMonth()->toDateString(),
-                $month->copy()->endOfMonth()->toDateString(),
-            ]));
     }
 }

@@ -84,6 +84,8 @@ class BookingController extends Controller
                 'name' => $hiker->name ?? $user->name,
                 'phone' => $hiker->phone ?? $user->phone,
                 'email' => $hiker->email ?? $user->email,
+                'emergency_contact_name' => $hiker?->emergency_contact_name,
+                'emergency_contact_phone' => $hiker?->emergency_contact_phone,
             ],
         ]];
     }

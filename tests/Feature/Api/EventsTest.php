@@ -38,6 +38,16 @@ describe('upcoming hikes', function () {
         $this->getJson(route('api.v1.events.index', ['xtreme' => 0]))->assertJsonPath('data.*.id', [$foundation->id]);
     });
 
+    it('searches the title and the place', function () {
+        $ehden = Event::factory()->published()->create(['title' => 'Horch Ehden Nature Reserve', 'location' => 'Ehden', 'starts_on' => now()->addDays(3)->toDateString()]);
+        $chouf = Event::factory()->published()->create(['title' => 'Cedar Ridge', 'location' => 'Barouk', 'starts_on' => now()->addDays(5)->toDateString()]);
+
+        $this->getJson(route('api.v1.events.index', ['search' => 'horch']))->assertJsonPath('data.*.id', [$ehden->id]);
+        $this->getJson(route('api.v1.events.index', ['search' => 'barouk']))->assertJsonPath('data.*.id', [$chouf->id]);
+        $this->getJson(route('api.v1.events.index', ['search' => '  ']))->assertJsonCount(2, 'data');
+        $this->getJson(route('api.v1.events.index', ['search' => str_repeat('a', 101)]))->assertJsonValidationErrors('search');
+    });
+
     it('rejects unknown filter values', function () {
         $this->getJson(route('api.v1.events.index', ['level' => 9, 'month' => 'November']))
             ->assertUnprocessable()

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Site;
 use App\Domain\Loyalty\Leaderboard;
 use App\Domain\Members\Actions\DeleteAccount;
 use App\Domain\Members\Actions\SetLeaderboardVisibility;
+use App\Domain\Members\Actions\UpdateProfile;
 use App\Domain\Members\Exceptions\MemberException;
 use App\Domain\Registrations\Actions\CancelOwnBooking;
 use App\Domain\Registrations\Enums\Attendance;
@@ -12,6 +13,7 @@ use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Domain\Registrations\Exceptions\RegistrationException;
 use App\Domain\Rewards\HikerRewards;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Site\ProfileRequest;
 use App\Models\EventRegistration;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -72,6 +74,23 @@ class AccountController extends Controller
         $action->handle($hiker, $visible);
 
         return back()->with('success', $visible ? 'You are shown on the leaderboard.' : 'You are hidden from the public leaderboard.');
+    }
+
+    public function editProfile(Request $request): View
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        return view('site.account.profile', ['user' => $user, 'hiker' => $user->hiker]);
+    }
+
+    public function updateProfile(ProfileRequest $request, UpdateProfile $action): RedirectResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+        $action->handle($user, $request->toData());
+
+        return redirect()->route('account')->with('success', 'Your profile is saved.');
     }
 
     public function confirmDelete(): View

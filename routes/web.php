@@ -119,6 +119,8 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('account', [AccountController::class, 'show'])->name('account');
     Route::post('account/bookings/{registration}/cancel', [AccountController::class, 'cancelBooking'])->name('account.bookings.cancel');
     Route::post('account/leaderboard', [AccountController::class, 'leaderboardVisibility'])->name('account.leaderboard');
+    Route::get('account/profile', [AccountController::class, 'editProfile'])->name('account.profile');
+    Route::post('account/profile', [AccountController::class, 'updateProfile'])->middleware('throttle:10,1')->name('account.profile.update');
     Route::get('account/delete', [AccountController::class, 'confirmDelete'])->name('account.delete');
     Route::post('account/delete', [AccountController::class, 'destroy'])->middleware('throttle:5,1')->name('account.delete.destroy');
     Route::post('logout', [MemberSessionController::class, 'destroy'])->name('logout');

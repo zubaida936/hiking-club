@@ -20,6 +20,8 @@ use Illuminate\Support\Carbon;
  * @property string $phone normalized: "+" and digits
  * @property string $name
  * @property ?string $email
+ * @property ?string $emergency_contact_name the member's own, to fill in booking forms
+ * @property ?string $emergency_contact_phone
  * @property ?int $user_id
  * @property bool $show_on_leaderboard
  * @property ?Carbon $x_approved_at approved for X Events
