@@ -12,6 +12,10 @@ export const Colors = {
     backgroundElement: '#F0F0F3',
     backgroundSelected: '#E0E1E6',
     textSecondary: '#60646C',
+    // Placeholder brand colours until the branding decision.
+    accent: '#1f6f43',
+    danger: '#c0352b',
+    border: '#D0D2D7',
   },
   dark: {
     text: '#ffffff',
@@ -19,6 +23,9 @@ export const Colors = {
     backgroundElement: '#212225',
     backgroundSelected: '#2E3135',
     textSecondary: '#B0B4BA',
+    accent: '#4fbf7f',
+    danger: '#ff6b5e',
+    border: '#3A3D42',
   },
 } as const;
 

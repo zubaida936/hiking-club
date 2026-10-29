@@ -23,7 +23,7 @@ export function VersionGate({ children }: { children: ReactNode }) {
     staleTime: 60 * 60 * 1000,
   });
 
-  if (data && mustUpdate(APP_VERSION, data.min_version)) {
+  if (data && APP_VERSION !== null && mustUpdate(APP_VERSION, data.min_version)) {
     const storeUrl = Platform.OS === 'ios' ? data.store_url.ios : data.store_url.android;
 
     return (

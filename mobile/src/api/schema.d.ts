@@ -1169,8 +1169,11 @@ export interface components {
                     points_needed: number | null;
                 } | null;
                 rank_progress_percent: number;
-                /** @description Place on the public leaderboard; null when hidden or without points. */
-                leaderboard_position: string;
+                /**
+                 * @description Place on the public leaderboard; null when hidden or without points.
+                 *     (int): the API docs (and the app's types) otherwise guess a string here.
+                 */
+                leaderboard_position: number | null;
                 hikes_completed: number;
                 distance_km: number;
                 show_on_leaderboard: boolean;

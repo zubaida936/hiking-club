@@ -19,6 +19,16 @@ export class ApiError extends Error {
   }
 }
 
+let onUnauthorized: (() => void) | null = null;
+
+/**
+ * Called when the API answers 401 to a request that carried the login token: the token was revoked
+ * (logout elsewhere, new password, account deactivated). The auth context logs the app out.
+ */
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  onUnauthorized = handler;
+}
+
 type Options = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: unknown;
@@ -53,6 +63,9 @@ export async function apiFetch<T>(path: string, { method = 'GET', body, query }:
   const json: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     const data = (json ?? {}) as { message?: string; errors?: Record<string, string[]> };
+    if (response.status === 401 && token) {
+      onUnauthorized?.();
+    }
     throw new ApiError(data.message ?? strings.errors.generic, response.status, data.errors ?? {});
   }
 

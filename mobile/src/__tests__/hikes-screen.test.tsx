@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react-native';
 
 import { apiFetch } from '@/api/client';
 import type { Event } from '@/api/types';
-import HikesScreen from '@/app/index';
+import HikesScreen from '@/app/(tabs)/index';
 
 jest.mock('@/api/client', () => ({ ...jest.requireActual('@/api/client'), apiFetch: jest.fn() }));
 

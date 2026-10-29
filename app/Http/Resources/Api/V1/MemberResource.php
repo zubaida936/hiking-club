@@ -40,6 +40,7 @@ class MemberResource extends JsonResource
         /** @var ?Hiker $hiker */
         $hiker = $this->hiker;
         $next = $hiker?->tier()->next();
+        $position = $hiker === null ? null : app(Leaderboard::class)->publicPositionOf($hiker);
 
         return [
             'id' => $this->id,
@@ -56,7 +57,8 @@ class MemberResource extends JsonResource
                 ],
                 'rank_progress_percent' => $hiker->tierProgressPercent(),
                 // Place on the public leaderboard; null when hidden or without points.
-                'leaderboard_position' => app(Leaderboard::class)->publicPositionOf($hiker),
+                // (int): the API docs (and the app's types) otherwise guess a string here.
+                'leaderboard_position' => $position === null ? null : (int) $position,
                 'hikes_completed' => (int) $hiker->getAttribute('hikes_completed'),
                 'distance_km' => round($hiker->totalDistanceKm(), 1),
                 'show_on_leaderboard' => $hiker->show_on_leaderboard,
