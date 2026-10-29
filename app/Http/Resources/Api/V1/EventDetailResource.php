@@ -29,7 +29,9 @@ class EventDetailResource extends EventResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request) + [
+        // Spread, not `+`: the API docs (and the app's types) only follow the spread.
+        return [
+            ...parent::toArray($request),
             // Plain text; a blank line separates paragraphs.
             'description' => $this->description,
             'included' => $this->included ?? [],
@@ -47,8 +49,8 @@ class EventDetailResource extends EventResource
             'gpx_url' => $this->gpxUrl(),
             // [[lat, lng], ...] for drawing the route; empty when no GPX was uploaded.
             'route_points' => $this->route_points ?? [],
-            // Photos of a past hike: GET /gallery/{album_slug} (coming with the content endpoints).
-            'album_slug' => $this->albumSlug,
+            // Photos of a past hike: GET /gallery/{album_slug}. (Written out so the docs type it string|null.)
+            'album_slug' => $this->albumSlug !== null ? (string) $this->albumSlug : null,
         ];
     }
 }

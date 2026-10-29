@@ -1098,7 +1098,75 @@ export interface components {
             website?: string;
         };
         /** EventDetailResource */
-        EventDetailResource: unknown[];
+        EventDetailResource: {
+            id: number;
+            slug: string;
+            title: string;
+            location: string;
+            season_tag: string | null;
+            starts_on: string;
+            summary: string | null;
+            distance_km: number;
+            elevation_gain_m: number;
+            elevation_loss_m: number;
+            duration_hours: number | null;
+            effort_score: number;
+            difficulty: {
+                /** @enum {integer} */
+                level: 1 | 2 | 3 | 4;
+                /** @enum {string} */
+                name: "Foundation" | "Endurance" | "Advanced" | "Xtreme";
+                label: string;
+                /** @enum {string} */
+                description: "Easy. Low vertical load; builds base endurance and uphill rhythm." | "Moderate. Longer distance or steady climbs; needs regular hiking fitness." | "Challenging. Long day with significant elevation; for experienced hikers." | "Very demanding. Long routes with sustained effort; approval required.";
+            };
+            fee: {
+                cents: number;
+                formatted: string;
+            };
+            is_xtreme: boolean;
+            /** @enum {string} */
+            status: "draft" | "published" | "cancelled";
+            cancellation_reason: string | null;
+            seats: {
+                capacity: number;
+                left: number;
+                sold_out: boolean;
+            };
+            registration: {
+                open: boolean;
+                closes_at: string;
+                waitlist_open: boolean;
+                requires_level_acknowledgement: boolean;
+            };
+            cover_image_url: string | null;
+            web_url: string;
+            /** @description Plain text; a blank line separates paragraphs. */
+            description: string | null;
+            included: string[];
+            what_to_bring: string[];
+            itinerary: {
+                time: string | null;
+                text: string;
+            }[];
+            meeting_points: {
+                name: string;
+                pickup_time: string;
+            }[];
+            updates: {
+                message: string;
+                posted_at: string;
+            }[];
+            photo_credit: string | null;
+            gpx_url: string | null;
+            /** @description [[lat, lng], ...] for drawing the route; empty when no GPX was uploaded. */
+            route_points: [
+                number,
+                number
+            ][];
+            /** @description Photos of a past hike: GET /gallery/{album_slug}. (Written out so the docs type it string|null.) */
+            album_slug: string | null;
+        };
         /** EventResource */
         EventResource: {
             id: number;

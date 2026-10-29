@@ -1,18 +1,19 @@
 import { Image } from 'expo-image';
-import { StyleSheet, View } from 'react-native';
+import { Link } from 'expo-router';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import type { Event } from '@/api/types';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
+import { formatDay } from '@/format';
 import { strings } from '@/strings';
 
 /**
- * A hike in the list. Seats, fee and level come from the API as they are: the app never works them out.
+ * A hike in the list; opens its detail screen. Seats, fee and level come from the API as they are:
+ * the app never works them out.
  */
 export function EventCard({ event }: { event: Event }) {
-  const date = new Date(`${event.starts_on}T12:00:00`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-
   const seats =
     event.status === 'cancelled'
       ? strings.hikes.cancelled
@@ -23,19 +24,23 @@ export function EventCard({ event }: { event: Event }) {
         : strings.hikes.seatsLeft(event.seats.left);
 
   return (
-    <ThemedView type="backgroundElement" style={styles.card}>
-      {event.cover_image_url ? <Image source={event.cover_image_url} style={styles.cover} contentFit="cover" /> : null}
-      <View style={styles.body}>
-        <ThemedText type="small" themeColor="textSecondary">
-          {date} · {event.location}
-        </ThemedText>
-        <ThemedText type="subtitle">{event.title}</ThemedText>
-        <ThemedText type="small">
-          {event.difficulty.label} · {event.fee.formatted}
-        </ThemedText>
-        <ThemedText type="smallBold">{seats}</ThemedText>
-      </View>
-    </ThemedView>
+    <Link href={`/events/${event.slug}`} asChild>
+      <Pressable accessibilityRole="link" accessibilityLabel={`${event.title}, ${formatDay(event.starts_on)}`}>
+        <ThemedView type="backgroundElement" style={styles.card}>
+          {event.cover_image_url ? <Image source={event.cover_image_url} style={styles.cover} contentFit="cover" /> : null}
+          <View style={styles.body}>
+            <ThemedText type="small" themeColor="textSecondary">
+              {formatDay(event.starts_on)} · {event.location}
+            </ThemedText>
+            <ThemedText type="subtitle">{event.title}</ThemedText>
+            <ThemedText type="small">
+              {event.difficulty.label} · {event.fee.formatted}
+            </ThemedText>
+            <ThemedText type="smallBold">{seats}</ThemedText>
+          </View>
+        </ThemedView>
+      </Pressable>
+    </Link>
   );
 }
 

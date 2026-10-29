@@ -1,7 +1,7 @@
 import { fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
 
-import type { Member } from '@/api/types';
 import { clearToken, getToken, saveToken } from '@/auth/token';
+import { appConfigRoute, fakeApi, sampleMember } from '@/test-utils/fake-api';
 
 // The token lives in memory instead of the phone's secure storage.
 jest.mock('@/auth/token', () => {
@@ -19,44 +19,8 @@ jest.mock('@/auth/token', () => {
 
 jest.mock('expo-device', () => ({ modelName: 'Pixel 8' }));
 
-const rima: Member = {
-  id: 7,
-  name: 'Rima Haddad',
-  phone: '+96170123456',
-  email: 'rima@example.com',
-  hiker: {
-    points: 140,
-    rank: { key: 'trekker', label: 'Trekker' },
-    next_rank: { key: 'mountaineer', label: 'Mountaineer', points_needed: 60 },
-    rank_progress_percent: 50,
-    leaderboard_position: 3,
-    hikes_completed: 4,
-    distance_km: 52.5,
-    show_on_leaderboard: true,
-    x_events_approved: false,
-  },
-};
-
-type Route = { status: number; body?: unknown };
-
-/** A fake API: "METHOD /path" => answer. Every request is recorded in `calls`. */
-function fakeApi(routes: Record<string, Route>) {
-  const calls: { method: string; path: string; body: unknown; auth: string | undefined }[] = [];
-
-  global.fetch = jest.fn(async (url: string | URL | Request, init?: RequestInit) => {
-    const method = init?.method ?? 'GET';
-    const path = new URL(String(url)).pathname.replace(/^.*\/api\/v1/, '');
-    const headers = (init?.headers ?? {}) as Record<string, string>;
-    calls.push({ method, path, body: init?.body ? JSON.parse(String(init.body)) : undefined, auth: headers.Authorization });
-
-    const route = routes[`${method} ${path}`] ?? { status: 404, body: { message: 'Not found' } };
-    return new Response(route.body === undefined ? null : JSON.stringify(route.body), { status: route.status });
-  }) as typeof fetch;
-
-  return calls;
-}
-
-const appConfig = { 'GET /app-config': { status: 200, body: { data: { min_version: '1.0.0', latest_version: '1.0.0', store_url: { android: null, ios: null } } } } };
+const rima = sampleMember;
+const appConfig = appConfigRoute;
 
 async function openAccount() {
   await renderRouter('./src/app', { initialUrl: '/account' });

@@ -1,70 +1,93 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, renderRouter, screen } from 'expo-router/testing-library';
+import { Linking, Share } from 'react-native';
 
-import { apiFetch } from '@/api/client';
-import type { Event } from '@/api/types';
-import HikesScreen from '@/app/(tabs)/index';
+import { appConfigRoute, fakeApi, sampleEvent, sampleEventDetail } from '@/test-utils/fake-api';
 
-jest.mock('@/api/client', () => ({ ...jest.requireActual('@/api/client'), apiFetch: jest.fn() }));
+jest.mock('@/auth/token', () => ({ getToken: jest.fn(async () => null), saveToken: jest.fn(), clearToken: jest.fn() }));
 
-function hike(overrides: Partial<Event> = {}): Event {
-  return {
-    id: 1,
-    slug: 'horch-ehden',
-    title: 'Horch Ehden Nature Reserve',
-    location: 'Ehden',
-    season_tag: null,
-    starts_on: '2026-11-02',
-    summary: null,
-    distance_km: 8,
-    elevation_gain_m: 220,
-    elevation_loss_m: 320,
-    duration_hours: 2.7,
-    effort_score: 90,
-    difficulty: { level: 1, name: 'Foundation', label: 'Level 1 · Foundation', description: 'Easy.' },
-    fee: { cents: 3000, formatted: '$30' },
-    is_xtreme: false,
-    status: 'published',
-    cancellation_reason: null,
-    seats: { capacity: 30, left: 4, sold_out: false },
-    registration: { open: true, closes_at: '2026-11-01T22:00:00+00:00', waitlist_open: false, requires_level_acknowledgement: false },
-    cover_image_url: null,
-    web_url: 'http://localhost:8080/events/horch-ehden',
-    ...overrides,
-  } as Event;
-}
+const list = (events: ReturnType<typeof sampleEvent>[]) => ({ status: 200, body: { data: events, links: {}, meta: {} } });
 
-function renderScreen() {
-  // gcTime Infinity: no cache clean-up timers left running after the test.
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: Infinity } } });
+describe('hikes list', () => {
+  it('lists the upcoming hikes from the API', async () => {
+    fakeApi({
+      ...appConfigRoute,
+      'GET /events': list([sampleEvent(), sampleEvent({ id: 2, slug: 'chouf', title: 'Chouf Cedars Ridge', seats: { capacity: 20, left: 0, sold_out: true } })]),
+    });
+    await renderRouter('./src/app', { initialUrl: '/' });
 
-  return render(
-    <QueryClientProvider client={client}>
-      <HikesScreen />
-    </QueryClientProvider>,
-  );
-}
-
-it('lists the upcoming hikes from the API', async () => {
-  jest.mocked(apiFetch).mockResolvedValue({
-    data: [hike(), hike({ id: 2, title: 'Chouf Cedars Ridge', seats: { capacity: 20, left: 0, sold_out: true } })],
+    expect(await screen.findByText('Horch Ehden Nature Reserve')).toBeOnTheScreen();
+    expect(screen.getByText('4 seats left')).toBeOnTheScreen();
+    expect(screen.getAllByText('Level 1 · Foundation · $30')).toHaveLength(2);
+    expect(screen.getByText('Fully booked')).toBeOnTheScreen();
   });
 
-  await renderScreen();
+  it('shows the error message with a retry button', async () => {
+    global.fetch = jest.fn(async () => {
+      throw new TypeError('Network request failed');
+    }) as typeof fetch;
+    await renderRouter('./src/app', { initialUrl: '/' });
 
-  expect(await screen.findByText('Horch Ehden Nature Reserve')).toBeOnTheScreen();
-  expect(screen.getByText('4 seats left')).toBeOnTheScreen();
-  expect(screen.getAllByText('Level 1 · Foundation · $30')).toHaveLength(2);
-  expect(screen.getByText('Fully booked')).toBeOnTheScreen();
-  expect(apiFetch).toHaveBeenCalledWith('/events');
+    // The app retries network trouble twice before showing the error.
+    expect(await screen.findByText("Can't reach the server. Check your internet connection and try again.", {}, { timeout: 10000 })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeOnTheScreen();
+  });
 });
 
-it('shows the error message with a retry button', async () => {
-  const { ApiError } = jest.requireActual('@/api/client');
-  jest.mocked(apiFetch).mockRejectedValue(new ApiError("Can't reach the server.", 0));
+describe('hike detail', () => {
+  it('opens from the list and shows everything about the hike', async () => {
+    fakeApi({
+      ...appConfigRoute,
+      'GET /events': list([sampleEvent()]),
+      'GET /events/horch-ehden': { status: 200, body: { data: sampleEventDetail({ updates: [{ message: 'Bring a rain jacket.', posted_at: '2026-10-30T09:00:00+00:00' }] }) } },
+    });
+    await renderRouter('./src/app', { initialUrl: '/' });
 
-  await renderScreen();
+    await fireEvent.press(await screen.findByRole('link', { name: /Horch Ehden Nature Reserve/ }));
 
-  expect(await screen.findByText("Can't reach the server.")).toBeOnTheScreen();
-  expect(screen.getByRole('button', { name: 'Try again' })).toBeOnTheScreen();
+    expect(screen).toHavePathname('/events/horch-ehden');
+    expect(await screen.findByText('Monday, 2 November 2026 · Ehden')).toBeOnTheScreen();
+    expect(screen.getByText('Level 1 · Foundation')).toBeOnTheScreen();
+    expect(screen.getByText('Effort score 90')).toBeOnTheScreen();
+    expect(screen.getByText('8 km')).toBeOnTheScreen();
+    expect(screen.getByText('+220 / -320 m')).toBeOnTheScreen();
+    expect(screen.getByText('4 seats left')).toBeOnTheScreen();
+    expect(screen.getByText('Bring a rain jacket.')).toBeOnTheScreen();
+    expect(screen.getByText('Second paragraph.')).toBeOnTheScreen();
+    expect(screen.getByText('Departure from Beirut')).toBeOnTheScreen();
+    expect(screen.getByText('• Transportation')).toBeOnTheScreen();
+    expect(screen.getByText('• 2L water')).toBeOnTheScreen();
+  });
+
+  it('opens a pickup point in Google Maps and shares the website link', async () => {
+    const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+    const share = jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction', activityType: undefined });
+    fakeApi({ ...appConfigRoute, 'GET /events/horch-ehden': { status: 200, body: { data: sampleEventDetail() } } });
+    await renderRouter('./src/app', { initialUrl: '/events/horch-ehden' });
+
+    await fireEvent.press(await screen.findByText('Beirut - Jnah'));
+    expect(openURL).toHaveBeenCalledWith('https://www.google.com/maps/search/?api=1&query=Beirut%20-%20Jnah%2C%20Lebanon');
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Share' }));
+    expect(share).toHaveBeenCalledWith({ message: 'Horch Ehden Nature Reserve, Monday, 2 November 2026\nhttp://localhost:8080/events/horch-ehden' });
+  });
+
+  it('explains a cancelled hike', async () => {
+    fakeApi({
+      ...appConfigRoute,
+      'GET /events/horch-ehden': { status: 200, body: { data: sampleEventDetail({ status: 'cancelled', cancellation_reason: 'Bad weather forecast', registration: { open: false, closes_at: '2026-11-01T22:00:00+00:00', waitlist_open: false, requires_level_acknowledgement: false } }) } },
+    });
+    await renderRouter('./src/app', { initialUrl: '/events/horch-ehden' });
+
+    expect(await screen.findByText('This hike is cancelled')).toBeOnTheScreen();
+    expect(screen.getByText('Bad weather forecast')).toBeOnTheScreen();
+    expect(screen.queryByText('4 seats left')).not.toBeOnTheScreen();
+  });
+
+  it('says when a hike does not exist', async () => {
+    fakeApi({ ...appConfigRoute });
+    await renderRouter('./src/app', { initialUrl: '/events/no-such-hike' });
+
+    expect(await screen.findByText("This hike doesn't exist or isn't public any more.")).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeOnTheScreen();
+  });
 });

@@ -11,6 +11,7 @@ export type ResponseOf<K extends keyof operations> = operations[K] extends {
 
 export type Event = components['schemas']['EventResource'];
 export type EventList = ResponseOf<'v1.events.index'>;
+export type EventDetail = components['schemas']['EventDetailResource'];
 export type AppConfig = ResponseOf<'v1.app-config'>['data'];
 export type Member = components['schemas']['MemberResource'];
 /** Login, activation and password reset all answer with a new token and the member. */

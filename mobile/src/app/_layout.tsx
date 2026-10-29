@@ -36,6 +36,7 @@ export default function RootLayout() {
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="activate" options={{ title: strings.activate.title }} />
               <Stack.Screen name="forgot-password" options={{ title: strings.forgot.title }} />
+              <Stack.Screen name="events/[slug]" options={{ title: '' }} />
             </Stack>
           </VersionGate>
         </ThemeProvider>
