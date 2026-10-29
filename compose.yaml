@@ -70,7 +70,12 @@ services:
       API_DOCS_URL: http://nginx/docs/api.json
       CI: ${EXPO_CI:-false}
     # Port 8082: 8081 (Expo's default) is phpMyAdmin.
-    command: sh -c "npm install --no-audit --no-fund && npx expo start --lan --port 8082"
+    # No QR code in `docker compose logs` (Expo prints it only in an interactive terminal): type the printed
+    # address in Expo Go → "Enter URL manually". The "React Native DevTools" download warning is harmless.
+    command:
+      - sh
+      - -c
+      - "npm install --no-audit --no-fund && echo 'Open in Expo Go -> Enter URL manually: exp://${EXPO_HOST_IP:-127.0.0.1}:8082' && npx expo start --lan --port 8082"
     ports:
       - "8082:8082"
     depends_on:
