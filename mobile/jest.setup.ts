@@ -9,3 +9,6 @@ jest.mock('react-native-qrcode-svg', () => {
   const { createElement } = require('react');
   return { __esModule: true, default: ({ value }: { value: string }) => createElement(Text, { testID: 'qr-code' }, value) };
 });
+
+// The root layout wraps the app in GestureHandlerRootView (photo viewer zoom): use the library's test stand-in.
+require('react-native-gesture-handler/jestSetup');

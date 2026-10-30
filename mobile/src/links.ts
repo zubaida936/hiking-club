@@ -26,6 +26,9 @@ export function appRouteFor(url: string): Href | null {
   if (path === '/leaderboard') return '/leaderboard';
   if (path === '/equipment') return '/equipment';
   if (path === '/contact') return '/contact';
+  if (path === '/gallery') return '/gallery';
+  const album = path.match(/^\/gallery\/([a-z0-9-]+)$/);
+  if (album) return `/gallery/${album[1]}`;
   if (path === '/guides') return '/guides';
   const guide = path.match(/^\/guides\/([a-z0-9-]+)$/);
   if (guide) return `/guides/${guide[1]}`;

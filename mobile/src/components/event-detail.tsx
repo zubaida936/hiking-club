@@ -138,6 +138,11 @@ export function EventDetailView({ event }: { event: EventDetail }) {
         </Section>
       ) : null}
 
+      {event.album_slug ? (
+        <Link href={`/gallery/${event.album_slug}`}>
+          <ThemedText type="linkPrimary">{strings.hike.album}</ThemedText>
+        </Link>
+      ) : null}
       {event.photo_credit ? <ThemedText type="small" themeColor="textSecondary">{strings.hike.photoCredit(event.photo_credit)}</ThemedText> : null}
     </>
   );

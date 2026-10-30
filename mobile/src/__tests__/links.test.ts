@@ -17,10 +17,12 @@ it('opens website links on the matching app screen', () => {
   expect(appRouteFor('https://hikingclub.lb/guides')).toBe('/guides');
   expect(appRouteFor('https://hikingclub.lb/equipment')).toBe('/equipment');
   expect(appRouteFor('https://hikingclub.lb/contact')).toBe('/contact');
+  expect(appRouteFor('https://hikingclub.lb/gallery')).toBe('/gallery');
+  expect(appRouteFor('https://hikingclub.lb/gallery/horsh-ehden')).toBe('/gallery/horsh-ehden');
   expect(appRouteFor('http://localhost:8080/guides/how-much-water-to-carry-on-a-day-hike')).toBe('/guides/how-much-water-to-carry-on-a-day-hike');
 });
 
 it('leaves links without an app screen to the browser', () => {
   expect(appRouteFor('https://hikingclub.lb/events/archive')).toBeNull();
-  expect(appRouteFor('https://hikingclub.lb/gallery')).toBeNull();
+  expect(appRouteFor('https://hikingclub.lb/about')).toBeNull();
 });

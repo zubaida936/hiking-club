@@ -74,6 +74,9 @@ export default function AccountScreen() {
               <Link href="/equipment">
                 <ThemedText type="linkPrimary">{strings.equipment.title}</ThemedText>
               </Link>
+              <Link href="/gallery">
+                <ThemedText type="linkPrimary">{strings.gallery.link}</ThemedText>
+              </Link>
               <Link href="/contact">
                 <ThemedText type="linkPrimary">{strings.contact.link}</ThemedText>
               </Link>
@@ -96,6 +99,9 @@ export default function AccountScreen() {
           </Link>
           <Link href="/equipment">
             <ThemedText type="linkPrimary">{strings.equipment.title}</ThemedText>
+          </Link>
+          <Link href="/gallery">
+            <ThemedText type="linkPrimary">{strings.gallery.link}</ThemedText>
           </Link>
           <Link href="/contact">
             <ThemedText type="linkPrimary">{strings.contact.link}</ThemedText>

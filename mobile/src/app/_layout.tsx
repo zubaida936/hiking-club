@@ -1,7 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { useState } from 'react';
-import { useColorScheme } from 'react-native';
+import { StyleSheet, useColorScheme } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ApiError } from '@/api/client';
 import { AuthProvider } from '@/auth/auth-context';
@@ -30,6 +31,8 @@ export default function RootLayout() {
   const [queryClient] = useState(createQueryClient);
 
   return (
+    // Gesture handler root: the photo viewer's pinch-zoom needs it.
+    <GestureHandlerRootView style={styles.root}>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CheckInProvider>
@@ -65,6 +68,9 @@ export default function RootLayout() {
                 <Stack.Screen name="guides/[slug]" options={{ title: '' }} />
                 <Stack.Screen name="equipment" options={{ title: strings.equipment.title }} />
                 <Stack.Screen name="contact" options={{ title: strings.contact.title }} />
+                <Stack.Screen name="gallery/index" options={{ title: strings.gallery.title }} />
+                <Stack.Screen name="gallery/[slug]" options={{ title: '' }} />
+                <Stack.Screen name="photo-viewer" options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'fade' }} />
               </Stack>
             </VersionGate>
           </ThemeProvider>
@@ -72,5 +78,10 @@ export default function RootLayout() {
         </CheckInProvider>
       </AuthProvider>
     </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1 },
+});
