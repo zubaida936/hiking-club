@@ -2480,7 +2480,17 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
-                            levels: unknown[];
+                            levels: {
+                                /** @enum {integer} */
+                                level: 1 | 2 | 3 | 4;
+                                /** @enum {string} */
+                                name: "Foundation" | "Endurance" | "Advanced" | "Xtreme";
+                                label: string;
+                                /** @enum {string} */
+                                description: "Easy. Low vertical load; builds base endurance and uphill rhythm." | "Moderate. Longer distance or steady climbs; needs regular hiking fitness." | "Challenging. Long day with significant elevation; for experienced hikers." | "Very demanding. Long routes with sustained effort; approval required.";
+                                max_score: number | null;
+                                points: number;
+                            }[];
                             formula: {
                                 multiplier: number;
                                 gain_per_km: number;
@@ -2523,7 +2533,7 @@ export interface operations {
                                 description: "Easy. Low vertical load; builds base endurance and uphill rhythm." | "Moderate. Longer distance or steady climbs; needs regular hiking fitness." | "Challenging. Long day with significant elevation; for experienced hikers." | "Very demanding. Long routes with sustained effort; approval required.";
                             };
                             points: number;
-                            upcoming_hikes: unknown[];
+                            upcoming_hikes: components["schemas"]["EventResource"][];
                         };
                     };
                 };

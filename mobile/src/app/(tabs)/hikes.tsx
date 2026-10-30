@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { Link } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -68,6 +69,9 @@ export default function HikesScreen() {
   const header = (
     <View style={styles.header}>
       <ThemedText type="title">{strings.hikes.title}</ThemedText>
+      <Link href="/difficulty-calculator">
+        <ThemedText type="linkPrimary">{strings.difficulty.link}</ThemedText>
+      </Link>
       <TextInput
         accessibilityLabel={strings.hikes.search}
         placeholder={strings.hikes.searchPlaceholder}

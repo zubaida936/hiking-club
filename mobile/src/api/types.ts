@@ -35,3 +35,5 @@ export type XApplicationForm = ResponseOf<'v1.x-events.application-form'>['data'
 export type XApplicationResult = ResponseOf<'v1.x-events.apply'>['data'];
 export type OrganizerHike = ResponseOf<'v1.organizer.events'>['data'][number];
 export type CheckIn = components['schemas']['CheckInResource'];
+export type DifficultyLevels = ResponseOf<'v1.difficulty.levels'>['data'];
+export type DifficultyResult = ResponseOf<'v1.difficulty.calculate'>['data'];

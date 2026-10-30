@@ -49,6 +49,9 @@ export function EventDetailView({ event }: { event: EventDetail }) {
         <ThemedText type="subtitle">{event.difficulty.label}</ThemedText>
         <ThemedText type="small">{event.difficulty.description}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">{strings.hike.effort(event.effort_score)}</ThemedText>
+        <Link href="/difficulty-calculator">
+          <ThemedText type="linkPrimary">{strings.difficulty.howRated}</ThemedText>
+        </Link>
         {event.is_xtreme ? (
           <Link href="/x-events">
             <ThemedText type="linkPrimary">{strings.hike.xtreme}</ThemedText>

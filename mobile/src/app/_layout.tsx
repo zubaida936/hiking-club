@@ -57,6 +57,7 @@ export default function RootLayout() {
                 <Stack.Screen name="x-events/apply" options={{ title: strings.xApply.title }} />
                 <Stack.Screen name="check-in/[slug]" options={{ title: '' }} />
                 <Stack.Screen name="check-in/scan" options={{ title: strings.organizer.scanTitle }} />
+                <Stack.Screen name="difficulty-calculator" options={{ title: strings.difficulty.title }} />
               </Stack>
             </VersionGate>
           </ThemeProvider>

@@ -21,6 +21,7 @@ export function appRouteFor(url: string): Href | null {
   if (path === '/cart') return '/cart';
   if (path === '/x-events') return '/x-events';
   if (path === '/x-events/apply') return '/x-events/apply';
+  if (path === '/difficulty-calculator') return '/difficulty-calculator';
   const order = path.match(/^\/orders\/([A-Za-z0-9]+)$/);
   if (order) return `/orders/${order[1]}`;
   if (path === '/') return '/';

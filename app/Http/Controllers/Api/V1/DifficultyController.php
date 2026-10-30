@@ -7,6 +7,7 @@ use App\Domain\Events\Enums\DifficultyLevel;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\EventResource;
 use App\Models\Event;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
@@ -22,29 +23,25 @@ class DifficultyController extends Controller
      * (score = multiplier × (km + gain / gain_per_km + loss / loss_per_km)), for the explanation screen.
      *
      * @unauthenticated
-     *
-     * @return array{data: array<string, mixed>}
      */
-    public function levels(DifficultyCalculator $calculator): array
+    public function levels(DifficultyCalculator $calculator): JsonResponse
     {
         $formula = $calculator->toArray();
 
-        return ['data' => [
-            'levels' => array_map(fn (array $level) => [
-                'level' => $level['value'],
-                'name' => DifficultyLevel::from($level['value'])->name,
-                'label' => $level['label'],
-                'description' => DifficultyLevel::from($level['value'])->description(),
-                // Highest effort score of the level; null for the last one.
-                'max_score' => $level['max'],
-                'points' => (int) config("points.hike.{$level['value']}"),
-            ], $formula['levels']),
+        // A loop with casts (not array_map) so the API docs type every field.
+        $levels = [];
+        foreach ($formula['levels'] as $bounds) {
+            $levels[] = $this->level(DifficultyLevel::from($bounds['value']), $bounds['max']);
+        }
+
+        return response()->json(['data' => [
+            'levels' => $levels,
             'formula' => [
-                'multiplier' => $formula['multiplier'],
-                'gain_per_km' => $formula['gainPerKm'],
-                'loss_per_km' => $formula['lossPerKm'],
+                'multiplier' => (float) $formula['multiplier'],
+                'gain_per_km' => (float) $formula['gainPerKm'],
+                'loss_per_km' => (float) $formula['lossPerKm'],
             ],
-        ]];
+        ]]);
     }
 
     /**
@@ -54,10 +51,8 @@ class DifficultyController extends Controller
      * 3 upcoming hikes of that level.
      *
      * @unauthenticated
-     *
-     * @return array{data: array<string, mixed>}
      */
-    public function calculate(Request $request, DifficultyCalculator $calculator): array
+    public function calculate(Request $request, DifficultyCalculator $calculator): JsonResponse
     {
         $validated = $request->validate([
             'km' => ['required', 'numeric', 'min:0.1', 'max:200'],
@@ -74,7 +69,7 @@ class DifficultyController extends Controller
             ->limit(3)
             ->get();
 
-        return ['data' => [
+        return response()->json(['data' => [
             'effort_score' => $result->effortScore,
             'difficulty' => [
                 'level' => $result->level->value,
@@ -83,7 +78,25 @@ class DifficultyController extends Controller
                 'description' => $result->level->description(),
             ],
             'points' => (int) config("points.hike.{$result->level->value}"),
-            'upcoming_hikes' => EventResource::collection($upcoming)->resolve($request),
-        ]];
+            'upcoming_hikes' => EventResource::collection($upcoming),
+        ]]);
+    }
+
+    /**
+     * One level for the explanation screen; `max_score` is the highest effort score of the level, null for the last one.
+     *
+     * @return array{level: int, name: string, label: string, description: string, max_score: int|null, points: int}
+     */
+    private function level(DifficultyLevel $level, ?int $maxScore): array
+    {
+        return [
+            'level' => $level->value,
+            'name' => $level->name,
+            'label' => $level->label(),
+            'description' => $level->description(),
+            // The cast looks redundant, but without it the API docs type the field as a string.
+            'max_score' => $maxScore === null ? null : (int) $maxScore,
+            'points' => (int) config("points.hike.{$level->value}"),
+        ];
     }
 }
