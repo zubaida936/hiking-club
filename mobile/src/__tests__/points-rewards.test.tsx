@@ -28,6 +28,7 @@ const reward = (overrides: Partial<RewardState>): RewardState => ({
   locked_reason: null,
   uses_left: 1,
   used: [],
+  perk_code: null,
   ...overrides,
 });
 

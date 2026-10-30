@@ -55,7 +55,8 @@ export interface paths {
         /**
          * My rewards
          * @description Every reward of the rank system: unlocked or not (and why), uses left, and where I used it.
-         *     Discounts are chosen on the booking form; perks are handed over by the organizers.
+         *     Discounts are chosen on the booking form; perks are handed over by the organizers, who scan `perk_code`
+         *     (shown as a QR code).
          */
         get: operations["v1.me.rewards"];
         put?: never;
@@ -800,6 +801,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/organizer/perks/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Check a perk code
+         * @description The member's name and phone, the perk, and whether it can be handed over now (otherwise `unavailable_reason`
+         *     says why: not unlocked yet, or already handed over). A code that isn't a genuine perk code gives a 422.
+         */
+        get: operations["v1.organizer.perks.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizer/perks/{code}/hand-over": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Hand over a perk
+         * @description Records it in the Rewards used log (same action as the CMS), with an optional note. A perk that was already
+         *     handed over, or isn't unlocked, gives a 422 with the reason; two organizers scanning at once can't both
+         *     hand it over.
+         */
+        post: operations["v1.organizer.perks.hand-over"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/password/forgot": {
         parameters: {
             query?: never;
@@ -1399,6 +1443,7 @@ export interface components {
              */
             organizer: {
                 can_mark_attendance: boolean;
+                can_hand_over_perks: boolean;
             } | null;
         };
         /** OrderResource */
@@ -1836,6 +1881,8 @@ export interface operations {
                                 note: string | null;
                                 used_at: string;
                             }[];
+                            /** @description The QR code to show an organizer, for a perk that can be handed over now; null otherwise. */
+                            perk_code: string | null;
                         }[];
                     };
                 };
@@ -3075,6 +3122,91 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
             404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "v1.organizer.perks.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            member: {
+                                name: string;
+                                phone: string;
+                            };
+                            reward: {
+                                key: string;
+                                label: string;
+                                rank: string;
+                            };
+                            available: boolean;
+                            unavailable_reason: string | null;
+                            /** @description When it was last handed over (newest first), null if never. */
+                            handed_over_at: string | null;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "v1.organizer.perks.hand-over": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    note?: string | null;
+                };
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            member: {
+                                name: string;
+                                phone: string;
+                            };
+                            reward: {
+                                key: string;
+                                label: string;
+                                rank: string;
+                            };
+                            available: boolean;
+                            unavailable_reason: string | null;
+                            /** @description When it was last handed over (newest first), null if never. */
+                            handed_over_at: string | null;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
             422: components["responses"]["ValidationException"];
         };
     };

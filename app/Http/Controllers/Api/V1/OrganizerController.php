@@ -5,11 +5,18 @@ namespace App\Http\Controllers\Api\V1;
 use App\Domain\Registrations\Actions\MarkAttendance;
 use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
+use App\Domain\Rewards\Actions\RecordPerkUse;
+use App\Domain\Rewards\Exceptions\RewardException;
+use App\Domain\Rewards\HikerRewards;
+use App\Domain\Rewards\PerkCode;
+use App\Domain\Rewards\Reward;
+use App\Domain\Rewards\RewardCatalog;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\CheckInResource;
 use App\Http\Resources\Api\V1\EventResource;
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Models\Hiker;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -101,5 +108,84 @@ class OrganizerController extends Controller
         $action->handle($registration, $value === null ? null : Attendance::from($value), $actor);
 
         return new CheckInResource($registration->refresh());
+    }
+
+    /**
+     * Check a perk code.
+     *
+     * The member's name and phone, the perk, and whether it can be handed over now (otherwise `unavailable_reason`
+     * says why: not unlocked yet, or already handed over). A code that isn't a genuine perk code gives a 422.
+     */
+    public function perk(string $code, PerkCode $codes, RewardCatalog $catalog, HikerRewards $rewards): JsonResponse
+    {
+        Gate::authorize('handOverPerk', Hiker::class);
+
+        [$hiker, $reward] = $this->resolvePerk($code, $codes, $catalog);
+
+        return response()->json(['data' => $this->perkState($hiker, $reward, $rewards)]);
+    }
+
+    /**
+     * Hand over a perk.
+     *
+     * Records it in the Rewards used log (same action as the CMS), with an optional note. A perk that was already
+     * handed over, or isn't unlocked, gives a 422 with the reason; two organizers scanning at once can't both
+     * hand it over.
+     */
+    public function handOverPerk(Request $request, string $code, PerkCode $codes, RewardCatalog $catalog, HikerRewards $rewards, RecordPerkUse $action): JsonResponse
+    {
+        Gate::authorize('handOverPerk', Hiker::class);
+
+        [$hiker, $reward] = $this->resolvePerk($code, $codes, $catalog);
+        $note = $request->validate(['note' => ['nullable', 'string', 'max:200']])['note'] ?? null;
+
+        /** @var User $actor */
+        $actor = $request->user();
+        $action->handle($hiker, $reward->key, $note, $actor);
+
+        return response()->json(['data' => $this->perkState($hiker, $reward, $rewards)], 201);
+    }
+
+    /**
+     * @return array{0: Hiker, 1: Reward}
+     *
+     * @throws RewardException
+     */
+    private function resolvePerk(string $code, PerkCode $codes, RewardCatalog $catalog): array
+    {
+        $parsed = $codes->parse($code);
+        $hiker = $parsed === null ? null : Hiker::find($parsed['hiker_id']);
+        $reward = $parsed === null ? null : $catalog->find($parsed['reward']);
+
+        if ($hiker === null || $reward === null || $reward->kind !== Reward::PERK) {
+            throw RewardException::invalidPerkCode();
+        }
+
+        return [$hiker, $reward];
+    }
+
+    /**
+     * @return array{member: array{name: string, phone: string}, reward: array{key: string, label: string, rank: string}, available: bool, unavailable_reason: string|null, handed_over_at: string|null}
+     */
+    private function perkState(Hiker $hiker, Reward $reward, HikerRewards $rewards): array
+    {
+        $state = null;
+        foreach ($rewards->statesFor($hiker) as $candidate) {
+            if ($candidate['reward']->key === $reward->key) {
+                $state = $candidate;
+            }
+        }
+
+        $lastUse = $state === null ? null : $state['redemptions']->first();
+        $available = $state !== null && $state['unlocked'] && $state['uses_left'] > 0;
+
+        return [
+            'member' => ['name' => (string) $hiker->name, 'phone' => (string) $hiker->phone],
+            'reward' => ['key' => $reward->key, 'label' => $reward->label, 'rank' => $reward->tier->label()],
+            'available' => $available,
+            'unavailable_reason' => $available ? null : (string) ($state['locked_reason'] ?? 'Already handed over.'),
+            // When it was last handed over (newest first), null if never.
+            'handed_over_at' => $lastUse === null ? null : $lastUse->created_at->toIso8601String(),
+        ];
     }
 }

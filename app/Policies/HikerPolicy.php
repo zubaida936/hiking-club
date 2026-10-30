@@ -25,4 +25,12 @@ class HikerPolicy
     {
         return $actor->can(Permission::ManageLoyalty->value);
     }
+
+    /**
+     * Hand over a perk (CMS, or scanning the member's QR code in the app). Guides can, without managing points.
+     */
+    public function handOverPerk(User $actor): bool
+    {
+        return $actor->can(Permission::HandOverPerks->value);
+    }
 }

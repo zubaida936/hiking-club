@@ -1,8 +1,9 @@
-import { CameraView, useCameraPermissions, type BarcodeScanningResult } from 'expo-camera';
+import { CameraView, type BarcodeScanningResult } from 'expo-camera';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { CameraGate } from '@/components/camera-gate';
 import { Button } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -21,7 +22,6 @@ const SAME_CODE_PAUSE_MS = 3000;
  */
 export default function ScanScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
-  const [permission, requestPermission] = useCameraPermissions();
   const { lists, mark } = useCheckIn();
   const [result, setResult] = useState<Result | null>(null);
   const last = useRef<{ data: string; at: number } | null>(null);
@@ -35,7 +35,7 @@ export default function ScanScreen() {
     last.current = { data, at: now };
 
     const reference = referenceFromQr(data);
-    if (!reference) return setResult({ ok: false, text: strings.organizer.notBookingQr });
+    if (!reference) return setResult({ ok: false, text: data.startsWith('PERK-') ? strings.organizer.perkOnBookingScan : strings.organizer.notBookingQr });
     const item = lists[slug]?.items.find((entry) => entry.reference === reference);
     if (!item) return setResult({ ok: false, text: strings.organizer.notOnList });
     if (!item.can_check_in) return setResult({ ok: false, text: strings.organizer.notConfirmed(item.name) });
@@ -44,36 +44,21 @@ export default function ScanScreen() {
     setResult({ ok: true, text: strings.organizer.scanned(item.name) });
   };
 
-  if (!permission) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
-  }
-
-  if (!permission.granted) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{permission.canAskAgain ? strings.organizer.cameraNeeded : strings.organizer.cameraBlocked}</ThemedText>
-        {permission.canAskAgain ? <Button title={strings.organizer.allowCamera} onPress={() => void requestPermission()} /> : null}
-      </ThemedView>
-    );
-  }
-
   return (
-    <ThemedView style={styles.container}>
-      <CameraView style={styles.camera} facing="back" barcodeScannerSettings={{ barcodeTypes: ['qr'] }} onBarcodeScanned={onScanned} />
-      <View style={styles.panel}>
-        <ThemedText accessibilityRole="alert" type="smallBold" themeColor={result && !result.ok ? 'danger' : undefined} style={styles.text}>
-          {result?.text ?? strings.organizer.scanHint}
-        </ThemedText>
-        <ThemedText type="small" style={styles.text}>
-          {strings.organizer.counts(checkedIn, confirmed.length)}
-        </ThemedText>
-        <Button title={strings.organizer.done} onPress={() => router.back()} variant="secondary" />
-      </View>
-    </ThemedView>
+    <CameraGate reason={strings.organizer.cameraNeeded}>
+      <ThemedView style={styles.container}>
+        <CameraView style={styles.camera} facing="back" barcodeScannerSettings={{ barcodeTypes: ['qr'] }} onBarcodeScanned={onScanned} />
+        <View style={styles.panel}>
+          <ThemedText accessibilityRole="alert" type="smallBold" themeColor={result && !result.ok ? 'danger' : undefined} style={styles.text}>
+            {result?.text ?? strings.organizer.scanHint}
+          </ThemedText>
+          <ThemedText type="small" style={styles.text}>
+            {strings.organizer.counts(checkedIn, confirmed.length)}
+          </ThemedText>
+          <Button title={strings.organizer.done} onPress={() => router.back()} variant="secondary" />
+        </View>
+      </ThemedView>
+    </CameraGate>
   );
 }
 
@@ -81,6 +66,5 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   camera: { flex: 1 },
   panel: { padding: Spacing.three, gap: Spacing.three },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
   text: { textAlign: 'center' },
 });

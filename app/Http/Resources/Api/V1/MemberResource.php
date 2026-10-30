@@ -74,6 +74,7 @@ class MemberResource extends JsonResource
             // organizer endpoint checks its own permission again; these only decide what the app shows.
             'organizer' => ! $this->resource->can(Permission::ViewRegistrations->value) ? null : [
                 'can_mark_attendance' => $this->resource->can(Permission::ManageAttendance->value),
+                'can_hand_over_perks' => $this->resource->can(Permission::HandOverPerks->value),
             ],
         ];
     }

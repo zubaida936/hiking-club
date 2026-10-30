@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 
 import { apiFetch } from '@/api/client';
 import type { RewardState } from '@/api/types';
@@ -13,7 +14,7 @@ import { strings } from '@/strings';
 
 /**
  * Every reward of the rank system for this member (GET /me/rewards): available, used, or locked and why.
- * Discounts are used on the booking form; perks are handed over by the organizers.
+ * Discounts are used on the booking form; perks are handed over by the organizers, who scan the perk's QR code.
  */
 export default function MyRewardsScreen() {
   const { data, error, isPending, refetch, isRefetching } = useQuery({
@@ -77,6 +78,16 @@ function RewardCard({ reward }: { reward: RewardState }) {
           {use.event ? strings.rewards.usedOn(use.event.title, formatMoment(use.used_at)) : strings.rewards.usedAt(formatMoment(use.used_at))}
         </ThemedText>
       ))}
+      {/* A perk that can be handed over now: an organizer scans this (Organizer tab → "Scan a reward code"). */}
+      {reward.perk_code ? (
+        <View style={styles.qrBlock}>
+          <ThemedText type="smallBold">{strings.rewards.perkQrTitle}</ThemedText>
+          <View style={styles.qr}>
+            <QRCode value={reward.perk_code} size={160} backgroundColor="#ffffff" color="#000000" />
+          </View>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.text}>{strings.rewards.perkQrHint}</ThemedText>
+        </View>
+      ) : null}
     </ThemedView>
   );
 }
@@ -85,6 +96,9 @@ const styles = StyleSheet.create({
   group: { gap: Spacing.two },
   card: { borderRadius: Spacing.three, padding: Spacing.three, gap: Spacing.one },
   locked: { opacity: 0.7 },
+  qrBlock: { alignItems: 'center', gap: Spacing.two, marginTop: Spacing.two },
+  // White around the code so it scans in dark mode too.
+  qr: { padding: Spacing.three, backgroundColor: '#ffffff', borderRadius: Spacing.two },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
   text: { textAlign: 'center' },
 });

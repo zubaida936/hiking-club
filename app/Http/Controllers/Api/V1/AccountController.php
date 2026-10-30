@@ -8,6 +8,8 @@ use App\Domain\Members\Actions\UpdateProfile;
 use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Domain\Rewards\HikerRewards;
+use App\Domain\Rewards\PerkCode;
+use App\Domain\Rewards\Reward;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Site\ProfileRequest;
 use App\Http\Resources\Api\V1\BookingResource;
@@ -107,9 +109,10 @@ class AccountController extends Controller
      * My rewards.
      *
      * Every reward of the rank system: unlocked or not (and why), uses left, and where I used it.
-     * Discounts are chosen on the booking form; perks are handed over by the organizers.
+     * Discounts are chosen on the booking form; perks are handed over by the organizers, who scan `perk_code`
+     * (shown as a QR code).
      */
-    public function rewards(Request $request, HikerRewards $rewards): JsonResponse
+    public function rewards(Request $request, HikerRewards $rewards, PerkCode $perkCodes): JsonResponse
     {
         $hiker = $this->hiker($request);
 
@@ -142,6 +145,10 @@ class AccountController extends Controller
                 // null for rewards that aren't counted (e.g. X events access).
                 'uses_left' => $state['reward']->isCountable() ? (int) $state['uses_left'] : null,
                 'used' => $used,
+                // The QR code to show an organizer, for a perk that can be handed over now; null otherwise.
+                'perk_code' => $hiker !== null && $state['reward']->kind === Reward::PERK && $state['unlocked'] && $state['uses_left'] > 0
+                    ? $perkCodes->for($hiker->id, $state['reward']->key)
+                    : null,
             ];
         }
 

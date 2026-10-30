@@ -14,6 +14,7 @@ use App\Domain\Newsletter\Listeners\AnnounceNewEvent;
 use App\Domain\Registrations\Events\AttendanceMarked;
 use App\Domain\Registrations\Events\RegistrationChanged;
 use App\Domain\Registrations\Listeners\CancelBookingsOfCancelledEvent;
+use App\Domain\Rewards\PerkCode;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
@@ -31,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(DifficultyCalculator::class, fn () => DifficultyCalculator::fromConfig());
+        $this->app->singleton(PerkCode::class, fn () => PerkCode::fromConfig());
 
         // config/members.php picks how one-time codes reach members (mail today, SMS/WhatsApp later).
         $this->app->bind(CodeChannel::class, fn ($app) => $app->make(config('members.code_channels.'.config('members.code_channel'))));

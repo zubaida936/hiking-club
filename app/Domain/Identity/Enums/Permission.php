@@ -19,4 +19,6 @@ enum Permission: string
     case ManageMedia = 'media.manage';
     // Newsletter subscriber list: personal data, so not part of content editing.
     case ManageSubscribers = 'subscribers.manage';
+    // Hand over perks (gift card...) on the trail: guides too, without managing points.
+    case HandOverPerks = 'rewards.hand_over';
 }

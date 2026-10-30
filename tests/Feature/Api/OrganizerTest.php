@@ -1,9 +1,13 @@
 <?php
 
 use App\Domain\Identity\Enums\Role;
+use App\Domain\Loyalty\Enums\PointType;
 use App\Domain\Registrations\Enums\Attendance;
+use App\Domain\Rewards\PerkCode;
 use App\Models\Event;
 use App\Models\EventRegistration;
+use App\Models\Hiker;
+use App\Models\RewardRedemption;
 use App\Models\User;
 
 /**
@@ -29,8 +33,8 @@ describe('organizer mode', function () {
             ->assertOk()
             ->assertJsonPath('data.organizer', $organizer);
     })->with([
-        'guide' => [Role::Guide, ['can_mark_attendance' => true]],
-        'admin' => [Role::Admin, ['can_mark_attendance' => true]],
+        'guide' => [Role::Guide, ['can_mark_attendance' => true, 'can_hand_over_perks' => true]],
+        'admin' => [Role::Admin, ['can_mark_attendance' => true, 'can_hand_over_perks' => true]],
         'content editor' => [Role::Editor, null],
         'member' => [Role::Member, null],
     ]);
@@ -133,4 +137,76 @@ describe('marking attendance', function () {
             ->assertJsonValidationErrors('attendance');
         $this->withToken($token)->putJson(route('api.v1.organizer.attendance', 'NOPE1234'), ['attendance' => 'attended'])->assertNotFound();
     });
+});
+
+describe('perks', function () {
+    beforeEach(function () {
+        $this->member = Hiker::factory()->create(['name' => 'Rima Haddad', 'phone' => '+96170123456']);
+        $this->member->pointTransactions()->create(['type' => PointType::Adjustment, 'points' => 450, 'description' => 'Test']); // Highlander
+        $this->code = app(PerkCode::class)->for($this->member->id, 'highlander_gift_card');
+    });
+
+    it('gives the member the QR code of a perk they can receive', function () {
+        $user = User::factory()->create(['phone' => $this->member->phone]);
+        $this->member->update(['user_id' => $user->id]);
+
+        $rewards = collect($this->withToken($user->createToken('Phone')->plainTextToken)->getJson(route('api.v1.me.rewards'))->json('data'))->keyBy('key');
+
+        expect($rewards['highlander_gift_card']['perk_code'])->toBe($this->code)
+            ->and($rewards['highlander_winter_bonus']['perk_code'])->toStartWith('PERK-')
+            // Discounts are used on the booking form, and locked perks have no code.
+            ->and($rewards['elite_free_hike']['perk_code'])->toBeNull()
+            ->and($rewards['highlander_challenging_15']['perk_code'])->toBeNull();
+    });
+
+    it('lets a guide check a code and hand the perk over once', function () {
+        $token = organizerToken(Role::Guide);
+
+        $this->withToken($token)->getJson(route('api.v1.organizer.perks.show', $this->code))
+            ->assertOk()
+            ->assertJsonPath('data.member', ['name' => 'Rima Haddad', 'phone' => '+96170123456'])
+            ->assertJsonPath('data.reward.label', 'Gift card')
+            ->assertJsonPath('data.available', true)
+            ->assertJsonPath('data.handed_over_at', null);
+
+        $this->withToken($token)->postJson(route('api.v1.organizer.perks.hand-over', $this->code), ['note' => 'Given at the bus'])
+            ->assertCreated()
+            ->assertJsonPath('data.available', false)
+            ->assertJsonPath('data.unavailable_reason', 'Already handed over.');
+
+        // Same rule as the CMS: once only, logged in the Rewards used log.
+        $this->withToken($token)->postJson(route('api.v1.organizer.perks.hand-over', $this->code))
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'This reward is not available to you (not unlocked yet, or already used).');
+        expect(RewardRedemption::sole())->reward->toBe('highlander_gift_card')->note->toBe('Given at the bus')->hiker_id->toBe($this->member->id);
+        $this->withToken($token)->getJson(route('api.v1.organizer.perks.show', $this->code))->assertJsonPath('data.available', false);
+    });
+
+    it('explains a perk that is not unlocked yet', function () {
+        $newcomer = Hiker::factory()->create();
+        $code = app(PerkCode::class)->for($newcomer->id, 'highlander_gift_card');
+
+        $this->withToken(organizerToken(Role::Guide))->getJson(route('api.v1.organizer.perks.show', $code))
+            ->assertOk()
+            ->assertJsonPath('data.available', false)
+            ->assertJsonPath('data.unavailable_reason', fn (string $reason) => str_starts_with($reason, 'Reach Highlander'));
+    });
+
+    it('refuses edited codes and codes that are not perks', function (string $code) {
+        $this->withToken(organizerToken(Role::Guide))->getJson(route('api.v1.organizer.perks.show', $code))
+            ->assertUnprocessable()
+            ->assertJsonPath('message', "That's not a valid reward code.");
+    })->with([
+        'another member' => fn () => str_replace("PERK-{$this->member->id}-", 'PERK-'.($this->member->id + 1).'-', $this->code),
+        'a discount' => fn () => app(PerkCode::class)->for($this->member->id, 'elite_free_hike'),
+        'a booking reference' => 'HK-7F3K2Q',
+    ]);
+
+    it('is for staff with the permission only', function (Role $role) {
+        $token = organizerToken($role);
+
+        $this->withToken($token)->getJson(route('api.v1.organizer.perks.show', $this->code))->assertForbidden();
+        $this->withToken($token)->postJson(route('api.v1.organizer.perks.hand-over', $this->code))->assertForbidden();
+        expect(RewardRedemption::count())->toBe(0);
+    })->with([Role::Editor, Role::Member]);
 });

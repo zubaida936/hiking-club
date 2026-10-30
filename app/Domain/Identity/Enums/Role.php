@@ -47,6 +47,7 @@ enum Role: string
                 Permission::AccessAdmin,
                 Permission::ViewRegistrations,
                 Permission::ManageAttendance,
+                Permission::HandOverPerks,
             ],
             self::Member => [],
         };

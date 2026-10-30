@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -34,6 +34,7 @@ export default function OrganizerScreen() {
     <View style={styles.header}>
       <ThemedText type="title">{strings.organizer.title}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">{strings.organizer.intro}</ThemedText>
+      {member?.organizer?.can_hand_over_perks ? <Button title={strings.perks.scan} onPress={() => router.push('/perks/scan')} variant="secondary" /> : null}
       {pending.length > 0 ? (
         <ThemedView type="backgroundElement" style={styles.waiting}>
           <ThemedText type="smallBold">{strings.organizer.waiting(pending.length)}</ThemedText>

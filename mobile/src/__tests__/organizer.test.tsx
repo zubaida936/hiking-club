@@ -13,7 +13,7 @@ beforeEach(async () => {
 });
 
 const ok = (data: unknown) => ({ status: 200, body: { data } });
-const guide = { ...sampleMember, organizer: { can_mark_attendance: true } };
+const guide = { ...sampleMember, organizer: { can_mark_attendance: true, can_hand_over_perks: true } };
 const hike: OrganizerHike = { event: sampleEvent(), confirmed: 2, checked_in: 0, check_in_open: true };
 const person = (overrides: Partial<CheckIn> = {}): CheckIn => ({
   reference: 'MAYA0001',
@@ -38,6 +38,8 @@ it('opens a hike from the Organizer tab and checks a hiker in', async () => {
   await renderRouter('./src/app', { initialUrl: '/' });
   const hikeLink = await screen.findByRole('link', { name: /Horch Ehden Nature Reserve/ });
   await act(() => router.navigate('/organizer'));
+  // Guides may hand over perks too (rewards.hand_over).
+  expect(screen.getByRole('button', { name: 'Scan a reward code' })).toBeOnTheScreen();
   await fireEvent.press(hikeLink);
   expect(screen).toHavePathname('/check-in/horch-ehden');
   expect(await screen.findByText('Maya Saad')).toBeOnTheScreen();

@@ -84,6 +84,8 @@ class DifficultyController extends Controller
 
     /**
      * One level for the explanation screen; `max_score` is the highest effort score of the level, null for the last one.
+     * (Its cast looks redundant, but without it the API docs type the field as a string. Comments next to array keys
+     * become API field descriptions, so this one lives here.)
      *
      * @return array{level: int, name: string, label: string, description: string, max_score: int|null, points: int}
      */
@@ -94,7 +96,6 @@ class DifficultyController extends Controller
             'name' => $level->name,
             'label' => $level->label(),
             'description' => $level->description(),
-            // The cast looks redundant, but without it the API docs type the field as a string.
             'max_score' => $maxScore === null ? null : (int) $maxScore,
             'points' => (int) config("points.hike.{$level->value}"),
         ];

@@ -24,6 +24,11 @@ final class RewardException extends DomainException
         return new self('Rewards can only be used on a booking with your own phone number.');
     }
 
+    public static function invalidPerkCode(): self
+    {
+        return new self("That's not a valid reward code.");
+    }
+
     public static function notHandedOver(): self
     {
         return new self('Only gift-type rewards are handed over by organizers.');

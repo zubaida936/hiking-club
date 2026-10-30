@@ -44,7 +44,7 @@ class PointsController extends Controller
 
     public function handOver(Request $request, Hiker $hiker, RecordPerkUse $action): RedirectResponse
     {
-        Gate::authorize('adjustPoints', $hiker);
+        Gate::authorize('handOverPerk', Hiker::class);
 
         $validated = $request->validate([
             'reward' => ['required', 'string'],
