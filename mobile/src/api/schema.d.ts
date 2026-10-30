@@ -2402,15 +2402,22 @@ export interface operations {
                         data: {
                             intro: string;
                             founded: number;
-                            story: unknown[];
-                            offers: unknown[];
-                            testimonials: unknown[];
+                            story: string[];
+                            offers: {
+                                icon: string;
+                                title: string;
+                                text: string;
+                            }[];
+                            testimonials: {
+                                name: string;
+                                text: string;
+                            }[];
                             google_reviews_url: string | null;
                             team: {
                                 name: string;
                                 role: string;
                                 bio: string | null;
-                                photo_url: null;
+                                photo_url: string | null;
                             }[];
                             stats: {
                                 hikes: number;

@@ -70,31 +70,48 @@ class ContentController extends Controller
      * The club's story, what it offers, testimonials and team (CMS → Team), and club numbers.
      *
      * @unauthenticated
-     *
-     * @return array{data: array<string, mixed>}
      */
-    public function about(): array
+    public function about(): JsonResponse
     {
         $about = (array) config('site.about_page');
 
-        return ['data' => [
+        // Loops with casts (not array_map / collection maps) so the API docs type every field.
+        $story = [];
+        foreach ((array) $about['story'] as $paragraph) {
+            $story[] = (string) $paragraph;
+        }
+        $offers = [];
+        foreach ((array) $about['offers'] as $offer) {
+            $offers[] = ['icon' => (string) $offer[0], 'title' => (string) $offer[1], 'text' => (string) $offer[2]];
+        }
+        $testimonials = [];
+        foreach ((array) $about['testimonials'] as $quote) {
+            $testimonials[] = ['name' => (string) $quote[0], 'text' => (string) $quote[1]];
+        }
+        $team = [];
+        foreach (TeamMember::shown()->get() as $member) {
+            $photo = $member->photoUrl();
+            $team[] = [
+                'name' => (string) $member->name,
+                'role' => (string) $member->role,
+                'bio' => $member->bio === null ? null : (string) $member->bio,
+                'photo_url' => $photo === null ? null : (string) $photo,
+            ];
+        }
+
+        return response()->json(['data' => [
             'intro' => (string) config('site.about'),
             'founded' => (int) $about['founded'],
-            'story' => array_values((array) $about['story']),
-            'offers' => array_map(fn (array $offer) => ['icon' => $offer[0], 'title' => $offer[1], 'text' => $offer[2]], (array) $about['offers']),
-            'testimonials' => array_map(fn (array $quote) => ['name' => $quote[0], 'text' => $quote[1]], (array) $about['testimonials']),
-            'google_reviews_url' => $about['google_reviews_url'] ?: null,
-            'team' => TeamMember::shown()->get()->map(fn (TeamMember $member) => [
-                'name' => $member->name,
-                'role' => $member->role,
-                'bio' => $member->bio,
-                'photo_url' => $member->photoUrl(),
-            ])->values()->all(),
+            'story' => $story,
+            'offers' => $offers,
+            'testimonials' => $testimonials,
+            'google_reviews_url' => $about['google_reviews_url'] ? (string) $about['google_reviews_url'] : null,
+            'team' => $team,
             'stats' => [
                 'hikes' => Event::published()->past()->count(),
                 'hikers' => EventRegistration::where('attendance', Attendance::Attended)->distinct()->count('hiker_id'),
             ],
-        ]];
+        ]]);
     }
 
     /**

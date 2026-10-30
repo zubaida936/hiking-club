@@ -36,7 +36,7 @@ return [
         'paths' => [
             '/', '/events', '/events/*', '/bookings/*', '/shop', '/shop/*', '/cart', '/checkout', '/orders/*',
             '/x-events', '/x-events/*', '/difficulty-calculator', '/rank-system', '/leaderboard', '/guides', '/guides/*',
-            '/gallery', '/gallery/*', '/equipment', '/contact', '/account', '/account/*', '/login', '/activate',
+            '/gallery', '/gallery/*', '/equipment', '/contact', '/about', '/account', '/account/*', '/login', '/activate',
             '/forgot-password',
         ],
     ],

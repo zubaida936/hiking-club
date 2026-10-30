@@ -10,7 +10,7 @@ const host = process.env.APP_LINKS_HOST;
 
 // Website paths the app has a screen for (see src/links.ts). Not the CMS's signed links or payment pages.
 const pathPrefixes = ['/events', '/bookings/', '/shop', '/orders/', '/x-events', '/guides', '/gallery', '/account'];
-const paths = ['/', '/cart', '/checkout', '/difficulty-calculator', '/rank-system', '/leaderboard', '/equipment', '/contact', '/login', '/activate', '/forgot-password'];
+const paths = ['/', '/cart', '/checkout', '/difficulty-calculator', '/rank-system', '/leaderboard', '/equipment', '/contact', '/about', '/login', '/activate', '/forgot-password'];
 
 export default ({ config }: ConfigContext): ExpoConfig => {
   if (!host) return config as ExpoConfig;

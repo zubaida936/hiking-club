@@ -58,6 +58,7 @@ export default function RootLayout() {
                 <Stack.Screen name="guides/[slug]" options={{ title: '' }} />
                 <Stack.Screen name="equipment" options={{ title: strings.equipment.title }} />
                 <Stack.Screen name="contact" options={{ title: strings.contact.title }} />
+                <Stack.Screen name="about" options={{ title: strings.about.title }} />
                 <Stack.Screen name="gallery/index" options={{ title: strings.gallery.title }} />
                 <Stack.Screen name="gallery/[slug]" options={{ title: '' }} />
                 <Stack.Screen name="photo-viewer" options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'fade' }} />

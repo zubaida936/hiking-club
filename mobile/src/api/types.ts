@@ -51,3 +51,4 @@ export type ContactSent = operations['v1.contact.send']['responses'][202]['conte
 export type AlbumList = ResponseOf<'v1.gallery.index'>;
 export type AlbumCard = AlbumList['data'][number];
 export type Album = ResponseOf<'v1.gallery.show'>['data'];
+export type About = ResponseOf<'v1.about'>['data'];
