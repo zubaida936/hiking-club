@@ -522,6 +522,8 @@ export const strings = {
   },
   errors: {
     offline: "Can't reach the server. Check your internet connection and try again.",
+    offlineBanner: 'No signal: showing what was saved on this phone',
+    savedCopy: (time: string) => `Couldn't refresh: showing what was saved at ${time}.`,
     generic: 'Something went wrong. Please try again.',
     retry: 'Try again',
   },

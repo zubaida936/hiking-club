@@ -1,26 +1,16 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { ApiError } from '@/api/client';
+import { createQueryClient, persistOptions } from '@/api/query-cache';
 import { AuthProvider } from '@/auth/auth-context';
+import { OfflineBanner } from '@/components/offline-banner';
 import { VersionGate } from '@/components/version-gate';
 import { CheckInProvider } from '@/organizer/check-in-store';
 import { CartProvider } from '@/shop/cart';
 import { strings } from '@/strings';
-
-function createQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        // Don't retry answers the server gave on purpose (not found, validation, logged out); retry network trouble.
-        retry: (failures, error) => !(error instanceof ApiError && error.status >= 400 && error.status < 500) && failures < 2,
-      },
-    },
-  });
-}
 
 /**
  * The tabs, with screens that open over them (activation, forgot password).
@@ -33,7 +23,7 @@ export default function RootLayout() {
   return (
     // Gesture handler root: the photo viewer's pinch-zoom needs it.
     <GestureHandlerRootView style={styles.root}>
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
       <AuthProvider>
         <CheckInProvider>
         <CartProvider>
@@ -72,12 +62,13 @@ export default function RootLayout() {
                 <Stack.Screen name="gallery/[slug]" options={{ title: '' }} />
                 <Stack.Screen name="photo-viewer" options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'fade' }} />
               </Stack>
+              <OfflineBanner />
             </VersionGate>
           </ThemeProvider>
         </CartProvider>
         </CheckInProvider>
       </AuthProvider>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
     </GestureHandlerRootView>
   );
 }

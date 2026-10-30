@@ -8,6 +8,7 @@ import { apiFetch } from '@/api/client';
 import type { EventList, ResponseOf } from '@/api/types';
 import { Chip } from '@/components/chip';
 import { EventCard } from '@/components/event-card';
+import { SavedCopyNote } from '@/components/saved-copy-note';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
@@ -43,7 +44,7 @@ export default function HikesScreen() {
     queryFn: () => apiFetch<ResponseOf<'v1.events.months'>>('/events/months').then((answer) => answer.data.filter((month) => month.upcoming > 0).reverse()),
   });
 
-  const { data, error, isPending, refetch, isRefetching, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+  const { data, error, isPending, refetch, isRefetching, fetchNextPage, hasNextPage, isFetchingNextPage, dataUpdatedAt } = useInfiniteQuery({
     queryKey: ['events', 'upcoming', { ...filters, search }],
     queryFn: ({ pageParam }) =>
       apiFetch<EventList>('/events', {
@@ -69,6 +70,7 @@ export default function HikesScreen() {
   const header = (
     <View style={styles.header}>
       <ThemedText type="title">{strings.hikes.title}</ThemedText>
+      <SavedCopyNote error={error} updatedAt={dataUpdatedAt} />
       <Link href="/difficulty-calculator">
         <ThemedText type="linkPrimary">{strings.difficulty.link}</ThemedText>
       </Link>
@@ -103,7 +105,7 @@ export default function HikesScreen() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        {error ? (
+        {error && !data ? (
           <>
             {header}
             <ThemedView style={styles.state}>

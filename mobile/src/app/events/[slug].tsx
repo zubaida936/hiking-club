@@ -6,6 +6,7 @@ import { ApiError, apiFetch } from '@/api/client';
 import type { EventDetail } from '@/api/types';
 import { EventDetailView } from '@/components/event-detail';
 import { Button } from '@/components/form';
+import { SavedCopyNote } from '@/components/saved-copy-note';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -16,7 +17,7 @@ import { strings } from '@/strings';
 /** One hike, opened from the hikes list (or a shared link later, with deep links). */
 export default function HikeScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
-  const { data: event, error, isPending, refetch } = useQuery({
+  const { data: event, error, isPending, refetch, dataUpdatedAt } = useQuery({
     queryKey: ['events', 'detail', slug],
     queryFn: () => apiFetch<{ data: EventDetail }>(`/events/${encodeURIComponent(slug)}`).then((answer) => answer.data),
   });
@@ -44,13 +45,14 @@ export default function HikeScreen() {
         <ThemedView style={styles.center}>
           <ActivityIndicator />
         </ThemedView>
-      ) : error ? (
+      ) : error && !event ? (
         <ThemedView style={styles.center}>
           <ThemedText style={styles.text}>{error instanceof ApiError && error.status === 404 ? strings.hike.notFound : error.message}</ThemedText>
           {!(error instanceof ApiError && error.status === 404) ? <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" /> : null}
         </ThemedView>
       ) : (
         <ScreenScroll>
+          <SavedCopyNote error={error} updatedAt={dataUpdatedAt} />
           <EventDetailView event={event} />
           {/* Open for booking: a free seat, or a waitlist when full (the booking form explains the rest). */}
           {event.registration.open && (!event.seats.sold_out || event.registration.waitlist_open) ? (

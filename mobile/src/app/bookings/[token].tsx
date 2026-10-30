@@ -8,6 +8,7 @@ import { formMessage } from '@/api/errors';
 import type { Booking } from '@/api/types';
 import { Button, FormError } from '@/components/form';
 import { PaymentPanel } from '@/components/payment-panel';
+import { SavedCopyNote } from '@/components/saved-copy-note';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -26,7 +27,7 @@ export default function BookingScreen() {
   const path = `/bookings/${encodeURIComponent(token)}`;
   const queryKey = ['my', 'booking', token];
 
-  const { data: booking, error, isPending, refetch } = useQuery({
+  const { data: booking, error, isPending, refetch, dataUpdatedAt } = useQuery({
     queryKey,
     queryFn: () => apiFetch<{ data: Booking }>(path).then((answer) => answer.data),
   });
@@ -59,7 +60,7 @@ export default function BookingScreen() {
     );
   }
 
-  if (error) {
+  if (error && !booking) {
     const notFound = error instanceof ApiError && error.status === 404;
     return (
       <ThemedView style={styles.center}>
@@ -73,6 +74,7 @@ export default function BookingScreen() {
 
   return (
     <ScreenScroll>
+      <SavedCopyNote error={error} updatedAt={dataUpdatedAt} />
       <ThemedText type="title">{strings.booking.titles[booking.status.key] ?? booking.status.label}</ThemedText>
       <ThemedText type="smallBold">
         {booking.event.title} · {formatDay(booking.event.starts_on, 'long')}

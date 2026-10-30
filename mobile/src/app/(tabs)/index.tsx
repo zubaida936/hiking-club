@@ -8,6 +8,7 @@ import { apiFetch } from '@/api/client';
 import type { Home, Slide } from '@/api/types';
 import { EventCard } from '@/components/event-card';
 import { Button } from '@/components/form';
+import { SavedCopyNote } from '@/components/saved-copy-note';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -17,7 +18,7 @@ import { strings } from '@/strings';
 
 /** Home (GET /home): the homepage slides, the next hike and the top 10 hikers. */
 export default function HomeScreen() {
-  const { data, error, isPending, refetch, isRefetching } = useQuery({
+  const { data, error, isPending, refetch, isRefetching, dataUpdatedAt } = useQuery({
     queryKey: ['home'],
     queryFn: () => apiFetch<{ data: Home }>('/home').then((answer) => answer.data),
   });
@@ -30,7 +31,7 @@ export default function HomeScreen() {
     );
   }
 
-  if (error) {
+  if (error && !data) {
     return (
       <ThemedView style={styles.center}>
         <ThemedText style={styles.text}>{error.message}</ThemedText>
@@ -42,6 +43,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScreenScroll onRefresh={() => void refetch()} refreshing={isRefetching}>
+        <SavedCopyNote error={error} updatedAt={dataUpdatedAt} />
         {data.slides.length > 0 ? <Slides slides={data.slides} /> : null}
 
         <ThemedText type="subtitle">{strings.home.nextHike}</ThemedText>

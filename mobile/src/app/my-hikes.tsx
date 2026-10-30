@@ -5,6 +5,7 @@ import { apiFetch } from '@/api/client';
 import type { BookingList } from '@/api/types';
 import { BookingCard } from '@/components/booking-card';
 import { Button } from '@/components/form';
+import { SavedCopyNote } from '@/components/saved-copy-note';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
@@ -12,7 +13,7 @@ import { strings } from '@/strings';
 
 /** Hikes the member attended, newest first, with the points each earned (GET /me/bookings?status=completed). */
 export default function MyHikesScreen() {
-  const { data, error, isPending, refetch, fetchNextPage, hasNextPage, isFetchingNextPage, isRefetching } = useInfiniteQuery({
+  const { data, error, isPending, refetch, fetchNextPage, hasNextPage, isFetchingNextPage, isRefetching, dataUpdatedAt } = useInfiniteQuery({
     queryKey: ['my', 'bookings', 'completed'],
     queryFn: ({ pageParam }) => apiFetch<BookingList>('/me/bookings', { query: { status: 'completed', page: pageParam } }),
     initialPageParam: 1,
@@ -27,7 +28,7 @@ export default function MyHikesScreen() {
     );
   }
 
-  if (error) {
+  if (error && !data) {
     return (
       <ThemedView style={styles.center}>
         <ThemedText style={styles.text}>{error.message}</ThemedText>
@@ -43,6 +44,7 @@ export default function MyHikesScreen() {
         keyExtractor={(booking) => booking.token}
         renderItem={({ item }) => <BookingCard booking={item} />}
         contentContainerStyle={styles.list}
+        ListHeaderComponent={<SavedCopyNote error={error} updatedAt={dataUpdatedAt} />}
         ListEmptyComponent={<ThemedText style={styles.text}>{strings.myBookings.completedEmpty}</ThemedText>}
         onEndReached={() => hasNextPage && !isFetchingNextPage && void fetchNextPage()}
         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator /> : undefined}

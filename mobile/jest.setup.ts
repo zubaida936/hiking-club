@@ -12,3 +12,6 @@ jest.mock('react-native-qrcode-svg', () => {
 
 // The root layout wraps the app in GestureHandlerRootView (photo viewer zoom): use the library's test stand-in.
 require('react-native-gesture-handler/jestSetup');
+
+// The phone's connection (offline banner, React Query's online state): the library's test stand-in (always online).
+jest.mock('@react-native-community/netinfo', () => require('@react-native-community/netinfo/jest/netinfo-mock.js'));

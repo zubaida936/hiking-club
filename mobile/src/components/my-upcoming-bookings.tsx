@@ -6,6 +6,7 @@ import { apiFetch } from '@/api/client';
 import type { BookingList } from '@/api/types';
 import { BookingCard } from '@/components/booking-card';
 import { Button } from '@/components/form';
+import { SavedCopyNote } from '@/components/saved-copy-note';
 import { ThemedText } from '@/components/themed-text';
 import { strings } from '@/strings';
 
@@ -14,7 +15,7 @@ export const upcomingBookingsKey = ['my', 'bookings', 'upcoming'];
 
 /** The member's upcoming bookings and waitlist places, soonest first (GET /me/bookings). */
 export function MyUpcomingBookings() {
-  const { data, error, isPending, refetch } = useQuery({
+  const { data, error, isPending, refetch, dataUpdatedAt } = useQuery({
     queryKey: upcomingBookingsKey,
     queryFn: () => apiFetch<BookingList>('/me/bookings'),
   });
@@ -22,9 +23,10 @@ export function MyUpcomingBookings() {
   return (
     <>
       <ThemedText type="subtitle">{strings.myBookings.upcoming}</ThemedText>
+      <SavedCopyNote error={error} updatedAt={dataUpdatedAt} />
       {isPending ? (
         <ActivityIndicator />
-      ) : error ? (
+      ) : error && !data ? (
         <>
           <ThemedText>{error.message}</ThemedText>
           <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
