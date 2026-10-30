@@ -62,3 +62,24 @@ export const Spacing = {
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;
+
+/**
+ * Badge colours per difficulty level (1–4), like the website's badges (green, blue, amber, red). Only the colour
+ * lives here: the level itself always comes from the API.
+ */
+export const LevelColors = {
+  light: {
+    1: { background: '#D1FAE5', text: '#065F46' },
+    2: { background: '#E0F2FE', text: '#075985' },
+    3: { background: '#FEF3C7', text: '#92400E' },
+    4: { background: '#FEE2E2', text: '#991B1B' },
+  },
+  dark: {
+    1: { background: '#064E3B', text: '#A7F3D0' },
+    2: { background: '#0C4A6E', text: '#BAE6FD' },
+    3: { background: '#78350F', text: '#FDE68A' },
+    4: { background: '#7F1D1D', text: '#FECACA' },
+  },
+} as const;
+
+export type Level = keyof typeof LevelColors.light;

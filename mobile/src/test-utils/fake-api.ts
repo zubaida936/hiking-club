@@ -2,7 +2,7 @@
  * Test helpers: a fake API behind `fetch`, and sample API data.
  * (Outside __tests__ so Jest doesn't run it as a test file.)
  */
-import type { Booking, BookingForm, Event, EventDetail, Member, Order, Product } from '@/api/types';
+import type { Booking, BookingForm, DifficultyLevels, Event, EventDetail, Member, Order, Product } from '@/api/types';
 
 type Route = { status: number; body?: unknown };
 type Call = { method: string; path: string; query: Record<string, string>; body: unknown; auth: string | undefined };
@@ -229,3 +229,14 @@ export function sampleOrder(overrides: Partial<Order> = {}): Order {
     ...overrides,
   } as Order;
 }
+
+/** GET /difficulty/levels, with round numbers. */
+export const sampleLevels: DifficultyLevels = {
+  levels: [
+    { level: 1, name: 'Foundation', label: 'Level 1 · Foundation', description: 'Easy. Low vertical load; builds base endurance and uphill rhythm.', max_score: 120, points: 10 },
+    { level: 2, name: 'Endurance', label: 'Level 2 · Endurance', description: 'Moderate. Longer distance or steady climbs; needs regular hiking fitness.', max_score: 200, points: 15 },
+    { level: 3, name: 'Advanced', label: 'Level 3 · Advanced', description: 'Challenging. Long day with significant elevation; for experienced hikers.', max_score: 300, points: 20 },
+    { level: 4, name: 'Xtreme', label: 'Level 4 · Xtreme', description: 'Very demanding. Long routes with sustained effort; approval required.', max_score: null, points: 30 },
+  ],
+  formula: { multiplier: 10, gain_per_km: 100, loss_per_km: 200 },
+};

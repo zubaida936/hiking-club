@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import type { EventDetail } from '@/api/types';
+import { DifficultyBadge } from '@/components/difficulty-badge';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
@@ -46,9 +47,8 @@ export function EventDetailView({ event }: { event: EventDetail }) {
       ) : null}
 
       <ThemedView type="backgroundElement" style={styles.card}>
-        <ThemedText type="subtitle">{event.difficulty.label}</ThemedText>
+        <DifficultyBadge difficulty={event.difficulty} score={event.effort_score} />
         <ThemedText type="small">{event.difficulty.description}</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">{strings.hike.effort(event.effort_score)}</ThemedText>
         <Link href="/difficulty-calculator">
           <ThemedText type="linkPrimary">{strings.difficulty.howRated}</ThemedText>
         </Link>

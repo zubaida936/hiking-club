@@ -1,17 +1,18 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { apiFetch } from '@/api/client';
 import { fieldErrors, formMessage } from '@/api/errors';
-import type { DifficultyLevels, DifficultyResult } from '@/api/types';
+import type { DifficultyResult } from '@/api/types';
+import { DifficultyBadge } from '@/components/difficulty-badge';
+import { LevelsList, useDifficultyLevels } from '@/components/difficulty-levels';
 import { EventCard } from '@/components/event-card';
 import { Button, FormError, FormField } from '@/components/form';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
 import { strings } from '@/strings';
 
 /** Empty fields aren't sent; a decimal comma (some Android keyboards) becomes a point. */
@@ -66,7 +67,7 @@ function Result({ result }: { result: DifficultyResult }) {
       <ThemedView type="backgroundElement" style={styles.card}>
         <ThemedText type="title">{result.effort_score}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">{strings.difficulty.score}</ThemedText>
-        <ThemedText type="subtitle">{difficulty.label}</ThemedText>
+        <DifficultyBadge difficulty={difficulty} score={result.effort_score} marker={strings.difficulty.yourRoute} />
         <ThemedText>{difficulty.description}</ThemedText>
         <ThemedText type="smallBold">{strings.difficulty.points(result.points)}</ThemedText>
       </ThemedView>
@@ -83,11 +84,7 @@ function Result({ result }: { result: DifficultyResult }) {
 
 /** The formula and the 4 levels with their score ranges, from the API; the route's level is marked once calculated. */
 function HowItWorks({ level }: { level: number | null }) {
-  const theme = useTheme();
-  const { data, error, isPending, refetch } = useQuery({
-    queryKey: ['difficulty', 'levels'],
-    queryFn: () => apiFetch<{ data: DifficultyLevels }>('/difficulty/levels').then((answer) => answer.data),
-  });
+  const { data, error, isPending, refetch } = useDifficultyLevels();
 
   if (isPending) return <ActivityIndicator />;
 
@@ -114,23 +111,7 @@ function HowItWorks({ level }: { level: number | null }) {
       <ThemedText>{strings.difficulty.formulaText(gainPerKm, lossPerKm)}</ThemedText>
 
       <ThemedText type="subtitle">{strings.difficulty.levels}</ThemedText>
-      {levels.map((item, index) => {
-        const previous = levels[index - 1];
-        const min = previous?.max_score != null ? previous.max_score + 1 : 0;
-        const current = item.level === level;
-
-        return (
-          <ThemedView key={item.level} type="backgroundElement" style={[styles.card, current && { borderColor: theme.accent, borderWidth: 2 }]}>
-            <View style={styles.row}>
-              <ThemedText type="smallBold">{item.label}</ThemedText>
-              <ThemedText type="small" themeColor="textSecondary">{strings.difficulty.range(min, item.max_score)}</ThemedText>
-            </View>
-            {current ? <ThemedText type="smallBold" themeColor="accent">{strings.difficulty.yourRoute}</ThemedText> : null}
-            <ThemedText type="small">{item.description}</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">{strings.difficulty.levelPoints(item.points)}</ThemedText>
-          </ThemedView>
-        );
-      })}
+      <LevelsList levels={levels} highlight={level === null ? null : { level, label: strings.difficulty.yourRoute }} />
     </View>
   );
 }
@@ -139,5 +120,4 @@ const styles = StyleSheet.create({
   hinted: { gap: Spacing.one },
   section: { gap: Spacing.three },
   card: { borderRadius: Spacing.three, padding: Spacing.three, gap: Spacing.one },
-  row: { flexDirection: 'row', justifyContent: 'space-between', gap: Spacing.two, flexWrap: 'wrap' },
 });

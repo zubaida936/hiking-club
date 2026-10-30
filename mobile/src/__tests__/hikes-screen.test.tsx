@@ -17,7 +17,8 @@ describe('hikes list', () => {
 
     expect(await screen.findByText('Horch Ehden Nature Reserve')).toBeOnTheScreen();
     expect(screen.getByText('4 seats left')).toBeOnTheScreen();
-    expect(screen.getAllByText('Level 1 · Foundation · $30')).toHaveLength(2);
+    expect(screen.getAllByRole('button', { name: 'Level 1 · Foundation, effort score 90' })).toHaveLength(2);
+    expect(screen.getAllByText('$30')).toHaveLength(2);
     expect(screen.getByText('Fully booked')).toBeOnTheScreen();
   });
 
@@ -97,8 +98,7 @@ describe('hike detail', () => {
 
     expect(screen).toHavePathname('/events/horch-ehden');
     expect(await screen.findByText('Monday, 2 November 2026 · Ehden')).toBeOnTheScreen();
-    expect(screen.getByText('Level 1 · Foundation')).toBeOnTheScreen();
-    expect(screen.getByText('Effort score 90')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Level 1 · Foundation, effort score 90' })).toBeOnTheScreen();
     expect(screen.getByText('8 km')).toBeOnTheScreen();
     expect(screen.getByText('+220 / -320 m')).toBeOnTheScreen();
     expect(screen.getByText('4 seats left')).toBeOnTheScreen();
