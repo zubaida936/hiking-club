@@ -60,6 +60,7 @@ export default function BookScreen() {
     return (
       <ThemedView style={styles.center}>
         <ThemedText style={styles.text}>{form.x_locked ? strings.book.xLocked : strings.book.closed}</ThemedText>
+        {form.x_locked ? <Button title={strings.book.xAbout} onPress={() => router.push('/x-events')} /> : null}
       </ThemedView>
     );
   }

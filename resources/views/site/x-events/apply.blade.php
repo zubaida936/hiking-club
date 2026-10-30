@@ -135,8 +135,7 @@
             <div>
                 <label class="flex items-start gap-3 text-sm text-slate-700">
                     <input type="checkbox" name="consent" value="1" required class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500" @checked(old('consent'))>
-                    <span>My answers are true. I understand X Events are demanding and I take part at my own risk. The club may keep these answers to assess
-                        X Events access and contact me on WhatsApp. See our <a href="{{ route('legal.privacy') }}" target="_blank" class="text-brand-700 underline">privacy policy</a>.</span>
+                    <span>{{ config('xevents.consent') }} See our <a href="{{ route('legal.privacy') }}" target="_blank" class="text-brand-700 underline">privacy policy</a>.</span>
                 </label>
                 @error('consent') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>

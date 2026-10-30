@@ -957,8 +957,9 @@ export interface paths {
         };
         /**
          * X Events
-         * @description Upcoming X hikes, soonest first. With a token, `access` tells whether the member can book them
-         *     (approved, or Elite rank) and the status of their latest application. Without a token `access` is null.
+         * @description The page texts (same as the website's X Events page), upcoming X hikes soonest first. With a token,
+         *     `access` tells whether the member can book them (approved, or Elite rank) and the status of their latest
+         *     application. Without a token `access` is null.
          */
         get: operations["v1.x-events.index"];
         put?: never;
@@ -979,7 +980,7 @@ export interface paths {
         /**
          * Application form
          * @description The choices for the form (keys to send, labels to show), the age under which a parent or guardian
-         *     is needed, and the member's details to fill in.
+         *     is needed, the consent text, and the member's details to fill in.
          */
         get: operations["v1.x-events.application-form"];
         put?: never;
@@ -3236,18 +3237,31 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
-                            events: unknown[];
+                            page: {
+                                heading: string;
+                                intro: string;
+                                requirements: {
+                                    title: string;
+                                    text: string;
+                                }[];
+                                steps: {
+                                    title: string;
+                                    text: string;
+                                }[];
+                                no_events: string;
+                            };
+                            events: components["schemas"]["EventResource"][];
                             access: {
                                 can_book: boolean;
                                 /** @description pending, approved, rejected or revoked; null when the member never applied. */
                                 application: {
                                     status: {
-                                        /** @enum {string|null} */
-                                        key: "pending" | "approved" | "rejected" | "revoked" | null;
-                                        /** @enum {string|null} */
-                                        label: "Under review" | "Approved" | "Not approved" | "Access revoked" | null;
+                                        /** @enum {string} */
+                                        key: "pending" | "approved" | "rejected" | "revoked";
+                                        /** @enum {string} */
+                                        label: "Under review" | "Approved" | "Not approved" | "Access revoked";
                                     };
-                                    submitted_at: string | null;
+                                    submitted_at: string;
                                 } | null;
                                 /** @description Applying is possible again after a rejection or a revoked access. */
                                 can_apply: boolean;
@@ -3291,9 +3305,12 @@ export interface operations {
                                 label: string;
                             }[];
                             guardian_under_age: number;
+                            /** @description The text of the "I agree" box (`consent`), and the privacy policy it refers to. */
+                            consent: string;
+                            privacy_url: string;
                             member: {
                                 name: string;
-                                phone: string | null;
+                                phone: string;
                                 email: string | null;
                             } | null;
                         };

@@ -51,6 +51,8 @@ export default function RootLayout() {
                 <Stack.Screen name="checkout" options={{ title: strings.checkout.title }} />
                 <Stack.Screen name="orders/[token]" options={{ title: strings.order.title }} />
                 <Stack.Screen name="my-orders" options={{ title: strings.order.myOrders }} />
+                <Stack.Screen name="x-events/index" options={{ title: strings.xEvents.title }} />
+                <Stack.Screen name="x-events/apply" options={{ title: strings.xApply.title }} />
               </Stack>
             </VersionGate>
           </ThemeProvider>

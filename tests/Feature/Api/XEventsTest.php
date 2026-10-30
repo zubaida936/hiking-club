@@ -59,6 +59,18 @@ describe('X Events list', function () {
             ->assertJsonPath('data.access', null);
     });
 
+    it('gives the same page texts as the website', function () {
+        config(['xevents.page.heading' => 'Big days out.', 'xevents.page.steps.0.title' => 'Apply']);
+
+        $this->getJson(route('api.v1.x-events.index'))
+            ->assertJsonPath('data.page.heading', 'Big days out.')
+            ->assertJsonPath('data.page.requirements.*.title', ['Endurance', 'Preparation', 'Team discipline'])
+            ->assertJsonPath('data.page.steps.0.title', 'Apply')
+            ->assertJsonPath('data.page.no_events', config('xevents.page.no_events'));
+
+        $this->get(route('x-events'))->assertSee('Big days out.');
+    });
+
     it('tells the member their access and application status', function () {
         [$hiker, $token] = apiXMember();
 
@@ -89,6 +101,8 @@ describe('application', function () {
             ->assertJsonPath('data.frequency.0', ['key' => 'weekly', 'label' => 'Every week'])
             ->assertJsonPath('data.gear.*.key', array_keys(config('xevents.gear')))
             ->assertJsonPath('data.guardian_under_age', 18)
+            ->assertJsonPath('data.consent', config('xevents.consent'))
+            ->assertJsonPath('data.privacy_url', route('legal.privacy'))
             ->assertJsonPath('data.member', null);
 
         [, $token] = apiXMember();

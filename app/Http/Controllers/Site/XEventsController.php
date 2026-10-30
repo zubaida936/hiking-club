@@ -25,6 +25,7 @@ class XEventsController extends Controller
             'events' => Event::published()->upcoming()->where('is_xtreme', true)->withSeatCounts()->orderBy('starts_on')->get(),
             'hasAccess' => $access->allows($hiker),
             'application' => $hiker?->latestXApplication(),
+            'page' => (array) config('xevents.page'),
         ]);
     }
 

@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { Link } from 'expo-router';
 import type { ReactNode } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
@@ -48,7 +49,11 @@ export function EventDetailView({ event }: { event: EventDetail }) {
         <ThemedText type="subtitle">{event.difficulty.label}</ThemedText>
         <ThemedText type="small">{event.difficulty.description}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">{strings.hike.effort(event.effort_score)}</ThemedText>
-        {event.is_xtreme ? <ThemedText type="smallBold">{strings.hike.xtreme}</ThemedText> : null}
+        {event.is_xtreme ? (
+          <Link href="/x-events">
+            <ThemedText type="linkPrimary">{strings.hike.xtreme}</ThemedText>
+          </Link>
+        ) : null}
       </ThemedView>
 
       <View style={styles.facts}>
