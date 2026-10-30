@@ -503,7 +503,7 @@ export interface paths {
         };
         /**
          * Past hikes
-         * @description Newest first; filter by month for the archive.
+         * @description Newest first; filter by month for the archive. `album_slug` links a hike to its photos.
          */
         get: operations["v1.events.past"];
         put?: never;
@@ -1561,6 +1561,53 @@ export interface components {
             } | null;
             ordered_at: string;
             web_url: string;
+        };
+        /** PastEventResource */
+        PastEventResource: {
+            id: number;
+            slug: string;
+            title: string;
+            location: string;
+            season_tag: string | null;
+            starts_on: string;
+            summary: string | null;
+            distance_km: number;
+            elevation_gain_m: number;
+            elevation_loss_m: number;
+            duration_hours: number | null;
+            effort_score: number;
+            difficulty: {
+                /** @enum {integer} */
+                level: 1 | 2 | 3 | 4;
+                /** @enum {string} */
+                name: "Foundation" | "Endurance" | "Advanced" | "Xtreme";
+                label: string;
+                /** @enum {string} */
+                description: "Easy. Low vertical load; builds base endurance and uphill rhythm." | "Moderate. Longer distance or steady climbs; needs regular hiking fitness." | "Challenging. Long day with significant elevation; for experienced hikers." | "Very demanding. Long routes with sustained effort; approval required.";
+            };
+            fee: {
+                cents: number;
+                formatted: string;
+            };
+            is_xtreme: boolean;
+            /** @enum {string} */
+            status: "draft" | "published" | "cancelled";
+            cancellation_reason: string | null;
+            seats: {
+                capacity: number;
+                left: number;
+                sold_out: boolean;
+            };
+            registration: {
+                open: boolean;
+                closes_at: string;
+                waitlist_open: boolean;
+                requires_level_acknowledgement: boolean;
+            };
+            cover_image_url: string | null;
+            web_url: string;
+            /** @description The hike's photo album (GET /gallery/{slug}), null when none is published yet. */
+            album_slug: string | null;
         };
         /**
          * PaymentMethod
@@ -2706,14 +2753,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Paginated set of `EventResource` */
+            /** @description Paginated set of `PastEventResource` */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["EventResource"][];
+                        data: components["schemas"]["PastEventResource"][];
                         links: {
                             first: string | null;
                             last: string | null;

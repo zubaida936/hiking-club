@@ -71,6 +71,22 @@ describe('past hikes', function () {
         $this->getJson(route('api.v1.events.past', ['month' => $older->starts_on->format('Y-m')]))->assertJsonPath('data.*.title', ['Older']);
     });
 
+    it('links a past hike to its published album with photos', function () {
+        $withPhotos = Event::factory()->published()->create(['starts_on' => now()->subDays(3)->toDateString()]);
+        $album = Album::factory()->create(['event_id' => $withPhotos->id]);
+        $album->photos()->create(['path' => 'albums/a.jpg']);
+        $emptyAlbum = Event::factory()->published()->create(['starts_on' => now()->subDays(5)->toDateString()]);
+        Album::factory()->create(['event_id' => $emptyAlbum->id]);
+        $hiddenAlbum = Event::factory()->published()->create(['starts_on' => now()->subDays(7)->toDateString()]);
+        Album::factory()->create(['event_id' => $hiddenAlbum->id, 'is_published' => false])->photos()->create(['path' => 'albums/b.jpg']);
+
+        $this->getJson(route('api.v1.events.past'))
+            ->assertOk()
+            ->assertJsonPath('data.*.album_slug', [$album->slug, null, null])
+            // The list fields are all still there.
+            ->assertJsonPath('data.0.slug', $withPhotos->slug);
+    });
+
     it('pages by 20', function () {
         Event::factory()->published()->count(21)->sequence(fn ($s) => ['title' => "Hike {$s->index}", 'starts_on' => now()->subDays($s->index + 1)->toDateString()])->create();
 

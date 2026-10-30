@@ -5,6 +5,7 @@ it('opens website links on the matching app screen', () => {
   expect(appRouteFor('http://localhost:8080/events/horch-ehden')).toBe('/events/horch-ehden');
   expect(appRouteFor('https://hikingclub.lb/events/')).toBe('/hikes');
   expect(appRouteFor('/events')).toBe('/hikes');
+  expect(appRouteFor('https://hikingclub.lb/events/archive')).toBe('/past-hikes');
   expect(appRouteFor('https://hikingclub.lb/')).toBe('/');
   expect(appRouteFor('https://hikingclub.lb/account')).toBe('/account');
   expect(appRouteFor('https://hikingclub.lb/shop')).toBe('/shop');
@@ -35,7 +36,6 @@ it('opens website links on the matching app screen', () => {
 });
 
 it('leaves links without an app screen to the browser', () => {
-  expect(appRouteFor('https://hikingclub.lb/events/archive')).toBeNull();
   // Signed links from the CMS and the public delete-account page (Google Play) stay on the website.
   expect(appRouteFor('https://hikingclub.lb/activate/invite/12?signature=abc')).toBeNull();
   expect(appRouteFor('https://hikingclub.lb/password/set/7?signature=abc')).toBeNull();
@@ -47,8 +47,8 @@ describe('links that open the app', () => {
     expect(redirectSystemPath({ path: 'https://hikingclub.lb/events/horch-ehden', initial: true })).toBe('/events/horch-ehden');
     expect(redirectSystemPath({ path: 'https://hikingclub.lb/events', initial: false })).toBe('/hikes');
     expect(redirectSystemPath({ path: 'https://hikingclub.lb/account/profile', initial: true })).toBe('/edit-profile');
-    // A path the app claims but has no screen for: Home.
-    expect(redirectSystemPath({ path: 'https://hikingclub.lb/events/archive', initial: true })).toBe('/');
+    // A path the app claims but has no screen for (a hike's register page with a bad slug): Home.
+    expect(redirectSystemPath({ path: 'https://hikingclub.lb/events/Bad_Slug/register', initial: true })).toBe('/');
   });
 
   it("keeps the app's own links, and maps website paths sent to them", () => {

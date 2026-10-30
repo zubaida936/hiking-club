@@ -71,9 +71,14 @@ export default function HikesScreen() {
     <View style={styles.header}>
       <ThemedText type="title">{strings.hikes.title}</ThemedText>
       <SavedCopyNote error={error} updatedAt={dataUpdatedAt} />
-      <Link href="/difficulty-calculator">
-        <ThemedText type="linkPrimary">{strings.difficulty.link}</ThemedText>
-      </Link>
+      <View style={styles.links}>
+        <Link href="/difficulty-calculator">
+          <ThemedText type="linkPrimary">{strings.difficulty.link}</ThemedText>
+        </Link>
+        <Link href="/past-hikes">
+          <ThemedText type="linkPrimary">{strings.pastHikes.link}</ThemedText>
+        </Link>
+      </View>
       <TextInput
         accessibilityLabel={strings.hikes.search}
         placeholder={strings.hikes.searchPlaceholder}
@@ -151,6 +156,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, flexDirection: 'row', justifyContent: 'center' },
   safeArea: { flex: 1, maxWidth: MaxContentWidth, paddingHorizontal: Spacing.three },
   header: { gap: Spacing.two, marginTop: Spacing.three, marginBottom: Spacing.one },
+  links: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.four },
   search: { borderWidth: 1, borderRadius: 999, paddingHorizontal: Spacing.three, paddingVertical: Spacing.two, fontSize: 16 },
   chips: { gap: Spacing.two, paddingVertical: Spacing.half },
   list: { gap: Spacing.three, paddingBottom: BottomTabInset + Spacing.three },

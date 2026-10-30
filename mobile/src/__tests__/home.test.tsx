@@ -12,7 +12,7 @@ const home = (overrides = {}) => ({
     data: {
       slides: [
         { eyebrow: 'Autumn', heading: 'Into the cedars', text: 'Weekend hikes for every level.', cta: 'See the hike', url: 'http://localhost:8080/events/horch-ehden', image: null },
-        { eyebrow: null, heading: 'Past hikes', text: null, cta: 'See the archive', url: 'http://localhost:8080/events/archive', image: null },
+        { eyebrow: null, heading: 'Your data', text: null, cta: 'How to delete an account', url: 'http://localhost:8080/delete-account', image: null },
       ],
       next_event: sampleEvent(),
       top_hikers: [
@@ -29,7 +29,7 @@ it('shows the slides, the next hike and the top hikers', async () => {
   await renderRouter('./src/app', { initialUrl: '/' });
 
   expect(await screen.findByText('Into the cedars')).toBeOnTheScreen();
-  expect(screen.getByText('Past hikes')).toBeOnTheScreen();
+  expect(screen.getByText('Your data')).toBeOnTheScreen();
   expect(screen.getByText('Horch Ehden Nature Reserve')).toBeOnTheScreen();
   expect(screen.getByText('Rima H.')).toBeOnTheScreen();
   expect(screen.getByText('250 pts')).toBeOnTheScreen();
@@ -40,8 +40,8 @@ it('opens a slide link in the app when there is a screen for it, otherwise in th
   fakeApi({ ...appConfigRoute, 'GET /home': home(), 'GET /events/horch-ehden': { status: 200, body: { data: sampleEventDetail() } } });
   await renderRouter('./src/app', { initialUrl: '/' });
 
-  await fireEvent.press(await screen.findByRole('button', { name: 'See the archive' }));
-  expect(openURL).toHaveBeenCalledWith('http://localhost:8080/events/archive');
+  await fireEvent.press(await screen.findByRole('button', { name: 'How to delete an account' }));
+  expect(openURL).toHaveBeenCalledWith('http://localhost:8080/delete-account');
 
   await fireEvent.press(screen.getByRole('button', { name: 'See the hike' }));
   expect(screen).toHavePathname('/events/horch-ehden');

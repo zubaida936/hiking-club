@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\EventFilterRequest;
 use App\Http\Resources\Api\V1\EventDetailResource;
 use App\Http\Resources\Api\V1\EventResource;
+use App\Http\Resources\Api\V1\PastEventResource;
 use App\Models\Album;
 use App\Models\Event;
 use Illuminate\Database\Eloquent\Builder;
@@ -42,7 +43,7 @@ class EventController extends Controller
     /**
      * Past hikes.
      *
-     * Newest first; filter by month for the archive.
+     * Newest first; filter by month for the archive. `album_slug` links a hike to its photos.
      *
      * @unauthenticated
      */
@@ -51,10 +52,13 @@ class EventController extends Controller
         $events = Event::published()->past()
             ->where($request->filters())
             ->withSeatCounts()
+            // The newest published album with photos, in the same query (like the hike page's link).
+            ->addSelect(['album_slug' => Album::published()->select('slug')->whereColumn('event_id', 'events.id')->has('photos')->latest('id')->limit(1)])
             ->orderByDesc('starts_on')->orderByDesc('id')
             ->paginate(self::PER_PAGE);
 
-        return EventResource::collection($events);
+        // Built explicitly: the API docs read PastEventResource::collection() as a list of the parent EventResource.
+        return new AnonymousResourceCollection($events, PastEventResource::class);
     }
 
     /**

@@ -381,6 +381,13 @@ export const strings = {
     perkOnBookingScan: 'That\'s a reward code: use "Scan a reward code" on the Organizer tab.',
     done: 'Done',
   },
+  pastHikes: {
+    title: 'Past hikes',
+    link: 'Past hikes',
+    intro: 'Where we have been, month by month.',
+    empty: 'No past hikes yet.',
+    photos: 'See the photos',
+  },
   about: {
     title: 'About us',
     link: 'About the club',

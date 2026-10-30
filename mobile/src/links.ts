@@ -16,6 +16,7 @@ export function appRouteFor(url: string): Href | null {
   const hike = path.match(/^\/events\/([a-z0-9-]+)$/);
   if (hike && hike[1] !== 'archive') return `/events/${hike[1]}`;
   if (path === '/events') return '/hikes';
+  if (path === '/events/archive') return '/past-hikes';
   const booking = path.match(/^\/events\/([a-z0-9-]+)\/register$/);
   if (booking) return `/book/${booking[1]}`;
   const myBooking = path.match(/^\/bookings\/([A-Za-z0-9]+)$/);

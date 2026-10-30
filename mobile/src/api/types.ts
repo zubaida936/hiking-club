@@ -52,3 +52,5 @@ export type AlbumList = ResponseOf<'v1.gallery.index'>;
 export type AlbumCard = AlbumList['data'][number];
 export type Album = ResponseOf<'v1.gallery.show'>['data'];
 export type About = ResponseOf<'v1.about'>['data'];
+export type PastEvent = components['schemas']['PastEventResource'];
+export type PastEventList = ResponseOf<'v1.events.past'>;

@@ -18,6 +18,13 @@ export function formatDay(isoDate: string, style: 'short' | 'long' = 'short'): s
 }
 
 /** An ISO date-time → "1 Nov, 23:59" in the phone's time zone. */
+/** "October 2026" from a date like "2026-10-18" (the past hikes' month headings, like the website's archive). */
+export function formatMonth(isoDate: string): string {
+  const [year, month] = isoDate.split('-').map(Number);
+
+  return `${MONTHS[month - 1]} ${year}`;
+}
+
 /** "12 Oct 2026" from an ISO date-time (an article's publication date). */
 export function formatDate(isoDateTime: string): string {
   const date = new Date(isoDateTime);
