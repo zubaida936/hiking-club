@@ -23,6 +23,7 @@ export function appRouteFor(url: string): Href | null {
   if (path === '/x-events/apply') return '/x-events/apply';
   if (path === '/difficulty-calculator') return '/difficulty-calculator';
   if (path === '/rank-system') return '/rank-system';
+  if (path === '/leaderboard') return '/leaderboard';
   const order = path.match(/^\/orders\/([A-Za-z0-9]+)$/);
   if (order) return `/orders/${order[1]}`;
   if (path === '/') return '/';

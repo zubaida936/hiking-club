@@ -39,3 +39,5 @@ export type DifficultyLevels = ResponseOf<'v1.difficulty.levels'>['data'];
 export type DifficultyResult = ResponseOf<'v1.difficulty.calculate'>['data'];
 export type PerkState = ResponseOf<'v1.organizer.perks.show'>['data'];
 export type RankSystem = ResponseOf<'v1.rank-system'>['data'];
+export type LeaderboardList = ResponseOf<'v1.leaderboard'>;
+export type LeaderboardRow = LeaderboardList['data'][number];

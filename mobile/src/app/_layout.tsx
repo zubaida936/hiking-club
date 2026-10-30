@@ -60,6 +60,7 @@ export default function RootLayout() {
                 <Stack.Screen name="difficulty-calculator" options={{ title: strings.difficulty.title }} />
                 <Stack.Screen name="perks/scan" options={{ title: strings.perks.title }} />
                 <Stack.Screen name="rank-system" options={{ title: strings.rankSystem.title }} />
+                <Stack.Screen name="leaderboard" options={{ title: strings.leaderboard.title }} />
               </Stack>
             </VersionGate>
           </ThemeProvider>

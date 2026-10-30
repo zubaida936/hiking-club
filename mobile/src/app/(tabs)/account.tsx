@@ -65,6 +65,9 @@ export default function AccountScreen() {
               <Link href="/rank-system">
                 <ThemedText type="linkPrimary">{strings.rankSystem.link}</ThemedText>
               </Link>
+              <Link href="/leaderboard">
+                <ThemedText type="linkPrimary">{strings.leaderboard.link}</ThemedText>
+              </Link>
             </View>
           ) : null}
           <MyUpcomingBookings />

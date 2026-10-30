@@ -1,3 +1,4 @@
+import { Link } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import type { Member } from '@/api/types';
@@ -38,7 +39,9 @@ export function MemberProfile({ member }: { member: Member }) {
           <ThemedText type="small">{strings.account.hikesCompleted(hiker.hikes_completed)}</ThemedText>
           <ThemedText type="small">{strings.account.distance(hiker.distance_km)}</ThemedText>
           {hiker.leaderboard_position !== null ? (
-            <ThemedText type="small">{strings.account.leaderboardPosition(hiker.leaderboard_position)}</ThemedText>
+            <Link href="/leaderboard">
+              <ThemedText type="linkPrimary">{strings.account.leaderboardPosition(hiker.leaderboard_position)}</ThemedText>
+            </Link>
           ) : null}
         </ThemedView>
       ) : (

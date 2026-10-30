@@ -63,6 +63,9 @@ export default function HomeScreen() {
                 <ThemedText type="smallBold">{strings.home.points(hiker.points)}</ThemedText>
               </ThemedView>
             ))}
+            <Link href="/leaderboard">
+              <ThemedText type="linkPrimary">{strings.leaderboard.seeAll}</ThemedText>
+            </Link>
           </View>
         ) : null}
       </ScreenScroll>
