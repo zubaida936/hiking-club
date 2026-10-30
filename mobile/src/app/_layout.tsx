@@ -6,6 +6,7 @@ import { useColorScheme } from 'react-native';
 import { ApiError } from '@/api/client';
 import { AuthProvider } from '@/auth/auth-context';
 import { VersionGate } from '@/components/version-gate';
+import { CheckInProvider } from '@/organizer/check-in-store';
 import { CartProvider } from '@/shop/cart';
 import { strings } from '@/strings';
 
@@ -31,6 +32,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <CheckInProvider>
         <CartProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
             <VersionGate>
@@ -53,10 +55,13 @@ export default function RootLayout() {
                 <Stack.Screen name="my-orders" options={{ title: strings.order.myOrders }} />
                 <Stack.Screen name="x-events/index" options={{ title: strings.xEvents.title }} />
                 <Stack.Screen name="x-events/apply" options={{ title: strings.xApply.title }} />
+                <Stack.Screen name="check-in/[slug]" options={{ title: '' }} />
+                <Stack.Screen name="check-in/scan" options={{ title: strings.organizer.scanTitle }} />
               </Stack>
             </VersionGate>
           </ThemeProvider>
         </CartProvider>
+        </CheckInProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

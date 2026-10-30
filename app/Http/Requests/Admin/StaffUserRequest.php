@@ -5,6 +5,7 @@ namespace App\Http\Requests\Admin;
 use App\Domain\Identity\Data\StaffUserData;
 use App\Domain\Identity\Enums\Role;
 use App\Models\User;
+use App\Support\Phone;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -35,6 +36,13 @@ class StaffUserRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge(['is_active' => $this->boolean('is_active')]);
+
+        // Stored like members' phones ("+96170123456"): the app login looks the number up in that form,
+        // and the unique check then sees "+961 70 123 456" and "+96170123456" as the same number.
+        $phone = $this->input('phone');
+        if (is_string($phone) && preg_match(Phone::PATTERN, $phone) === 1) {
+            $this->merge(['phone' => Phone::normalize($phone)]);
+        }
     }
 
     public function toData(): StaffUserData

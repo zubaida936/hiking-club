@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, Alert, Linking, StyleSheet, View } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 
 import { ApiError, apiFetch } from '@/api/client';
 import { formMessage } from '@/api/errors';
@@ -12,6 +13,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { formatDay, formatMoment } from '@/format';
+import { QR_PREFIX } from '@/organizer/check-in-store';
 import { strings } from '@/strings';
 
 /**
@@ -84,6 +86,17 @@ export default function BookingScreen() {
         {booking.cancellation.reason ? <ThemedText themeColor="danger">{booking.cancellation.reason}</ThemedText> : null}
       </ThemedView>
 
+      {/* Organizers scan it at the meeting point (Organizer tab); it holds only the reference. */}
+      {booking.status.key === 'confirmed' ? (
+        <ThemedView type="backgroundElement" style={[styles.card, styles.qrCard]}>
+          <ThemedText type="smallBold">{strings.booking.qrTitle}</ThemedText>
+          <View style={styles.qr}>
+            <QRCode value={QR_PREFIX + booking.reference} size={180} backgroundColor="#ffffff" color="#000000" />
+          </View>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.qrHint}>{strings.booking.qrHint}</ThemedText>
+        </ThemedView>
+      ) : null}
+
       <PaymentPanel<Booking> path={path} amount={booking.amount_due.formatted} payment={payment} reload={refetch} onUpdated={update} />
 
       {payment.refund_due ? <ThemedText>{strings.booking.refundDue}</ThemedText> : null}
@@ -112,5 +125,9 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
   text: { textAlign: 'center' },
   card: { borderRadius: Spacing.four, padding: Spacing.three, gap: Spacing.one },
+  qrCard: { alignItems: 'center', gap: Spacing.two },
+  // White around the code (also in dark mode) so cameras read it.
+  qr: { backgroundColor: '#ffffff', padding: Spacing.three, borderRadius: Spacing.two },
+  qrHint: { textAlign: 'center' },
   block: { gap: Spacing.two },
 });

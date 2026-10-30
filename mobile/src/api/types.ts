@@ -33,3 +33,5 @@ export type LoginResult = ResponseOf<'v1.auth.login'>;
 export type XEvents = ResponseOf<'v1.x-events.index'>['data'];
 export type XApplicationForm = ResponseOf<'v1.x-events.application-form'>['data'];
 export type XApplicationResult = ResponseOf<'v1.x-events.apply'>['data'];
+export type OrganizerHike = ResponseOf<'v1.organizer.events'>['data'][number];
+export type CheckIn = components['schemas']['CheckInResource'];

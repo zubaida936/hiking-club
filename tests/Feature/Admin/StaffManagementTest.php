@@ -49,7 +49,19 @@ it('creates a staff user with a role', function () {
 
     $user = User::where('email', 'rami@example.com')->firstOrFail();
     expect($user->hasRole('guide'))->toBeTrue()
-        ->and($user->is_active)->toBeTrue();
+        ->and($user->is_active)->toBeTrue()
+        ->and($user->phone)->toBe('+96170111222');
+});
+
+it('stores staff phones like members\' so staff can log in to the app, and sees duplicates written differently', function () {
+    $this->actingAs($this->superAdmin)->post(route('admin.staff.store'), validStaffPayload())->assertSessionHasNoErrors();
+
+    $this->postJson(route('api.v1.auth.login'), ['phone' => '+961 70 111 222', 'password' => 'Mountain2026', 'device_name' => 'Pixel'])
+        ->assertCreated();
+
+    $this->actingAs($this->superAdmin)
+        ->post(route('admin.staff.store'), validStaffPayload(['email' => 'other@example.com', 'phone' => '+96170111222']))
+        ->assertSessionHasErrors('phone');
 });
 
 it('validates staff input', function (array $overrides, string $field) {

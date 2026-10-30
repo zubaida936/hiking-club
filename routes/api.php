@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\GuideController;
 use App\Http\Controllers\Api\V1\LeaderboardController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\OrderController;
+use App\Http\Controllers\Api\V1\OrganizerController;
 use App\Http\Controllers\Api\V1\RankSystemController;
 use App\Http\Controllers\Api\V1\ShopController;
 use App\Http\Controllers\Api\V1\XEventsController;
@@ -113,5 +114,12 @@ Route::prefix('v1')->name('api.v1.')->middleware([UseApiGuard::class, 'active', 
             Route::post('transfer', 'transfer')->middleware('throttle:10,1')->name('transfer');
             Route::post('cancel', 'cancel')->middleware('auth:sanctum')->name('cancel');
         });
+    });
+
+    // Organizer tools (staff): each action checks the same permission as the CMS.
+    Route::controller(OrganizerController::class)->prefix('organizer')->name('organizer.')->middleware('auth:sanctum')->group(function () {
+        Route::get('events', 'events')->name('events');
+        Route::get('events/{event:slug}/registrations', 'registrations')->name('registrations');
+        Route::put('registrations/{registration:reference}/attendance', 'attendance')->name('attendance');
     });
 });

@@ -7,11 +7,14 @@ import type { Booking, BookingForm, Event, EventDetail, Member, Order, Product }
 type Route = { status: number; body?: unknown };
 type Call = { method: string; path: string; query: Record<string, string>; body: unknown; auth: string | undefined };
 
+type Answer = Route | 'offline';
+
 /**
  * Replaces `fetch` with a fake API: "METHOD /path" => answer (or a function giving the answer, for answers that
- * change, e.g. a booking that becomes paid). Every request is recorded in the returned list.
+ * change, e.g. a booking that becomes paid, or a phone that loses signal). Every request is recorded in the
+ * returned list.
  */
-export function fakeApi(routes: Record<string, Route | (() => Route) | 'offline'>): Call[] {
+export function fakeApi(routes: Record<string, Answer | (() => Answer)>): Call[] {
   const calls: Call[] = [];
 
   global.fetch = jest.fn(async (url: string | URL | Request, init?: RequestInit) => {
@@ -22,9 +25,9 @@ export function fakeApi(routes: Record<string, Route | (() => Route) | 'offline'
     calls.push({ method, path, query: Object.fromEntries(parsed.searchParams), body: init?.body ? JSON.parse(String(init.body)) : undefined, auth: headers.Authorization });
 
     const answer = routes[`${method} ${path}`] ?? { status: 404, body: { message: 'Not found' } };
-    // 'offline': the request never reaches the server (like a phone without signal).
-    if (answer === 'offline') throw new TypeError('Network request failed');
     const route = typeof answer === 'function' ? answer() : answer;
+    // 'offline': the request never reaches the server (like a phone without signal). A function can switch it.
+    if (route === 'offline') throw new TypeError('Network request failed');
     return new Response(route.body === undefined ? null : JSON.stringify(route.body), { status: route.status });
   }) as typeof fetch;
 
@@ -63,6 +66,7 @@ export const sampleMember: Member = {
     show_on_leaderboard: true,
     x_events_approved: false,
   },
+  organizer: null,
 };
 
 export function sampleEvent(overrides: Partial<Event> = {}): Event {

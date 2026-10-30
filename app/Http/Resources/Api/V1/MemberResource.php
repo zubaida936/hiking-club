@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Domain\Identity\Enums\Permission;
 use App\Domain\Loyalty\Leaderboard;
 use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
@@ -68,6 +69,11 @@ class MemberResource extends JsonResource
                 'distance_km' => round($hiker->totalDistanceKm(), 1),
                 'show_on_leaderboard' => $hiker->show_on_leaderboard,
                 'x_events_approved' => $hiker->x_approved_at !== null,
+            ],
+            // Staff who may see hike registrations get the app's Organizer tab (null for everyone else). Each
+            // organizer endpoint checks its own permission again; these only decide what the app shows.
+            'organizer' => ! $this->resource->can(Permission::ViewRegistrations->value) ? null : [
+                'can_mark_attendance' => $this->resource->can(Permission::ManageAttendance->value),
             ],
         ];
     }

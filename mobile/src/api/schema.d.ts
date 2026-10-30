@@ -736,6 +736,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/organizer/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Hikes to check in
+         * @description Published hikes from a week ago to a week ahead, soonest first, with how many confirmed hikers there are
+         *     and how many are checked in. `check_in_open` is false before the hike day (attendance can't be marked yet).
+         */
+        get: operations["v1.organizer.events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizer/events/{event}/registrations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Check-in list
+         * @description The hike's confirmed bookings and those awaiting approval, by pickup time then name (waitlisted and
+         *     cancelled ones aren't coming). Save it on the phone: attendance can be marked offline and sent later.
+         */
+        get: operations["v1.organizer.registrations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organizer/registrations/{registration}/attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Mark attendance
+         * @description `attended`, `no_show`, or null to clear it. Same rules as the CMS: confirmed bookings only, from the hike
+         *     day on (otherwise 422 with a message). Sending the same value again changes nothing, so a phone can safely
+         *     resend marks it made offline. Points follow automatically.
+         */
+        put: operations["v1.organizer.attendance"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/password/forgot": {
         parameters: {
             query?: never;
@@ -1018,6 +1082,11 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * Attendance
+         * @enum {string}
+         */
+        Attendance: "attended" | "no_show";
         /** BookingResource */
         BookingResource: {
             reference: string;
@@ -1095,6 +1164,42 @@ export interface components {
             booked_at: string;
             web_url: string;
             whatsapp_url: string | null;
+        };
+        /** CheckInResource */
+        CheckInResource: {
+            /** @description Also what the member's QR code holds. */
+            reference: string;
+            name: string;
+            phone: string;
+            /** @description confirmed or pending (awaiting approval); only confirmed bookings can be checked in. */
+            status: {
+                /** @enum {string} */
+                key: "confirmed" | "pending" | "waitlisted" | "cancelled";
+                /** @enum {string} */
+                label: "Confirmed" | "Awaiting approval" | "On the waitlist" | "Cancelled";
+            };
+            pickup: {
+                point: string;
+                time: string | null;
+            } | null;
+            emergency_contact: {
+                name: string;
+                phone: string;
+            };
+            notes: string | null;
+            /** @description none (free), paid, or due (with the amount and how they chose to pay). */
+            payment: {
+                /** @enum {string} */
+                state: "none" | "paid" | "due";
+                amount: string;
+                method: string | null;
+            };
+            /**
+             * @description attended, no_show, or null when not marked yet.
+             * @enum {string|null}
+             */
+            attendance: "attended" | "no_show" | null;
+            can_check_in: boolean;
         };
         /**
          * CheckoutRequest
@@ -1287,6 +1392,13 @@ export interface components {
                 distance_km: number;
                 show_on_leaderboard: boolean;
                 x_events_approved: boolean;
+            } | null;
+            /**
+             * @description Staff who may see hike registrations get the app's Organizer tab (null for everyone else). Each
+             *     organizer endpoint checks its own permission again; these only decide what the app shows.
+             */
+            organizer: {
+                can_mark_attendance: boolean;
             } | null;
         };
         /** OrderResource */
@@ -2861,6 +2973,97 @@ export interface operations {
                     };
                 };
             };
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "v1.organizer.events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            event: components["schemas"]["EventResource"];
+                            confirmed: number;
+                            checked_in: number;
+                            check_in_open: boolean;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "v1.organizer.registrations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The event slug */
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `CheckInResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CheckInResource"][];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+        };
+    };
+    "v1.organizer.attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The registration reference */
+                registration: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    attendance: components["schemas"]["Attendance"] | null;
+                };
+            };
+        };
+        responses: {
+            /** @description `CheckInResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CheckInResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
             404: components["responses"]["ModelNotFoundException"];
             422: components["responses"]["ValidationException"];
         };
