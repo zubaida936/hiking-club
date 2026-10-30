@@ -105,28 +105,40 @@ class ContentController extends Controller
      * in that category (GET /shop/products?category=...).
      *
      * @unauthenticated
-     *
-     * @return array{data: array<string, mixed>}
      */
-    public function equipment(): array
+    public function equipment(): JsonResponse
     {
         $shopCategories = ProductCategory::query()->whereHas('products', fn ($q) => $q->where('is_active', true))->pluck('slug')->all();
 
-        return ['data' => [
-            'levels' => array_map(fn (DifficultyLevel $level) => ['level' => $level->value, 'label' => $level->label()], DifficultyLevel::cases()),
-            'adventures' => collect((array) config('equipment.adventures'))->map(fn (array $adventure, string $key) => [
-                'key' => $key,
-                'label' => $adventure['label'],
-                'icon' => $adventure['icon'],
-                'intro' => $adventure['intro'],
-                'items' => array_map(fn (array $item) => [
-                    'name' => $item[0],
-                    'tip' => $item[1],
-                    'from_level' => $item[2],
-                    'shop_category' => in_array($item[3], $shopCategories, true) ? $item[3] : null,
-                ], $adventure['items']),
-            ])->values()->all(),
-        ]];
+        // Loops with casts (not array_map / collect()->map over config arrays) so the API docs type every field.
+        $levels = [];
+        foreach (DifficultyLevel::cases() as $level) {
+            $levels[] = ['level' => (int) $level->value, 'label' => $level->label()];
+        }
+
+        $adventures = [];
+        foreach ((array) config('equipment.adventures') as $key => $adventure) {
+            $items = [];
+            foreach ((array) $adventure['items'] as $item) {
+                $items[] = [
+                    'name' => (string) $item[0],
+                    'tip' => (string) $item[1],
+                    // Needed from this difficulty level up; null: always.
+                    'from_level' => $item[2] === null ? null : (int) $item[2],
+                    // Set only when the shop has products in that category.
+                    'shop_category' => in_array($item[3], $shopCategories, true) ? (string) $item[3] : null,
+                ];
+            }
+            $adventures[] = [
+                'key' => (string) $key,
+                'label' => (string) $adventure['label'],
+                'icon' => (string) $adventure['icon'],
+                'intro' => (string) $adventure['intro'],
+                'items' => $items,
+            ];
+        }
+
+        return response()->json(['data' => ['levels' => $levels, 'adventures' => $adventures]]);
     }
 
     /**

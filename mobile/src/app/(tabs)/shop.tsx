@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,10 +14,19 @@ import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useCart } from '@/shop/cart';
 import { strings } from '@/strings';
 
-/** The shop (GET /shop/products), by category, with the cart button. */
+/** The shop (GET /shop/products), by category, with the cart button. `?category=slug` picks a category (equipment guide). */
 export default function ShopScreen() {
   const { count } = useCart();
-  const [category, setCategory] = useState<string | null>(null);
+  const params = useLocalSearchParams<{ category?: string }>();
+  const [category, setCategory] = useState<string | null>(params.category ?? null);
+
+  // The tab stays mounted: follow a new category link while it's open in the background (React's "adjust state
+  // when a prop changes" pattern, without an effect).
+  const [linkedCategory, setLinkedCategory] = useState(params.category);
+  if (params.category !== linkedCategory) {
+    setLinkedCategory(params.category);
+    if (params.category) setCategory(params.category);
+  }
 
   const { data: categories } = useQuery({
     queryKey: ['shop', 'categories'],

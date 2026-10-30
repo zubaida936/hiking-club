@@ -126,6 +126,9 @@ export function EventDetailView({ event }: { event: EventDetail }) {
 
       <List title={strings.hike.included} items={event.included} />
       <List title={strings.hike.whatToBring} items={event.what_to_bring} />
+      <Link href="/equipment">
+        <ThemedText type="linkPrimary">{strings.equipment.title}</ThemedText>
+      </Link>
 
       {event.gpx_url ? (
         <Section title={strings.hike.route}>

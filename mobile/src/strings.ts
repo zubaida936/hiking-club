@@ -380,6 +380,15 @@ export const strings = {
     perkOnBookingScan: 'That\'s a reward code: use "Scan a reward code" on the Organizer tab.',
     done: 'Done',
   },
+  equipment: {
+    title: 'Equipment guide',
+    level: 'Your hike level',
+    fromLevel: (level: number) => `From Level ${level}`,
+    packed: (done: number, total: number) => `${done} / ${total} packed`,
+    clear: 'Untick everything',
+    inShop: 'See it in the shop',
+    remembered: 'Your ticks are saved on this phone.',
+  },
   guides: {
     title: "Hiker's guides",
     link: "Hiker's guides",

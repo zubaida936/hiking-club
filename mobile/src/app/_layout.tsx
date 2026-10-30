@@ -63,6 +63,7 @@ export default function RootLayout() {
                 <Stack.Screen name="leaderboard" options={{ title: strings.leaderboard.title }} />
                 <Stack.Screen name="guides/index" options={{ title: strings.guides.title }} />
                 <Stack.Screen name="guides/[slug]" options={{ title: '' }} />
+                <Stack.Screen name="equipment" options={{ title: strings.equipment.title }} />
               </Stack>
             </VersionGate>
           </ThemeProvider>

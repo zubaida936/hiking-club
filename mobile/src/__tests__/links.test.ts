@@ -15,6 +15,7 @@ it('opens website links on the matching app screen', () => {
   expect(appRouteFor('https://hikingclub.lb/rank-system')).toBe('/rank-system');
   expect(appRouteFor('https://hikingclub.lb/leaderboard')).toBe('/leaderboard');
   expect(appRouteFor('https://hikingclub.lb/guides')).toBe('/guides');
+  expect(appRouteFor('https://hikingclub.lb/equipment')).toBe('/equipment');
   expect(appRouteFor('http://localhost:8080/guides/how-much-water-to-carry-on-a-day-hike')).toBe('/guides/how-much-water-to-carry-on-a-day-hike');
 });
 

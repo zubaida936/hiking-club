@@ -44,3 +44,4 @@ export type LeaderboardRow = LeaderboardList['data'][number];
 export type ArticleCard = components['schemas']['ArticleResource'];
 export type ArticleList = ResponseOf<'v1.guides.index'>;
 export type Article = components['schemas']['ArticleDetailResource'];
+export type Equipment = ResponseOf<'v1.equipment'>['data'];

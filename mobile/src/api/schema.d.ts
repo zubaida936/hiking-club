@@ -2438,13 +2438,23 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
-                            levels: unknown[];
+                            levels: {
+                                level: number;
+                                label: string;
+                            }[];
                             adventures: {
                                 key: string;
                                 label: string;
                                 icon: string;
                                 intro: string;
-                                items: unknown[];
+                                items: {
+                                    name: string;
+                                    tip: string;
+                                    /** @description Needed from this difficulty level up; null: always. */
+                                    from_level: number | null;
+                                    /** @description Set only when the shop has products in that category. */
+                                    shop_category: string | null;
+                                }[];
                             }[];
                         };
                     };
