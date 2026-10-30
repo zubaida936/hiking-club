@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Site\AboutController;
 use App\Http\Controllers\Site\AccountController;
+use App\Http\Controllers\Site\AppLinksController;
 use App\Http\Controllers\Site\Auth\ActivationController;
 use App\Http\Controllers\Site\Auth\InviteController;
 use App\Http\Controllers\Site\Auth\MemberSessionController;
@@ -27,6 +28,11 @@ use App\Http\Controllers\Site\XEventsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+
+// App Links / Universal Links: phones check these before opening website links in the installed app.
+Route::get('.well-known/assetlinks.json', [AppLinksController::class, 'android'])->name('app-links.android');
+Route::get('.well-known/apple-app-site-association', [AppLinksController::class, 'apple'])->name('app-links.apple');
+
 Route::get('events', [EventController::class, 'index'])->name('events.index');
 Route::get('events/archive', [EventController::class, 'archive'])->name('events.archive');
 Route::get('leaderboard', LeaderboardController::class)->name('leaderboard');

@@ -8,7 +8,8 @@
     "scheme": "hikingclub",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "club.hiking.app"
     },
     "android": {
       "package": "club.hiking.app",
