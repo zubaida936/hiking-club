@@ -152,6 +152,12 @@ class ContentController extends Controller
     {
         $contact = (array) config('site.contact');
 
+        // A loop, not collect()->map() over a plain array (that can untype other endpoints in the API docs).
+        $social = [];
+        foreach (SocialLinks::all() as $network => $link) {
+            $social[] = ['network' => (string) $network, 'label' => (string) $link[0], 'url' => (string) $link[1]];
+        }
+
         return ['data' => [
             'address' => $contact['address'],
             'phone' => $contact['phone'],
@@ -159,7 +165,7 @@ class ContentController extends Controller
             // null when the club has no WhatsApp number set.
             'whatsapp_url' => WhatsApp::link((string) $contact['whatsapp_message']),
             'maps_url' => $contact['maps_url'] ?: 'https://www.google.com/maps/search/?api=1&query='.rawurlencode((string) $contact['address']),
-            'social' => collect(SocialLinks::all())->map(fn (array $link, string $network) => ['network' => $network, 'label' => $link[0], 'url' => $link[1]])->values()->all(),
+            'social' => $social,
         ]];
     }
 

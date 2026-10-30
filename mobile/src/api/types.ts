@@ -45,3 +45,6 @@ export type ArticleCard = components['schemas']['ArticleResource'];
 export type ArticleList = ResponseOf<'v1.guides.index'>;
 export type Article = components['schemas']['ArticleDetailResource'];
 export type Equipment = ResponseOf<'v1.equipment'>['data'];
+export type ContactDetails = ResponseOf<'v1.contact'>['data'];
+export type ContactForm = components['schemas']['ContactRequest'];
+export type ContactSent = operations['v1.contact.send']['responses'][202]['content']['application/json'];

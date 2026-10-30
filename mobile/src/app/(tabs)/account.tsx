@@ -74,6 +74,9 @@ export default function AccountScreen() {
               <Link href="/equipment">
                 <ThemedText type="linkPrimary">{strings.equipment.title}</ThemedText>
               </Link>
+              <Link href="/contact">
+                <ThemedText type="linkPrimary">{strings.contact.link}</ThemedText>
+              </Link>
             </View>
           ) : null}
           <MyUpcomingBookings />
@@ -93,6 +96,9 @@ export default function AccountScreen() {
           </Link>
           <Link href="/equipment">
             <ThemedText type="linkPrimary">{strings.equipment.title}</ThemedText>
+          </Link>
+          <Link href="/contact">
+            <ThemedText type="linkPrimary">{strings.contact.link}</ThemedText>
           </Link>
         </ScreenScroll>
       )}
