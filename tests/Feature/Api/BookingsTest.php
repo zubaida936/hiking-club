@@ -283,6 +283,42 @@ describe('cancelling', function () {
         expect($registration->fresh()->status)->toBe(RegistrationStatus::Cancelled);
     });
 
+    it('lets a member leave the waitlist, and moves the others up', function () {
+        [, $hiker, $token] = bookingMember();
+        $this->event->update(['capacity' => 1, 'waitlist_enabled' => true]);
+        EventRegistration::factory()->for($this->event)->create();
+        $mine = EventRegistration::factory()->for($this->event)->create(['hiker_id' => $hiker->id, 'phone' => $hiker->phone, 'status' => RegistrationStatus::Waitlisted]);
+        $next = EventRegistration::factory()->for($this->event)->create(['status' => RegistrationStatus::Waitlisted]);
+
+        $this->getJson(route('api.v1.bookings.show', $next->token))->assertJsonPath('data.waitlist_position', 2);
+        $this->withToken($token)->getJson(route('api.v1.bookings.show', $mine->token))->assertJsonPath('data.cancellation.can_cancel', true);
+
+        $this->withToken($token)->postJson(route('api.v1.bookings.cancel', $mine->token))
+            ->assertOk()
+            ->assertJsonPath('data.status.key', 'cancelled')
+            ->assertJsonPath('data.waitlist_position', null);
+
+        $this->app['auth']->forgetGuards();
+        $this->getJson(route('api.v1.bookings.show', $next->token))
+            ->assertJsonPath('data.status.key', 'waitlisted')
+            ->assertJsonPath('data.waitlist_position', 1);
+    });
+
+    it('confirms the first on the waitlist when a member cancels, and the app sees it', function () {
+        [, $hiker, $token] = bookingMember();
+        $this->event->update(['capacity' => 1, 'waitlist_enabled' => true]);
+        $seat = EventRegistration::factory()->for($this->event)->create(['hiker_id' => $hiker->id, 'phone' => $hiker->phone]);
+        $waiting = EventRegistration::factory()->for($this->event)->create(['status' => RegistrationStatus::Waitlisted, 'email' => 'maya@example.com']);
+
+        $this->withToken($token)->postJson(route('api.v1.bookings.cancel', $seat->token))->assertOk();
+
+        $this->app['auth']->forgetGuards();
+        $this->getJson(route('api.v1.bookings.show', $waiting->token))
+            ->assertJsonPath('data.status.key', 'confirmed')
+            ->assertJsonPath('data.waitlist_position', null);
+        Mail::assertQueued(RegistrationConfirmationMail::class, fn (RegistrationConfirmationMail $mail) => $mail->hasTo('maya@example.com'));
+    });
+
     it('refuses guests and other members', function () {
         [, , $token] = bookingMember();
         $registration = EventRegistration::factory()->for($this->event)->create();

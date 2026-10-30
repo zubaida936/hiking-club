@@ -41,10 +41,12 @@ export default function BookingScreen() {
     onSuccess: ({ data }) => update(data),
   });
 
+  // On the waitlist the same cancel means leaving it: say so.
+  const waitlisted = booking?.status.key === 'waitlisted';
   const confirmCancel = () =>
-    Alert.alert(strings.booking.cancelConfirmTitle, strings.booking.cancelConfirmText, [
+    Alert.alert(waitlisted ? strings.booking.leaveConfirmTitle : strings.booking.cancelConfirmTitle, waitlisted ? strings.booking.leaveConfirmText : strings.booking.cancelConfirmText, [
       { text: strings.booking.keep, style: 'cancel' },
-      { text: strings.booking.cancelConfirm, style: 'destructive', onPress: () => cancel.mutate() },
+      { text: waitlisted ? strings.booking.leaveConfirm : strings.booking.cancelConfirm, style: 'destructive', onPress: () => cancel.mutate() },
     ]);
 
   if (isPending) {
@@ -96,7 +98,7 @@ export default function BookingScreen() {
           {booking.cancellation.until ? (
             <ThemedText type="small" themeColor="textSecondary">{strings.booking.cancelUntil(formatMoment(booking.cancellation.until))}</ThemedText>
           ) : null}
-          <Button title={strings.booking.cancel} onPress={confirmCancel} loading={cancel.isPending} variant="secondary" />
+          <Button title={waitlisted ? strings.booking.leaveWaitlist : strings.booking.cancel} onPress={confirmCancel} loading={cancel.isPending} variant="secondary" />
           <FormError message={formMessage(cancel.error)} />
         </View>
       ) : null}
