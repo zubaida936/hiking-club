@@ -890,8 +890,8 @@ export interface paths {
         };
         /**
          * Rank system
-         * @description The ranks with the points they need and their rewards, and how points are earned. The member's own
-         *     points and rank are in `GET /me`.
+         * @description The ranks with the points they need and their rewards, how points are earned, a worked example and the
+         *     terms: everything on the website's Rank System page. The member's own points and rank are in `GET /me`.
          */
         get: operations["v1.rank-system"];
         put?: never;
@@ -3287,9 +3287,23 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
-                            ranks: unknown[];
+                            ranks: {
+                                key: string;
+                                label: string;
+                                min_points: number;
+                                rewards: {
+                                    key: string;
+                                    label: string;
+                                    kind: string;
+                                    how_it_works: string;
+                                }[];
+                            }[];
                             points: {
-                                per_hike: unknown[];
+                                per_hike: {
+                                    level: number;
+                                    label: string;
+                                    points: number;
+                                }[];
                                 /** @description Bonus for booking at least `days` days before the hike. */
                                 early_booking: {
                                     points: number;
@@ -3300,6 +3314,17 @@ export interface operations {
                                 /** @description Only paid hikes count (free hikes always count). */
                                 paid_only: boolean;
                             };
+                            /** @description A Level 2 hike booked early, and about how many of those reach the second rank. */
+                            example: {
+                                level_label: string;
+                                hike_points: number;
+                                early_booking_points: number;
+                                total: number;
+                                rank_label: string;
+                                hikes_to_rank: number;
+                            };
+                            /** @description The fine print, one rule per line. */
+                            terms: string[];
                         };
                     };
                 };

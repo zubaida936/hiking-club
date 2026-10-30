@@ -59,6 +59,7 @@ export default function RootLayout() {
                 <Stack.Screen name="check-in/scan" options={{ title: strings.organizer.scanTitle }} />
                 <Stack.Screen name="difficulty-calculator" options={{ title: strings.difficulty.title }} />
                 <Stack.Screen name="perks/scan" options={{ title: strings.perks.title }} />
+                <Stack.Screen name="rank-system" options={{ title: strings.rankSystem.title }} />
               </Stack>
             </VersionGate>
           </ThemeProvider>

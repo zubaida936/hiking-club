@@ -62,6 +62,9 @@ export default function AccountScreen() {
               <Link href="/x-events">
                 <ThemedText type="linkPrimary">{strings.xEvents.link}</ThemedText>
               </Link>
+              <Link href="/rank-system">
+                <ThemedText type="linkPrimary">{strings.rankSystem.link}</ThemedText>
+              </Link>
             </View>
           ) : null}
           <MyUpcomingBookings />
@@ -73,6 +76,9 @@ export default function AccountScreen() {
       ) : (
         <ScreenScroll>
           <LoginForm />
+          <Link href="/rank-system">
+            <ThemedText type="linkPrimary">{strings.rankSystem.link}</ThemedText>
+          </Link>
         </ScreenScroll>
       )}
     </SafeAreaView>

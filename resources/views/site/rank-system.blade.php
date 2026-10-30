@@ -1,12 +1,5 @@
 @php
-    use App\Domain\Loyalty\Enums\RankTier;
-
     $icons = ['pathfinder' => '🧭', 'trekker' => '🥾', 'mountaineer' => '⛰️', 'highlander' => '🏔️', 'elite' => '👑'];
-
-    // Worked example: a Level 2 hike booked early, and how many of those reach the second tier.
-    $example = $hikePoints[1]['points'] + $earlyBooking['points'];
-    $secondTier = RankTier::cases()[1];
-    $exampleHikes = (int) ceil($secondTier->minPoints() / max(1, $example));
 @endphp
 
 <x-site.layout title="Rank System" description="Hike with us, earn points and climb the ranks from Pathfinder to Elite. How points are earned, what each rank unlocks and the terms.">
@@ -117,8 +110,8 @@
                     <p><strong>Harder hikes earn more.</strong> The level of every hike is on its page; the <a href="{{ route('guide.difficulty') }}" class="font-medium text-brand-600 underline">difficulty calculator</a> explains how it is worked out.</p>
                     <div class="rounded-2xl bg-white p-5 ring-1 ring-slate-200">
                         <p class="font-display font-semibold uppercase tracking-wide text-brand-800">Example</p>
-                        <p class="mt-2">A {{ $hikePoints[1]['level']->label() }} hike booked early: {{ $hikePoints[1]['points'] }} + {{ $earlyBooking['points'] }} = <strong>{{ $example }} points</strong>.
-                            About {{ $exampleHikes }} of those take you to {{ $secondTier->label() }}.</p>
+                        <p class="mt-2">A {{ $example['level']->label() }} hike booked early: {{ $example['hike_points'] }} + {{ $example['early_booking_points'] }} = <strong>{{ $example['total'] }} points</strong>.
+                            About {{ $example['hikes_to_rank'] }} of those take you to {{ $example['rank']->label() }}.</p>
                     </div>
                     <p>Ranks are on the <a href="{{ route('leaderboard') }}" class="font-medium text-brand-600 underline">leaderboard</a>. Hikers with the same points are ranked by the distance they hiked. Prefer to stay off it? Choose "Hide me" on My account.</p>
                 </div>
@@ -130,12 +123,9 @@
     <section class="mx-auto max-w-3xl px-4 py-16 sm:px-6" aria-labelledby="terms-heading">
         <x-site.section-heading eyebrow="The fine print"><span id="terms-heading">Terms</span></x-site.section-heading>
         <ul class="mt-8 list-disc space-y-3 pl-6 text-slate-700">
-            <li>Points and rewards belong to one hiker, identified by the phone number used to book. They can't be transferred or exchanged for cash.</li>
-            <li>A reward is used on a booking you make yourself, logged in, with your own phone number. One reward per booking; rewards can't be combined.</li>
-            <li>Rewards are one-time unless their description says otherwise. Cancelling a booking gives its reward back.</li>
-            <li>Points come from completed hikes only. If a hike is marked as not attended, cancelled{{ $paidOnly ? ' or unpaid' : '' }} afterwards, its points are removed.</li>
-            <li>If your points drop below a rank, the unused rewards of that rank are locked again until you climb back.</li>
-            <li>Points don't expire. The club may correct points that were added by mistake and may change the rank system; changes are announced on this page.</li>
+            @foreach ($terms as $term)
+                <li>{{ $term }}</li>
+            @endforeach
         </ul>
         <div class="mt-10 text-center">
             <a href="{{ route('events.index') }}" class="inline-block rounded-full bg-accent-500 px-8 py-3 font-display font-bold uppercase tracking-wide text-white hover:bg-accent-600">Start earning: see upcoming hikes</a>

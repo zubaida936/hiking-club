@@ -12,9 +12,10 @@ it('opens website links on the matching app screen', () => {
   expect(appRouteFor('https://hikingclub.lb/x-events')).toBe('/x-events');
   expect(appRouteFor('https://hikingclub.lb/x-events/apply/')).toBe('/x-events/apply');
   expect(appRouteFor('https://hikingclub.lb/difficulty-calculator')).toBe('/difficulty-calculator');
+  expect(appRouteFor('https://hikingclub.lb/rank-system')).toBe('/rank-system');
 });
 
 it('leaves links without an app screen to the browser', () => {
   expect(appRouteFor('https://hikingclub.lb/events/archive')).toBeNull();
-  expect(appRouteFor('https://hikingclub.lb/rank-system')).toBeNull();
+  expect(appRouteFor('https://hikingclub.lb/guides')).toBeNull();
 });

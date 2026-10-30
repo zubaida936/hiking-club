@@ -1,4 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { Link } from 'expo-router';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 
 import { apiFetch } from '@/api/client';
@@ -43,6 +44,11 @@ export default function MyPointsScreen() {
         keyExtractor={(line) => String(line.id)}
         renderItem={({ item }) => <PointRow line={item} />}
         contentContainerStyle={styles.list}
+        ListHeaderComponent={
+          <Link href="/rank-system">
+            <ThemedText type="linkPrimary">{strings.rankSystem.link}</ThemedText>
+          </Link>
+        }
         ListEmptyComponent={<ThemedText style={styles.text}>{strings.points.empty}</ThemedText>}
         onEndReached={() => hasNextPage && !isFetchingNextPage && void fetchNextPage()}
         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator /> : undefined}

@@ -4,6 +4,7 @@ use App\Domain\Events\Difficulty\DifficultyCalculator;
 use App\Domain\Events\Enums\DifficultyLevel;
 use App\Domain\Identity\Enums\Role;
 use App\Domain\Loyalty\Enums\PointType;
+use App\Domain\Loyalty\RankSystemGuide;
 use App\Models\Event;
 use App\Models\Hiker;
 use App\Models\User;
@@ -57,7 +58,24 @@ it('explains the rank system from the config', function () {
         ->and($response->json('data.ranks.2.rewards.*.key'))->toContain('mountaineer_free_moderate')
         ->and($response->json('data.points.per_hike.1'))->toBe(['level' => 2, 'label' => DifficultyLevel::Endurance->label(), 'points' => (int) config('points.hike.2')])
         ->and($response->json('data.points.early_booking'))->toBe(['points' => 4, 'days' => 5])
-        ->and($response->json('data.points.referral'))->toBe(10);
+        ->and($response->json('data.points.referral'))->toBe(10)
+        // The same example and terms as the website page (RankSystemGuide).
+        ->and($response->json('data.example'))->toBe([
+            'level_label' => DifficultyLevel::Endurance->label(),
+            'hike_points' => (int) config('points.hike.2'),
+            'early_booking_points' => 4,
+            'total' => (int) config('points.hike.2') + 4,
+            'rank_label' => 'Trekker',
+            'hikes_to_rank' => 5,
+        ])
+        ->and($response->json('data.terms'))->toBe(app(RankSystemGuide::class)->terms())
+        ->and($response->json('data.terms.3'))->toContain('cancelled or unpaid afterwards');
+});
+
+it('leaves "or unpaid" out of the terms when free and paid hikes both count', function () {
+    config(['points.paid_only' => false]);
+
+    expect($this->getJson(route('api.v1.rank-system'))->json('data.terms.3'))->toContain('not attended, cancelled afterwards');
 });
 
 describe('difficulty', function () {
