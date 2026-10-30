@@ -604,7 +604,7 @@ export interface paths {
         };
         /**
          * Guide articles
-         * @description Newest first.
+         * @description Newest first, 20 per page (`?page=N`).
          */
         get: operations["v1.guides.index"];
         put?: never;
@@ -1126,6 +1126,34 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ArticleDetailResource */
+        ArticleDetailResource: {
+            slug: string;
+            title: string;
+            summary: string;
+            author: string;
+            /** @description null when the article has no cover image. */
+            cover_url: string | null;
+            reading_minutes: number;
+            published_at: string | null;
+            web_url: string;
+            /** @description The article as safe HTML (raw HTML in the text is escaped), for a web view or an HTML renderer. */
+            body_html: string;
+            /** @description Up to 3 other recent articles. */
+            more: components["schemas"]["ArticleResource"][];
+        };
+        /** ArticleResource */
+        ArticleResource: {
+            slug: string;
+            title: string;
+            summary: string;
+            author: string;
+            /** @description null when the article has no cover image. */
+            cover_url: string | null;
+            reading_minutes: number;
+            published_at: string | null;
+            web_url: string;
+        };
         /**
          * Attendance
          * @enum {string}
@@ -2834,25 +2862,37 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Paginated set of `ArticleResource` */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        data: {
-                            slug: string;
-                            title: string;
-                            summary: string;
-                            author: string;
-                            cover_url: null;
-                            reading_minutes: number;
-                            published_at: string | null;
-                            web_url: string;
-                        }[];
+                        data: components["schemas"]["ArticleResource"][];
+                        links: {
+                            first: string | null;
+                            last: string | null;
+                            prev: string | null;
+                            next: string | null;
+                        };
                         meta: {
                             current_page: number;
+                            from: number | null;
                             last_page: number;
+                            /** @description Generated paginator links. */
+                            links: {
+                                url: string | null;
+                                label: string;
+                                active: boolean;
+                            }[];
+                            /** @description Base path for paginator generated URLs. */
+                            path: string | null;
+                            /** @description Number of items shown per page. */
+                            per_page: number;
+                            /** @description Number of the last item in the slice. */
+                            to: number | null;
+                            /** @description Total number of items being paginated. */
                             total: number;
                         };
                     };
@@ -2873,13 +2913,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description `ArticleDetailResource` */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        data: unknown[];
+                        data: components["schemas"]["ArticleDetailResource"];
                     };
                 };
             };

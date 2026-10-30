@@ -61,6 +61,8 @@ export default function RootLayout() {
                 <Stack.Screen name="perks/scan" options={{ title: strings.perks.title }} />
                 <Stack.Screen name="rank-system" options={{ title: strings.rankSystem.title }} />
                 <Stack.Screen name="leaderboard" options={{ title: strings.leaderboard.title }} />
+                <Stack.Screen name="guides/index" options={{ title: strings.guides.title }} />
+                <Stack.Screen name="guides/[slug]" options={{ title: '' }} />
               </Stack>
             </VersionGate>
           </ThemeProvider>

@@ -18,6 +18,13 @@ export function formatDay(isoDate: string, style: 'short' | 'long' = 'short'): s
 }
 
 /** An ISO date-time → "1 Nov, 23:59" in the phone's time zone. */
+/** "12 Oct 2026" from an ISO date-time (an article's publication date). */
+export function formatDate(isoDateTime: string): string {
+  const date = new Date(isoDateTime);
+
+  return `${date.getDate()} ${MONTHS[date.getMonth()].slice(0, 3)} ${date.getFullYear()}`;
+}
+
 export function formatMoment(isoDateTime: string): string {
   const date = new Date(isoDateTime);
   const time = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;

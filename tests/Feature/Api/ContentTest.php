@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Loyalty\Enums\PointType;
+use App\Http\Controllers\Api\V1\GuideController;
 use App\Mail\ConfirmSubscriptionMail;
 use App\Mail\ContactMessageMail;
 use App\Models\Album;
@@ -83,6 +84,20 @@ describe('guides', function () {
 
         $this->getJson(route('api.v1.guides.show', $draft))->assertNotFound();
         $this->getJson(route('api.v1.guides.show', $scheduled))->assertNotFound();
+    });
+
+    it('pages the list and gives the cover image when there is one', function () {
+        Article::factory()->count(GuideController::PER_PAGE + 1)->create(['published_at' => now()->subDays(2)]);
+        $withCover = Article::factory()->create(['cover_path' => 'articles/water.jpg', 'published_at' => now()->subHour()]);
+
+        $this->getJson(route('api.v1.guides.index'))
+            ->assertOk()
+            ->assertJsonCount(GuideController::PER_PAGE, 'data')
+            ->assertJsonPath('meta.last_page', 2)
+            ->assertJsonPath('data.0.slug', $withCover->slug)
+            ->assertJsonPath('data.0.cover_url', fn (string $url) => str_ends_with($url, 'articles/water.jpg'))
+            ->assertJsonPath('data.1.cover_url', null);
+        $this->getJson(route('api.v1.guides.index', ['page' => 2]))->assertJsonCount(2, 'data');
     });
 });
 

@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\ArticleDetailResource;
+use App\Http\Resources\Api\V1\ArticleResource;
 use App\Models\Article;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 /**
  * Guide articles (CMS → Guide articles). Only published ones: drafts and scheduled articles give 404
@@ -17,22 +20,17 @@ class GuideController extends Controller
     /**
      * Guide articles.
      *
-     * Newest first.
+     * Newest first, 20 per page (`?page=N`).
      *
      * @unauthenticated
-     *
-     * @return array{data: list<array<string, mixed>>, meta: array{current_page: int, last_page: int, total: int}}
      */
-    public function index(Request $request): array
+    public function index(Request $request): AnonymousResourceCollection
     {
         $request->validate(['page' => ['sometimes', 'integer', 'min:1']]);
 
-        $articles = Article::published()->latest('published_at')->latest('id')->paginate(self::PER_PAGE);
-
-        return [
-            'data' => $articles->getCollection()->map(fn (Article $article) => $this->card($article))->values()->all(),
-            'meta' => ['current_page' => $articles->currentPage(), 'last_page' => $articles->lastPage(), 'total' => $articles->total()],
-        ];
+        return ArticleResource::collection(
+            Article::published()->latest('published_at')->latest('id')->paginate(self::PER_PAGE),
+        );
     }
 
     /**
@@ -42,34 +40,13 @@ class GuideController extends Controller
      * HTML renderer. `more` has 3 other recent articles.
      *
      * @unauthenticated
-     *
-     * @return array{data: array<string, mixed>}
      */
-    public function show(Article $article): array
+    public function show(Article $article): ArticleDetailResource
     {
         abort_unless($article->isPublished(), 404);
 
-        return ['data' => $this->card($article) + [
-            'body_html' => $article->bodyHtml()->toHtml(),
-            'more' => Article::published()->whereKeyNot($article->id)->latest('published_at')->limit(3)->get()
-                ->map(fn (Article $other) => $this->card($other))->values()->all(),
-        ]];
-    }
+        $more = Article::published()->whereKeyNot($article->id)->latest('published_at')->limit(3)->get();
 
-    /**
-     * @return array<string, mixed>
-     */
-    private function card(Article $article): array
-    {
-        return [
-            'slug' => $article->slug,
-            'title' => $article->title,
-            'summary' => $article->summary(),
-            'author' => $article->author_name,
-            'cover_url' => $article->coverUrl(),
-            'reading_minutes' => $article->readingMinutes(),
-            'published_at' => $article->published_at?->toIso8601String(),
-            'web_url' => route('guide.articles.show', $article),
-        ];
+        return (new ArticleDetailResource($article))->withMore($more);
     }
 }

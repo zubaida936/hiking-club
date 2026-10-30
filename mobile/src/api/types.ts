@@ -41,3 +41,6 @@ export type PerkState = ResponseOf<'v1.organizer.perks.show'>['data'];
 export type RankSystem = ResponseOf<'v1.rank-system'>['data'];
 export type LeaderboardList = ResponseOf<'v1.leaderboard'>;
 export type LeaderboardRow = LeaderboardList['data'][number];
+export type ArticleCard = components['schemas']['ArticleResource'];
+export type ArticleList = ResponseOf<'v1.guides.index'>;
+export type Article = components['schemas']['ArticleDetailResource'];

@@ -380,6 +380,15 @@ export const strings = {
     perkOnBookingScan: 'That\'s a reward code: use "Scan a reward code" on the Organizer tab.',
     done: 'Done',
   },
+  guides: {
+    title: "Hiker's guides",
+    link: "Hiker's guides",
+    intro: 'Tips from our guides: gear, safety, water, trails.',
+    empty: 'No guides published yet.',
+    meta: (author: string, date: string | null, minutes: number) => [author, date, `${minutes} min read`].filter(Boolean).join(' · '),
+    more: 'More guides',
+    notFound: "This guide doesn't exist or isn't published any more.",
+  },
   leaderboard: {
     title: 'Leaderboard',
     link: 'Leaderboard',
