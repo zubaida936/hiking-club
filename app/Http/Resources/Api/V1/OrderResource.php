@@ -32,7 +32,8 @@ class OrderResource extends JsonResource
             // new (Received), preparing, ready (Ready for pickup / Out for delivery), completed, cancelled.
             'status' => ['key' => $this->status->value, 'label' => $this->statusLabel()],
             'items' => $this->items->map(fn (OrderItem $item) => [
-                'product_slug' => $slugs->get((int) $item->product_id),
+                // Link to the product while it's still on sale.
+                'product_slug' => $slugs->has((int) $item->product_id) ? (string) $slugs->get((int) $item->product_id) : null,
                 'product_name' => $item->product_name,
                 'variant_name' => $item->variant_name,
                 'quantity' => $item->quantity,

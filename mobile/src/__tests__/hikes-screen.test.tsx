@@ -1,7 +1,7 @@
 import { fireEvent, renderRouter, screen } from 'expo-router/testing-library';
 import { Linking, Share } from 'react-native';
 
-import { appConfigRoute, fakeApi, sampleEvent, sampleEventDetail } from '@/test-utils/fake-api';
+import { appConfigRoute, fakeApi, quietTabs, sampleEvent, sampleEventDetail } from '@/test-utils/fake-api';
 
 jest.mock('@/auth/token', () => ({ getToken: jest.fn(async () => null), saveToken: jest.fn(), clearToken: jest.fn() }));
 
@@ -22,8 +22,8 @@ describe('hikes list', () => {
   });
 
   it('shows the error message with a retry button', async () => {
-    // Only the hikes list is offline (the Home tab is rendered too and would show its own error).
-    fakeApi({ ...appConfigRoute, 'GET /events': 'offline', 'GET /home': { status: 200, body: { data: { slides: [], next_event: null, top_hikers: [] } } } });
+    // Only the hikes list is offline (the other tabs are rendered too and would show their own error).
+    fakeApi({ ...appConfigRoute, ...quietTabs, 'GET /events': 'offline' });
     await renderRouter('./src/app', { initialUrl: '/hikes' });
 
     // The app retries network trouble twice before showing the error.

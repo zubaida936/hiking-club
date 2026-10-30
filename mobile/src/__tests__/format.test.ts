@@ -1,4 +1,4 @@
-import { formatDay, formatHours, formatKm, formatMoment, paragraphs } from '@/format';
+import { formatDay, formatHours, formatKm, formatMoment, formatMoney, paragraphs } from '@/format';
 
 it('formats the club days the same on every phone', () => {
   expect(formatDay('2026-11-02')).toBe('Mon, 2 Nov');
@@ -10,6 +10,13 @@ it('formats a moment in the phone time zone', () => {
   const date = new Date(2026, 10, 1, 23, 5);
 
   expect(formatMoment(date.toISOString())).toBe('1 Nov, 23:05');
+});
+
+it('formats money like the server', () => {
+  expect(formatMoney(2400)).toBe('$24');
+  expect(formatMoney(2450)).toBe('$24.5');
+  expect(formatMoney(2405)).toBe('$24.05');
+  expect(formatMoney(0)).toBe('$0');
 });
 
 it('formats distances, durations and paragraphs like the website', () => {

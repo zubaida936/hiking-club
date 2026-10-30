@@ -10,7 +10,9 @@ use App\Http\Requests\Api\V1\CheckoutRequest;
 use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductVariant;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
@@ -77,37 +79,55 @@ class ShopController extends Controller
      * `can_checkout` is true when every line can be ordered.
      *
      * @unauthenticated
-     *
-     * @return array{data: array<string, mixed>}
      */
-    public function cart(Request $request): array
+    public function cart(Request $request): JsonResponse
     {
         $request->validate(CheckoutRequest::itemRules());
         $quantities = CheckoutRequest::quantitiesFrom((array) $request->input('items'));
 
-        $lines = Cart::linesFor($quantities);
-        $subtotal = (int) $lines->sum('line_cents');
-        $found = $lines->map(fn (array $line) => $line['variant']->id)->all();
+        // Loops and casts (not collection maps over plain arrays) so the API docs type every field.
+        $cartLines = Cart::linesFor($quantities);
+        $subtotal = (int) $cartLines->sum('line_cents');
+        $lines = [];
+        $found = [];
+        $canCheckout = true;
+        foreach ($cartLines as $line) {
+            /** @var ProductVariant $variant */
+            $variant = $line['variant'];
+            $unit = (int) $line['unit_cents'];
+            $total = (int) $line['line_cents'];
+            $inStock = (bool) $line['in_stock'];
+            $image = $variant->product->coverUrl();
 
-        return ['data' => [
-            'lines' => $lines->map(fn (array $line) => [
-                'variant_id' => $line['variant']->id,
-                'variant_name' => $line['variant']->name,
+            $found[] = $variant->id;
+            $canCheckout = $canCheckout && $inStock;
+            $lines[] = [
+                'variant_id' => (int) $variant->id,
+                'variant_name' => (string) $variant->name,
                 'product' => [
-                    'slug' => $line['variant']->product->slug,
-                    'name' => $line['variant']->product->name,
-                    'image' => $line['variant']->product->coverUrl(),
+                    'slug' => (string) $variant->product->slug,
+                    'name' => (string) $variant->product->name,
+                    'image' => $image === null ? null : (string) $image,
                 ],
-                'quantity' => $line['quantity'],
-                'stock' => $line['variant']->stock,
-                'in_stock' => $line['in_stock'],
-                'unit_price' => ['cents' => $line['unit_cents'], 'formatted' => Product::money($line['unit_cents'])],
-                'line_total' => ['cents' => $line['line_cents'], 'formatted' => Product::money($line['line_cents'])],
-            ])->values()->all(),
-            'unavailable' => array_values(array_diff(array_keys($quantities), $found)),
+                'quantity' => (int) $line['quantity'],
+                'stock' => (int) $variant->stock,
+                'in_stock' => $inStock,
+                'unit_price' => ['cents' => $unit, 'formatted' => Product::money($unit)],
+                'line_total' => ['cents' => $total, 'formatted' => Product::money($total)],
+            ];
+        }
+
+        $unavailable = [];
+        foreach (array_diff(array_keys($quantities), $found) as $variantId) {
+            $unavailable[] = (int) $variantId;
+        }
+
+        return response()->json(['data' => [
+            'lines' => $lines,
+            'unavailable' => $unavailable,
             'subtotal' => ['cents' => $subtotal, 'formatted' => Product::money($subtotal)],
-            'can_checkout' => $lines->isNotEmpty() && $lines->every(fn (array $line) => $line['in_stock']) && count($found) === count($quantities),
-        ]];
+            'can_checkout' => $lines !== [] && $canCheckout && $unavailable === [],
+        ]]);
     }
 
     /**
@@ -116,25 +136,25 @@ class ShopController extends Controller
      * Pickup or delivery (with fee and note), payment methods, and the member's details to fill in.
      *
      * @unauthenticated
-     *
-     * @return array{data: array<string, mixed>}
      */
-    public function checkoutForm(Request $request): array
+    public function checkoutForm(Request $request): JsonResponse
     {
         /** @var ?User $user */
         $user = $request->user();
         $hiker = $user?->hiker;
         $fee = (int) config('shop.delivery_fee_cents');
 
-        return ['data' => [
+        $methods = [];
+        foreach (PaymentMethod::available() as $method) {
+            $methods[] = ['key' => $method->value, 'label' => $method === PaymentMethod::Cash ? 'Cash on delivery / at pickup' : $method->label()];
+        }
+
+        return response()->json(['data' => [
             'fulfilment' => [
                 ['key' => Fulfilment::Pickup->value, 'label' => Fulfilment::Pickup->label(), 'fee' => ['cents' => 0, 'formatted' => 'Free'], 'note' => (string) config('shop.pickup_note'), 'needs_address' => false],
                 ['key' => Fulfilment::Delivery->value, 'label' => Fulfilment::Delivery->label(), 'fee' => ['cents' => $fee, 'formatted' => Product::money($fee)], 'note' => (string) config('shop.delivery_note'), 'needs_address' => true],
             ],
-            'payment_methods' => array_map(fn (PaymentMethod $method) => [
-                'key' => $method->value,
-                'label' => $method === PaymentMethod::Cash ? 'Cash on delivery / at pickup' : $method->label(),
-            ], PaymentMethod::available()),
+            'payment_methods' => $methods,
             'terms' => 'I agree that the club contacts me about this order by phone, WhatsApp or email.',
             'max_quantity' => (int) config('shop.max_quantity'),
             'member' => $user === null ? null : [
@@ -142,6 +162,6 @@ class ShopController extends Controller
                 'phone' => $hiker->phone ?? $user->phone,
                 'email' => $hiker->email ?? $user->email,
             ],
-        ]];
+        ]]);
     }
 }

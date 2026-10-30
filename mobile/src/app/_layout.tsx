@@ -6,6 +6,7 @@ import { useColorScheme } from 'react-native';
 import { ApiError } from '@/api/client';
 import { AuthProvider } from '@/auth/auth-context';
 import { VersionGate } from '@/components/version-gate';
+import { CartProvider } from '@/shop/cart';
 import { strings } from '@/strings';
 
 function createQueryClient() {
@@ -30,23 +31,30 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <VersionGate>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="activate" options={{ title: strings.activate.title }} />
-              <Stack.Screen name="forgot-password" options={{ title: strings.forgot.title }} />
-              <Stack.Screen name="events/[slug]" options={{ title: '' }} />
-              <Stack.Screen name="book/[slug]" options={{ title: strings.book.title }} />
-              <Stack.Screen name="bookings/[token]" options={{ title: strings.booking.reference }} />
-              <Stack.Screen name="my-hikes" options={{ title: strings.myBookings.completed }} />
-              <Stack.Screen name="my-points" options={{ title: strings.points.title }} />
-              <Stack.Screen name="my-rewards" options={{ title: strings.rewards.title }} />
-              <Stack.Screen name="delete-account" options={{ title: strings.deleteAccount.title }} />
-              <Stack.Screen name="edit-profile" options={{ title: strings.profile.title }} />
-            </Stack>
-          </VersionGate>
-        </ThemeProvider>
+        <CartProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <VersionGate>
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="activate" options={{ title: strings.activate.title }} />
+                <Stack.Screen name="forgot-password" options={{ title: strings.forgot.title }} />
+                <Stack.Screen name="events/[slug]" options={{ title: '' }} />
+                <Stack.Screen name="book/[slug]" options={{ title: strings.book.title }} />
+                <Stack.Screen name="bookings/[token]" options={{ title: strings.booking.reference }} />
+                <Stack.Screen name="my-hikes" options={{ title: strings.myBookings.completed }} />
+                <Stack.Screen name="my-points" options={{ title: strings.points.title }} />
+                <Stack.Screen name="my-rewards" options={{ title: strings.rewards.title }} />
+                <Stack.Screen name="delete-account" options={{ title: strings.deleteAccount.title }} />
+                <Stack.Screen name="edit-profile" options={{ title: strings.profile.title }} />
+                <Stack.Screen name="shop/[slug]" options={{ title: '' }} />
+                <Stack.Screen name="cart" options={{ title: strings.cart.title }} />
+                <Stack.Screen name="checkout" options={{ title: strings.checkout.title }} />
+                <Stack.Screen name="orders/[token]" options={{ title: strings.order.title }} />
+                <Stack.Screen name="my-orders" options={{ title: strings.order.myOrders }} />
+              </Stack>
+            </VersionGate>
+          </ThemeProvider>
+        </CartProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

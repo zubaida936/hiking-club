@@ -56,6 +56,9 @@ export default function AccountScreen() {
               <Link href="/my-rewards">
                 <ThemedText type="linkPrimary">{strings.rewards.link}</ThemedText>
               </Link>
+              <Link href="/my-orders">
+                <ThemedText type="linkPrimary">{strings.order.myOrders}</ThemedText>
+              </Link>
             </View>
           ) : null}
           <MyUpcomingBookings />

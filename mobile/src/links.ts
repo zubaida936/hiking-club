@@ -15,6 +15,12 @@ export function appRouteFor(url: string): Href | null {
   const hike = path.match(/^\/events\/([a-z0-9-]+)$/);
   if (hike && hike[1] !== 'archive') return `/events/${hike[1]}`;
   if (path === '/events') return '/hikes';
+  const product = path.match(/^\/shop\/([a-z0-9-]+)$/);
+  if (product) return `/shop/${product[1]}`;
+  if (path === '/shop') return '/shop';
+  if (path === '/cart') return '/cart';
+  const order = path.match(/^\/orders\/([A-Za-z0-9]+)$/);
+  if (order) return `/orders/${order[1]}`;
   if (path === '/') return '/';
   if (path === '/account') return '/account';
 

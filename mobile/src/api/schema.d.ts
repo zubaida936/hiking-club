@@ -1299,7 +1299,8 @@ export interface components {
                 label: string;
             };
             items: {
-                product_slug: unknown;
+                /** @description Link to the product while it's still on sale. */
+                product_slug: string | null;
                 product_name: string;
                 variant_name: string;
                 quantity: number;
@@ -3060,26 +3061,26 @@ export interface operations {
                     "application/json": {
                         data: {
                             lines: {
-                                variant_id: string;
+                                variant_id: number;
                                 variant_name: string;
                                 product: {
                                     slug: string;
                                     name: string;
-                                    image: string;
+                                    image: string | null;
                                 };
-                                quantity: number | string;
-                                stock: string;
-                                in_stock: boolean | string;
+                                quantity: number;
+                                stock: number;
+                                in_stock: boolean;
                                 unit_price: {
-                                    cents: string;
+                                    cents: number;
                                     formatted: string;
                                 };
                                 line_total: {
-                                    cents: number | string;
+                                    cents: number;
                                     formatted: string;
                                 };
                             }[];
-                            unavailable: unknown[];
+                            unavailable: number[];
                             subtotal: {
                                 cents: number;
                                 formatted: string;
@@ -3136,7 +3137,10 @@ export interface operations {
                                     needs_address: boolean;
                                 }
                             ];
-                            payment_methods: unknown[];
+                            payment_methods: {
+                                key: string;
+                                label: string | "Cash on delivery / at pickup";
+                            }[];
                             /** @constant */
                             terms: "I agree that the club contacts me about this order by phone, WhatsApp or email.";
                             max_quantity: number;

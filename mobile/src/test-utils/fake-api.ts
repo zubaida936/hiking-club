@@ -2,7 +2,7 @@
  * Test helpers: a fake API behind `fetch`, and sample API data.
  * (Outside __tests__ so Jest doesn't run it as a test file.)
  */
-import type { Booking, BookingForm, Event, EventDetail, Member } from '@/api/types';
+import type { Booking, BookingForm, Event, EventDetail, Member, Order, Product } from '@/api/types';
 
 type Route = { status: number; body?: unknown };
 type Call = { method: string; path: string; query: Record<string, string>; body: unknown; auth: string | undefined };
@@ -34,6 +34,16 @@ export function fakeApi(routes: Record<string, Route | (() => Route) | 'offline'
 /** GET /app-config allowing every version, so the update gate stays open. */
 export const appConfigRoute = {
   'GET /app-config': { status: 200, body: { data: { min_version: '0.0.0', latest_version: '1.0.0', store_url: { android: null, ios: null } } } },
+};
+
+/**
+ * Empty answers for the tabs' own data: native tabs render every tab at once, so a test about one screen
+ * also loads Home and Shop. Spread it in when another tab's error (e.g. a second "Try again") gets in the way.
+ */
+export const quietTabs = {
+  'GET /home': { status: 200, body: { data: { slides: [], next_event: null, top_hikers: [] } } },
+  'GET /shop/categories': { status: 200, body: { data: [] } },
+  'GET /shop/products': { status: 200, body: { data: [] } },
 };
 
 export const sampleMember: Member = {
@@ -157,4 +167,61 @@ export function sampleBooking(overrides: Partial<Booking> = {}): Booking {
     whatsapp_url: null,
     ...overrides,
   } as Booking;
+}
+
+export function sampleProduct(overrides: Partial<Product> = {}): Product {
+  return {
+    id: 5,
+    slug: 'club-t-shirt',
+    name: 'Club T-shirt',
+    category: { slug: 'clothing', name: 'Clothing' },
+    description: 'Soft cotton, club logo on the back.',
+    tags: ['Unisex'],
+    price: { cents: 1500, formatted: '$15' },
+    regular_price: { cents: 2000, formatted: '$20' },
+    stock: { total: 3, sold_out: false, low: true },
+    images: [],
+    variants: [
+      { id: 51, name: 'S', stock: 0 },
+      { id: 52, name: 'M', stock: 3 },
+    ],
+    web_url: 'http://localhost:8080/shop/club-t-shirt',
+    ...overrides,
+  } as Product;
+}
+
+export function sampleOrder(overrides: Partial<Order> = {}): Order {
+  return {
+    reference: 'ORD12345',
+    token: 'secret-order-token',
+    status: { key: 'new', label: 'Received' },
+    items: [
+      {
+        product_slug: 'club-t-shirt',
+        product_name: 'Club T-shirt',
+        variant_name: 'M',
+        quantity: 2,
+        unit_price: { cents: 1500, formatted: '$15' },
+        line_total: { cents: 3000, formatted: '$30' },
+      },
+    ],
+    subtotal: { cents: 3000, formatted: '$30' },
+    delivery_fee: { cents: 400, formatted: '$4' },
+    total: { cents: 3400, formatted: '$34' },
+    fulfilment: { key: 'delivery', label: 'Delivery', city: 'Beirut', address: 'Hamra Street 12', note: 'Delivery in 3–5 working days.' },
+    name: 'Karim Saad',
+    phone: '+96171222333',
+    email: null,
+    notes: null,
+    payment: {
+      state: 'due',
+      method: { key: 'omt', label: 'OMT Pay transfer' },
+      paid_at: null,
+      instructions: { type: 'transfer', provider: 'OMT Pay', account_name: 'Hiking Club', account_number: '+961 70 000 000', note: 'ORD12345', reported_transaction_number: null },
+    },
+    cancellation: null,
+    ordered_at: '2026-10-29T10:00:00+00:00',
+    web_url: 'http://localhost:8080/orders/secret-order-token',
+    ...overrides,
+  } as Order;
 }

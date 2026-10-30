@@ -25,6 +25,11 @@ export function formatMoment(isoDateTime: string): string {
   return `${date.getDate()} ${MONTHS[date.getMonth()].slice(0, 3)}, ${time}`;
 }
 
+/** Cents → "$24", "$24.5", like the server's Product::money() (for totals the app adds up itself). */
+export function formatMoney(cents: number): string {
+  return `$${Number((cents / 100).toFixed(2))}`;
+}
+
 /** 12.5 → "12.5 km", 8 → "8 km" (one decimal at most, like the website). */
 export function formatKm(km: number): string {
   return `${Number(km.toFixed(1))} km`;
