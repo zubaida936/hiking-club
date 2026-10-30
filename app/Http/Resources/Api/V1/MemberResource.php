@@ -75,6 +75,8 @@ class MemberResource extends JsonResource
             'organizer' => ! $this->resource->can(Permission::ViewRegistrations->value) ? null : [
                 'can_mark_attendance' => $this->resource->can(Permission::ManageAttendance->value),
                 'can_hand_over_perks' => $this->resource->can(Permission::HandOverPerks->value),
+                // Send a hike update to everyone booked (same permission as the CMS: registrations.manage).
+                'can_post_updates' => $this->resource->can(Permission::ManageRegistrations->value),
             ],
         ];
     }

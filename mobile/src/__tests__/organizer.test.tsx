@@ -13,7 +13,7 @@ beforeEach(async () => {
 });
 
 const ok = (data: unknown) => ({ status: 200, body: { data } });
-const guide = { ...sampleMember, organizer: { can_mark_attendance: true, can_hand_over_perks: true } };
+const guide = { ...sampleMember, organizer: { can_mark_attendance: true, can_hand_over_perks: true, can_post_updates: false } };
 const hike: OrganizerHike = { event: sampleEvent(), confirmed: 2, checked_in: 0, check_in_open: true };
 const person = (overrides: Partial<CheckIn> = {}): CheckIn => ({
   reference: 'MAYA0001',

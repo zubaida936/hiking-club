@@ -121,6 +121,7 @@ Route::prefix('v1')->name('api.v1.')->middleware([UseApiGuard::class, 'active', 
         Route::get('events', 'events')->name('events');
         Route::get('events/{event:slug}/registrations', 'registrations')->name('registrations');
         Route::put('registrations/{registration:reference}/attendance', 'attendance')->name('attendance');
+        Route::post('events/{event:slug}/updates', 'postUpdate')->middleware('throttle:10,1')->name('updates.store');
         Route::get('perks/{code}', 'perk')->name('perks.show');
         Route::post('perks/{code}/hand-over', 'handOverPerk')->name('perks.hand-over');
     });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\Events\Actions\PostEventUpdate;
 use App\Domain\Registrations\Actions\MarkAttendance;
 use App\Domain\Registrations\Enums\Attendance;
 use App\Domain\Registrations\Enums\RegistrationStatus;
@@ -108,6 +109,30 @@ class OrganizerController extends Controller
         $action->handle($registration, $value === null ? null : Attendance::from($value), $actor);
 
         return new CheckInResource($registration->refresh());
+    }
+
+    /**
+     * Send a hike update.
+     *
+     * A weather, route or timing update for everyone booked on the hike (and its waitlist): shown on the hike page
+     * and every booking page, and emailed to each booking with an email address. Same action and permission as
+     * CMS → Registrations → "Send update to hikers". `emailed_count` says how many emails went out.
+     */
+    public function postUpdate(Request $request, Event $event, PostEventUpdate $action): JsonResponse
+    {
+        Gate::authorize('notifyHikers', EventRegistration::class);
+
+        $message = $request->validate(['message' => ['required', 'string', 'max:2000']])['message'];
+
+        /** @var User $actor */
+        $actor = $request->user();
+        $update = $action->handle($event, trim((string) $message), $actor);
+
+        return response()->json(['data' => [
+            'message' => (string) $update->message,
+            'posted_at' => $update->created_at->toIso8601String(),
+            'emailed_count' => (int) $update->emailed_count,
+        ]], 201);
     }
 
     /**

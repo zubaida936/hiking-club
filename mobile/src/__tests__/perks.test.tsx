@@ -21,7 +21,7 @@ beforeEach(() => {
 
 const ok = (data: unknown) => ({ status: 200, body: { data } });
 const CODE = 'PERK-12-highlander_gift_card-0123456789abcdef';
-const guide = { ...sampleMember, organizer: { can_mark_attendance: true, can_hand_over_perks: true } };
+const guide = { ...sampleMember, organizer: { can_mark_attendance: true, can_hand_over_perks: true, can_post_updates: false } };
 const routes = { ...appConfigRoute, ...quietTabs, 'GET /me': ok(guide), 'GET /me/bookings': ok([]) };
 const perk = (overrides: Partial<PerkState> = {}): PerkState => ({
   member: { name: 'Rima Haddad', phone: '+96170123456' },

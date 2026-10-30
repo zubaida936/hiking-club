@@ -41,7 +41,7 @@ it('checks in the hiker whose QR code is scanned, from the list saved on the pho
   const calls = fakeApi({
     ...appConfigRoute,
     ...quietTabs,
-    'GET /me': ok({ ...sampleMember, organizer: { can_mark_attendance: true, can_hand_over_perks: true } }),
+    'GET /me': ok({ ...sampleMember, organizer: { can_mark_attendance: true, can_hand_over_perks: true, can_post_updates: false } }),
     'PUT /organizer/registrations/MAYA0001/attendance': ok({ ...maya, attendance: 'attended' }),
   });
   await renderRouter('./src/app', { initialUrl: '/check-in/scan?slug=horch-ehden' });

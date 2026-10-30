@@ -92,6 +92,9 @@ export default function CheckInScreen() {
             <ThemedText type="subtitle">{strings.organizer.counts(checkedIn, confirmed.length)}</ThemedText>
             {hike && !hike.check_in_open ? <ThemedText type="small" themeColor="textSecondary">{strings.organizer.notYet}</ThemedText> : null}
             {canMark ? <Button title={strings.organizer.scan} onPress={() => router.push({ pathname: '/check-in/scan', params: { slug } })} /> : null}
+            {member?.organizer?.can_post_updates ? (
+              <Button title={strings.hikeUpdate.open} onPress={() => router.push({ pathname: '/hike-update', params: { slug } })} variant="secondary" />
+            ) : null}
             <FormField label={strings.organizer.search} value={search} onChangeText={setSearch} autoCapitalize="none" autoCorrect={false} />
           </View>
         }

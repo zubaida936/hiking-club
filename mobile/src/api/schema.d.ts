@@ -801,6 +801,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/organizer/events/{event}/updates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a hike update
+         * @description A weather, route or timing update for everyone booked on the hike (and its waitlist): shown on the hike page
+         *     and every booking page, and emailed to each booking with an email address. Same action and permission as
+         *     CMS → Registrations → "Send update to hikers". `emailed_count` says how many emails went out.
+         */
+        post: operations["v1.organizer.updates.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/organizer/perks/{code}": {
         parameters: {
             query?: never;
@@ -1472,6 +1494,8 @@ export interface components {
             organizer: {
                 can_mark_attendance: boolean;
                 can_hand_over_perks: boolean;
+                /** @description Send a hike update to everyone booked (same permission as the CMS: registrations.manage). */
+                can_post_updates: boolean;
             } | null;
         };
         /** OrderResource */
@@ -3221,6 +3245,44 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["CheckInResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            404: components["responses"]["ModelNotFoundException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "v1.organizer.updates.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The event slug */
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    message: string;
+                };
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            message: string;
+                            posted_at: string;
+                            emailed_count: number;
+                        };
                     };
                 };
             };

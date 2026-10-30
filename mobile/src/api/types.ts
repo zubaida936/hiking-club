@@ -54,3 +54,6 @@ export type Album = ResponseOf<'v1.gallery.show'>['data'];
 export type About = ResponseOf<'v1.about'>['data'];
 export type PastEvent = components['schemas']['PastEventResource'];
 export type PastEventList = ResponseOf<'v1.events.past'>;
+export type HikeUpdateSent = ResponseOf<'v1.organizer.updates.store'>['data'];
+export type SubscribeForm = components['schemas']['SubscribeRequest'];
+export type Subscribed = operations['v1.newsletter.subscribe']['responses'][202]['content']['application/json'];

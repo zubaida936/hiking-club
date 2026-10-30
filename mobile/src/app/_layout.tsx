@@ -60,6 +60,7 @@ export default function RootLayout() {
                 <Stack.Screen name="contact" options={{ title: strings.contact.title }} />
                 <Stack.Screen name="about" options={{ title: strings.about.title }} />
                 <Stack.Screen name="past-hikes" options={{ title: strings.pastHikes.title }} />
+                <Stack.Screen name="hike-update" options={{ title: strings.hikeUpdate.title }} />
                 <Stack.Screen name="gallery/index" options={{ title: strings.gallery.title }} />
                 <Stack.Screen name="gallery/[slug]" options={{ title: '' }} />
                 <Stack.Screen name="photo-viewer" options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'fade' }} />

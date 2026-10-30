@@ -3,12 +3,15 @@
 use App\Domain\Identity\Enums\Role;
 use App\Domain\Loyalty\Enums\PointType;
 use App\Domain\Registrations\Enums\Attendance;
+use App\Domain\Registrations\Enums\RegistrationStatus;
 use App\Domain\Rewards\PerkCode;
+use App\Mail\EventUpdateMail;
 use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\Hiker;
 use App\Models\RewardRedemption;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * An app token for a user with this role (staff log in to the app with their phone, like members).
@@ -33,8 +36,8 @@ describe('organizer mode', function () {
             ->assertOk()
             ->assertJsonPath('data.organizer', $organizer);
     })->with([
-        'guide' => [Role::Guide, ['can_mark_attendance' => true, 'can_hand_over_perks' => true]],
-        'admin' => [Role::Admin, ['can_mark_attendance' => true, 'can_hand_over_perks' => true]],
+        'guide' => [Role::Guide, ['can_mark_attendance' => true, 'can_hand_over_perks' => true, 'can_post_updates' => false]],
+        'admin' => [Role::Admin, ['can_mark_attendance' => true, 'can_hand_over_perks' => true, 'can_post_updates' => true]],
         'content editor' => [Role::Editor, null],
         'member' => [Role::Member, null],
     ]);
@@ -209,4 +212,35 @@ describe('perks', function () {
         $this->withToken($token)->postJson(route('api.v1.organizer.perks.hand-over', $this->code))->assertForbidden();
         expect(RewardRedemption::count())->toBe(0);
     })->with([Role::Editor, Role::Member]);
+});
+
+describe('hike updates', function () {
+    it('lets an admin send an update to everyone booked, like the CMS', function () {
+        Mail::fake();
+        $event = hikeOn(1);
+        EventRegistration::factory()->for($event)->create(['email' => 'maya@example.com']);
+        EventRegistration::factory()->for($event)->create(['email' => null]);
+        EventRegistration::factory()->for($event)->create(['email' => 'gone@example.com', 'status' => RegistrationStatus::Cancelled]);
+
+        $this->withToken(organizerToken(Role::Admin))
+            ->postJson(route('api.v1.organizer.updates.store', $event), ['message' => '  Bus leaves 30 minutes later.  '])
+            ->assertCreated()
+            ->assertJsonPath('data.message', 'Bus leaves 30 minutes later.')
+            ->assertJsonPath('data.emailed_count', 1);
+
+        Mail::assertQueued(EventUpdateMail::class, 1);
+        // Shown on the hike page, in the app too.
+        $this->getJson(route('api.v1.events.show', $event))->assertJsonPath('data.updates.0.message', 'Bus leaves 30 minutes later.');
+    });
+
+    it('needs a message', function () {
+        $this->withToken(organizerToken(Role::Admin))->postJson(route('api.v1.organizer.updates.store', hikeOn(1)), ['message' => ''])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['message']);
+    });
+
+    // One role per test: within a test, Laravel keeps the first token's user for later requests.
+    it('needs the CMS permission (registrations.manage)', function (Role $role) {
+        $this->withToken(organizerToken($role))->postJson(route('api.v1.organizer.updates.store', hikeOn(1)), ['message' => 'Hi'])->assertForbidden();
+    })->with([Role::Guide, Role::Member]);
 });

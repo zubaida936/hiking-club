@@ -13,6 +13,7 @@ import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
+import { NewsletterSignup } from '@/components/newsletter-signup';
 import { appRouteFor } from '@/links';
 import { strings } from '@/strings';
 
@@ -70,6 +71,8 @@ export default function HomeScreen() {
             </Link>
           </View>
         ) : null}
+
+        <NewsletterSignup />
       </ScreenScroll>
     </SafeAreaView>
   );
