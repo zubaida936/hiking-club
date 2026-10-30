@@ -187,8 +187,9 @@ export interface paths {
         /**
          * App configuration
          * @description Asked by the app when it starts. When the installed version is below `min_version`, the app shows
-         *     only an "update the app" screen (with `store_url` for its platform); below `latest_version` it may
-         *     suggest updating. Set in `config/mobile.php` (`MOBILE_*` in `.env`), no release needed.
+         *     only an "update the app" screen (with `store_url` for its platform); below `latest_version` it
+         *     suggests updating once per version, with `latest_notes` (what's new, may be null). Set in
+         *     `config/mobile.php` (`MOBILE_*` in `.env`), no release needed.
          */
         get: operations["v1.app-config"];
         put?: never;
@@ -2195,6 +2196,7 @@ export interface operations {
                         data: {
                             min_version: string;
                             latest_version: string;
+                            latest_notes: string | null;
                             store_url: {
                                 android: string | null;
                                 ios: string | null;

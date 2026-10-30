@@ -284,6 +284,8 @@ export const strings = {
     text: 'This version of the app is too old to keep working. Update it to continue.',
     button: 'Update',
     noStore: 'Install the latest version from the store.',
+    available: (version: string) => `Version ${version} is available`,
+    later: 'Later',
   },
   xEvents: {
     title: 'X Events',

@@ -18,3 +18,8 @@ export function compareVersions(a: string, b: string): number {
 export function mustUpdate(installed: string, minVersion: string): boolean {
   return compareVersions(installed, minVersion) < 0;
 }
+
+/** True when a newer version than the installed one is out (the app suggests updating, without forcing). */
+export function canUpdate(installed: string, latestVersion: string): boolean {
+  return compareVersions(installed, latestVersion) < 0;
+}

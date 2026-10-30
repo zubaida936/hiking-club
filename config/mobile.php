@@ -13,6 +13,9 @@ return [
 
     'latest_version' => env('MOBILE_LATEST_VERSION', '1.0.0'),
 
+    // One or two sentences about what's new in latest_version, shown with the "new version available" banner.
+    'latest_notes' => env('MOBILE_LATEST_NOTES'),
+
     // Store page the update screen opens. Empty until the app is published.
     'store_url' => [
         'android' => env('MOBILE_ANDROID_STORE_URL'),

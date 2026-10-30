@@ -36,7 +36,7 @@ export function fakeApi(routes: Record<string, Answer | (() => Answer)>): Call[]
 
 /** GET /app-config allowing every version, so the update gate stays open. */
 export const appConfigRoute = {
-  'GET /app-config': { status: 200, body: { data: { min_version: '0.0.0', latest_version: '1.0.0', store_url: { android: null, ios: null } } } },
+  'GET /app-config': { status: 200, body: { data: { min_version: '0.0.0', latest_version: '1.0.0', latest_notes: null, store_url: { android: null, ios: null } } } },
 };
 
 /**
