@@ -45,11 +45,10 @@ it('marks the current page in the menu', function () {
         ->not->toMatch($current('contact'));
 });
 
-it('titles placeholder pages after the section', function () {
+it('titles legal pages after the page', function () {
     $this->get(route('legal.privacy'))
         ->assertOk()
-        ->assertSee('<title>Privacy Policy · '.config('app.name').'</title>', false)
-        ->assertSee('This page is on its way');
+        ->assertSee('<title>Privacy Policy · '.config('app.name').'</title>', false);
 });
 
 it('points the call to action at the events page', function () {

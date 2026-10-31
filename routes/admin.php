@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\HeroSlideController;
+use App\Http\Controllers\Admin\LegalPageController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PointsController;
@@ -66,6 +67,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('albums', AlbumController::class)->except('show');
     Route::resource('hero-slides', HeroSlideController::class)->except('show');
     Route::resource('team', TeamMemberController::class)->except('show')->parameters(['team' => 'member']);
+    Route::controller(LegalPageController::class)->prefix('legal-pages')->name('legal-pages.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{document}/edit', 'edit')->name('edit');
+        Route::put('{document}', 'update')->name('update');
+    });
     Route::controller(SubscriberController::class)->prefix('subscribers')->name('subscribers.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('export', 'export')->name('export');

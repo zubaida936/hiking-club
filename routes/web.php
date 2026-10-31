@@ -17,6 +17,7 @@ use App\Http\Controllers\Site\GalleryController;
 use App\Http\Controllers\Site\GuideController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\LeaderboardController;
+use App\Http\Controllers\Site\LegalPageController;
 use App\Http\Controllers\Site\NewsletterController;
 use App\Http\Controllers\Site\PaymentController;
 use App\Http\Controllers\Site\RankSystemController;
@@ -47,6 +48,8 @@ Route::get('gallery/{album:slug}', [GalleryController::class, 'show'])->name('ga
 Route::get('equipment', EquipmentController::class)->name('guide.equipment');
 Route::get('contact', [ContactController::class, 'show'])->name('contact');
 Route::post('contact', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.send');
+Route::get('privacy-policy', [LegalPageController::class, 'privacy'])->name('legal.privacy');
+Route::get('terms', [LegalPageController::class, 'terms'])->name('legal.terms');
 
 Route::get('shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('shop/{product:slug}', [ShopController::class, 'show'])->name('shop.show');
@@ -144,13 +147,3 @@ Route::controller(NewsletterController::class)->prefix('newsletter')->name('news
     Route::get('unsubscribe/{subscriber:token}', 'showUnsubscribe')->name('unsubscribe');
     Route::post('unsubscribe/{subscriber:token}', 'unsubscribe')->name('unsubscribe.confirm');
 });
-
-// Placeholder pages so every header link works today. Each feature replaces its own line
-// with a real controller route (keep the route name: the header links by name).
-$placeholders = [
-    'privacy-policy' => ['legal.privacy', 'Privacy Policy'],
-];
-
-foreach ($placeholders as $uri => [$name, $title]) {
-    Route::view($uri, 'site.coming-soon', ['title' => $title])->name($name);
-}

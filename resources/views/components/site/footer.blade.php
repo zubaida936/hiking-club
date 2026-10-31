@@ -20,6 +20,7 @@
         ['label' => 'About', 'route' => 'about'],
         ['label' => 'Contact', 'route' => 'contact'],
         ['label' => 'Privacy Policy', 'route' => 'legal.privacy'],
+        ['label' => 'Terms', 'route' => 'legal.terms'],
     ];
 @endphp
 

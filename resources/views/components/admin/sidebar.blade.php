@@ -16,6 +16,7 @@
         ['label' => 'Gallery', 'route' => 'admin.albums.index', 'active' => 'admin.albums.*', 'can' => Permission::ManageMedia],
         ['label' => 'Homepage slides', 'route' => 'admin.hero-slides.index', 'active' => 'admin.hero-slides.*', 'can' => Permission::ManageContent],
         ['label' => 'Team', 'route' => 'admin.team.index', 'active' => 'admin.team.*', 'can' => Permission::ManageContent],
+        ['label' => 'Legal pages', 'route' => 'admin.legal-pages.index', 'active' => 'admin.legal-pages.*', 'can' => Permission::ManageContent],
         ['label' => 'Subscribers', 'route' => 'admin.subscribers.index', 'active' => 'admin.subscribers.*', 'can' => Permission::ManageSubscribers],
         ['label' => 'Staff & roles', 'route' => 'admin.staff.index', 'active' => 'admin.staff.*', 'can' => Permission::ManageStaff],
     ];

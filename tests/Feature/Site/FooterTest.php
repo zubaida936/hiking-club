@@ -49,15 +49,16 @@ it('hides social accounts that are not set', function () {
 it('has a site map built from the main menu plus support links', function () {
     $footer = footerHtml();
 
-    foreach (['home', 'events.index', 'x-events', 'shop.index', 'rank-system', 'guide.difficulty', 'guide.equipment', 'guide.articles', 'about', 'contact', 'legal.privacy'] as $route) {
+    foreach (['home', 'events.index', 'x-events', 'shop.index', 'rank-system', 'guide.difficulty', 'guide.equipment', 'guide.articles', 'about', 'contact', 'legal.privacy', 'legal.terms'] as $route) {
         expect($footer)->toContain('href="'.route($route).'"');
     }
 
     expect($footer)->toContain('Explore')->toContain('Hiker&#039;s Guide')->toContain('Support')->toContain('Privacy Policy');
 });
 
-it('has a working privacy policy page', function () {
+it('has working privacy policy and terms pages', function () {
     $this->get(route('legal.privacy'))->assertOk()->assertSee('Privacy Policy');
+    $this->get(route('legal.terms'))->assertOk()->assertSee('Terms');
 });
 
 it('shows the copyright with the current year', function () {

@@ -6,14 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Album;
 use App\Models\Article;
 use App\Models\Event;
+use App\Models\LegalPage;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 
 class SeoController extends Controller
 {
     /**
-     * Public pages that have real content. "Coming soon" placeholders are left out
-     * (they are noindex); add a page's route name here when its feature ships.
+     * Public pages that have real content; add a page's route name here when its feature ships.
      */
     private const PAGES = ['home', 'about', 'events.index', 'events.archive', 'gallery.index', 'x-events', 'leaderboard', 'rank-system', 'guide.difficulty', 'guide.equipment', 'guide.articles', 'contact'];
 
@@ -26,6 +26,11 @@ class SeoController extends Controller
             if (Route::has($name)) {
                 $urls[] = ['loc' => route($name), 'lastmod' => null];
             }
+        }
+
+        // Legal pages only once they have text (an empty one is noindex).
+        foreach (LegalPage::query()->whereNotNull('body')->where('body', '!=', '')->get() as $page) {
+            $urls[] = ['loc' => route($page->document->routeName()), 'lastmod' => $page->updated_at?->toAtomString()];
         }
 
         foreach (Event::published()->orderByDesc('starts_on')->select(['id', 'slug', 'updated_at'])->lazy() as $event) {

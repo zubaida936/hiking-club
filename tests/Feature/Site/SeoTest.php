@@ -68,7 +68,7 @@ describe('meta tags', function () {
 });
 
 describe('sitemap.xml', function () {
-    it('lists the real pages but not placeholders', function () {
+    it('lists the real pages but not legal pages without text', function () {
         $this->get('/sitemap.xml')
             ->assertOk()
             ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
