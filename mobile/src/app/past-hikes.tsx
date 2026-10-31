@@ -5,9 +5,9 @@ import { ActivityIndicator, SectionList, StyleSheet, View } from 'react-native';
 import { apiFetch } from '@/api/client';
 import type { PastEvent, PastEventList } from '@/api/types';
 import { EventCard } from '@/components/event-card';
-import { Button } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { formatMonth } from '@/format';
 import { strings } from '@/strings';
@@ -35,20 +35,11 @@ export default function PastHikesScreen() {
   });
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error && !data) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{error.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={error.message} onRetry={() => void refetch()} />;
   }
 
   return (
@@ -73,7 +64,7 @@ export default function PastHikesScreen() {
         )}
         stickySectionHeadersEnabled={false}
         ListHeaderComponent={<ThemedText themeColor="textSecondary">{strings.pastHikes.intro}</ThemedText>}
-        ListEmptyComponent={<ThemedText style={styles.text}>{strings.pastHikes.empty}</ThemedText>}
+        ListEmptyComponent={<EmptyState inline message={strings.pastHikes.empty} />}
         contentContainerStyle={styles.list}
         onEndReached={() => hasNextPage && !isFetchingNextPage && void fetchNextPage()}
         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator /> : undefined}
@@ -89,6 +80,4 @@ const styles = StyleSheet.create({
   list: { padding: Spacing.three, gap: Spacing.three, width: '100%', maxWidth: MaxContentWidth, alignSelf: 'center' },
   month: { marginTop: Spacing.three },
   item: { gap: Spacing.two, marginTop: Spacing.three },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
 });

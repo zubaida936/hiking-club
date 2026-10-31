@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Pressable, Share, StyleSheet } from 'react-native';
+import { Pressable, Share, StyleSheet } from 'react-native';
 
 import { ApiError, apiFetch } from '@/api/client';
 import type { EventDetail } from '@/api/types';
@@ -10,6 +10,7 @@ import { SavedCopyNote } from '@/components/saved-copy-note';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { LoadingState } from '@/components/states';
 import { Spacing } from '@/constants/theme';
 import { formatDay } from '@/format';
 import { strings } from '@/strings';
@@ -42,9 +43,7 @@ export default function HikeScreen() {
       />
 
       {isPending ? (
-        <ThemedView style={styles.center}>
-          <ActivityIndicator />
-        </ThemedView>
+        <LoadingState />
       ) : error && !event ? (
         <ThemedView style={styles.center}>
           <ThemedText style={styles.text}>{error instanceof ApiError && error.status === 404 ? strings.hike.notFound : error.message}</ThemedText>

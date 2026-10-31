@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { apiFetch } from '@/api/client';
 import type { XEvents } from '@/api/types';
@@ -10,6 +10,7 @@ import { Button } from '@/components/form';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ErrorState, LoadingState } from '@/components/states';
 import { Spacing } from '@/constants/theme';
 import { formatMoment } from '@/format';
 import { strings } from '@/strings';
@@ -28,20 +29,11 @@ export default function XEventsScreen() {
   });
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{error.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={error.message} onRetry={() => void refetch()} />;
   }
 
   const { page, events } = data;
@@ -111,8 +103,6 @@ function AccessBox({ access }: { access: XEvents['access'] }) {
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
   card: { borderRadius: Spacing.three, padding: Spacing.three, gap: Spacing.one },
   access: { gap: Spacing.two },
 });

@@ -1,6 +1,6 @@
 import { Platform, StyleSheet, Text, type TextProps } from 'react-native';
 
-import { Fonts, ThemeColor } from '@/constants/theme';
+import { DisplayFonts, Fonts, HeadingMaxFontScale, ThemeColor } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export type ThemedTextProps = TextProps & {
@@ -8,10 +8,20 @@ export type ThemedTextProps = TextProps & {
   themeColor?: ThemeColor;
 };
 
+const headings: NonNullable<ThemedTextProps['type']>[] = ['title', 'subtitle'];
+
 export function ThemedText({ style, type = 'default', themeColor, ...rest }: ThemedTextProps) {
   const theme = useTheme();
+  // Links are in the accent colour unless the screen asks for another one.
+  const color = theme[themeColor ?? (type === 'linkPrimary' ? 'accent' : 'text')];
 
-  return <Text style={[{ color: theme[themeColor ?? 'text'] }, styles[type], style]} {...rest} />;
+  return (
+    <Text
+      maxFontSizeMultiplier={headings.includes(type) ? HeadingMaxFontScale : undefined}
+      style={[{ color }, styles[type], style]}
+      {...rest}
+    />
+  );
 }
 
 const styles = StyleSheet.create({
@@ -30,15 +40,16 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontWeight: 500,
   },
+  // Custom fonts carry their weight in the family name (Android ignores fontWeight for them).
   title: {
-    fontSize: 48,
-    fontWeight: 600,
-    lineHeight: 52,
+    fontFamily: DisplayFonts.bold,
+    fontSize: 32,
+    lineHeight: 40,
   },
   subtitle: {
-    fontSize: 32,
-    lineHeight: 44,
-    fontWeight: 600,
+    fontFamily: DisplayFonts.semiBold,
+    fontSize: 24,
+    lineHeight: 32,
   },
   link: {
     lineHeight: 30,
@@ -47,7 +58,7 @@ const styles = StyleSheet.create({
   linkPrimary: {
     lineHeight: 30,
     fontSize: 14,
-    color: '#3c87f7',
+    fontWeight: 700,
   },
   code: {
     fontFamily: Fonts.mono,

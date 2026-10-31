@@ -5,9 +5,9 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-
 
 import { apiFetch } from '@/api/client';
 import type { AlbumCard, AlbumList } from '@/api/types';
-import { Button } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { formatDay } from '@/format';
 import { strings } from '@/strings';
@@ -22,20 +22,11 @@ export default function GalleryScreen() {
   });
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{error.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={error.message} onRetry={() => void refetch()} />;
   }
 
   return (
@@ -47,7 +38,7 @@ export default function GalleryScreen() {
         columnWrapperStyle={styles.row}
         renderItem={({ item }) => <AlbumTile album={item} />}
         ListHeaderComponent={<ThemedText themeColor="textSecondary">{strings.gallery.intro}</ThemedText>}
-        ListEmptyComponent={<ThemedText style={styles.text}>{strings.gallery.empty}</ThemedText>}
+        ListEmptyComponent={<EmptyState inline message={strings.gallery.empty} />}
         contentContainerStyle={styles.list}
         onEndReached={() => hasNextPage && !isFetchingNextPage && void fetchNextPage()}
         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator /> : undefined}
@@ -86,6 +77,4 @@ const styles = StyleSheet.create({
   card: { borderRadius: Spacing.three, overflow: 'hidden' },
   cover: { width: '100%', aspectRatio: 4 / 3 },
   body: { padding: Spacing.two, gap: Spacing.half },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
 });

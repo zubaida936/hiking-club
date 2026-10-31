@@ -70,7 +70,7 @@ class MemberResource extends JsonResource
                 'show_on_leaderboard' => $hiker->show_on_leaderboard,
                 'x_events_approved' => $hiker->x_approved_at !== null,
             ],
-            // Staff who may see hike registrations get the app's Organizer tab (null for everyone else). Each
+            // Staff who may see hike registrations get the app's Organizer screen (null for everyone else). Each
             // organizer endpoint checks its own permission again; these only decide what the app shows.
             'organizer' => ! $this->resource->can(Permission::ViewRegistrations->value) ? null : [
                 'can_mark_attendance' => $this->resource->can(Permission::ManageAttendance->value),

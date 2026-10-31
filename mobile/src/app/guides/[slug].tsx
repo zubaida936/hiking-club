@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Linking, Pressable, Share, StyleSheet } from 'react-native';
+import { Linking, Pressable, Share, StyleSheet } from 'react-native';
 import { WebView, type WebViewNavigation } from 'react-native-webview';
 
 import { ApiError, apiFetch } from '@/api/client';
@@ -8,6 +8,7 @@ import type { Article } from '@/api/types';
 import { Button } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { LoadingState } from '@/components/states';
 import { Spacing } from '@/constants/theme';
 import { articleHtml } from '@/guides/article-html';
 import { useTheme } from '@/hooks/use-theme';
@@ -60,9 +61,7 @@ export default function GuideScreen() {
       />
 
       {isPending ? (
-        <ThemedView style={styles.center}>
-          <ActivityIndicator />
-        </ThemedView>
+        <LoadingState />
       ) : error ? (
         <ThemedView style={styles.center}>
           <ThemedText style={styles.text}>{notFound ? strings.guides.notFound : error.message}</ThemedText>

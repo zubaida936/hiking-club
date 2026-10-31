@@ -1,6 +1,10 @@
+import { Jost_600SemiBold } from '@expo-google-fonts/jost/600SemiBold';
+import { Jost_700Bold } from '@expo-google-fonts/jost/700Bold';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
-import { useState } from 'react';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect, useState } from 'react';
 import { StyleSheet, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -8,17 +12,41 @@ import { createQueryClient, persistOptions } from '@/api/query-cache';
 import { AuthProvider } from '@/auth/auth-context';
 import { OfflineBanner } from '@/components/offline-banner';
 import { VersionGate } from '@/components/version-gate';
+import { Colors, DisplayFonts } from '@/constants/theme';
 import { CheckInProvider } from '@/organizer/check-in-store';
 import { CartProvider } from '@/shop/cart';
 import { strings } from '@/strings';
+
+// Keep the splash screen up until the heading font is ready (a few milliseconds: it ships inside the app).
+void SplashScreen.preventAutoHideAsync();
+
+/** Header colours from the app's design tokens, on top of React Navigation's light / dark themes. */
+function navigationTheme(scheme: 'light' | 'dark') {
+  const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
+  const colors = Colors[scheme];
+
+  return {
+    ...base,
+    colors: { ...base.colors, primary: colors.accent, background: colors.background, card: colors.bar, text: colors.text, border: colors.border },
+  };
+}
 
 /**
  * The tabs, with screens that open over them (activation, forgot password).
  */
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme() === 'dark' ? 'dark' : 'light';
+  // A font that fails to load falls back to the system font: never keep the app closed for it.
+  const [fontsLoaded, fontError] = useFonts({ [DisplayFonts.semiBold]: Jost_600SemiBold, [DisplayFonts.bold]: Jost_700Bold });
+  const fontsReady = fontsLoaded || Boolean(fontError);
   // One cache per app start (and per test), created once.
   const [queryClient] = useState(createQueryClient);
+
+  useEffect(() => {
+    if (fontsReady) void SplashScreen.hideAsync();
+  }, [fontsReady]);
+
+  if (!fontsReady) return null;
 
   return (
     // Gesture handler root: the photo viewer's pinch-zoom needs it.
@@ -27,9 +55,9 @@ export default function RootLayout() {
       <AuthProvider>
         <CheckInProvider>
         <CartProvider>
-          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <ThemeProvider value={navigationTheme(colorScheme)}>
             <VersionGate>
-              <Stack>
+              <Stack screenOptions={{ headerTitleStyle: { fontFamily: DisplayFonts.semiBold } }}>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="activate" options={{ title: strings.activate.title }} />
                 <Stack.Screen name="forgot-password" options={{ title: strings.forgot.title }} />
@@ -51,6 +79,7 @@ export default function RootLayout() {
                 <Stack.Screen name="check-in/[slug]" options={{ title: '' }} />
                 <Stack.Screen name="check-in/scan" options={{ title: strings.organizer.scanTitle }} />
                 <Stack.Screen name="difficulty-calculator" options={{ title: strings.difficulty.title }} />
+                <Stack.Screen name="organizer" options={{ title: strings.organizer.title }} />
                 <Stack.Screen name="perks/scan" options={{ title: strings.perks.title }} />
                 <Stack.Screen name="rank-system" options={{ title: strings.rankSystem.title }} />
                 <Stack.Screen name="leaderboard" options={{ title: strings.leaderboard.title }} />

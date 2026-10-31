@@ -1,10 +1,9 @@
 import { Link } from 'expo-router';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable } from 'react-native';
 
 import type { Booking } from '@/api/types';
+import { Card } from '@/components/card';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
 import { formatDay } from '@/format';
 import { strings } from '@/strings';
 
@@ -29,7 +28,7 @@ export function BookingCard({ booking }: { booking: Booking }) {
   return (
     <Link href={`/bookings/${booking.token}`} asChild>
       <Pressable accessibilityRole="link" accessibilityLabel={`${booking.event.title}, ${formatDay(booking.event.starts_on)}`}>
-        <ThemedView type="backgroundElement" style={styles.card}>
+        <Card>
           <ThemedText type="small" themeColor="textSecondary">
             {formatDay(booking.event.starts_on)} · {booking.status.label}
           </ThemedText>
@@ -40,12 +39,8 @@ export function BookingCard({ booking }: { booking: Booking }) {
           ) : payment ? (
             <ThemedText type="smallBold">{payment}</ThemedText>
           ) : null}
-        </ThemedView>
+        </Card>
       </Pressable>
     </Link>
   );
 }
-
-const styles = StyleSheet.create({
-  card: { borderRadius: Spacing.four, padding: Spacing.three, gap: Spacing.one },
-});

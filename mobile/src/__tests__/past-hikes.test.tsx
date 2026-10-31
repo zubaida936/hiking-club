@@ -35,7 +35,8 @@ it('opens from the Hikes tab', async () => {
   fakeApi({ ...appConfigRoute, ...quietTabs, 'GET /events': page([]), 'GET /events/past': page([]) });
   await renderRouter('./src/app', { initialUrl: '/hikes' });
 
-  await fireEvent.press(await screen.findByText('Past hikes'));
+  // The More tab (rendered too) has a "Past hikes" row as well: the Hikes tab's link comes first.
+  await fireEvent.press((await screen.findAllByText('Past hikes'))[0]);
 
   expect(screen).toHavePathname('/past-hikes');
   expect(await screen.findByText('No past hikes yet.')).toBeOnTheScreen();

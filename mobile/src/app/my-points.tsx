@@ -4,9 +4,9 @@ import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 
 import { apiFetch } from '@/api/client';
 import type { PointLine, PointList } from '@/api/types';
-import { Button } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { formatMoment } from '@/format';
 import { strings } from '@/strings';
@@ -21,20 +21,11 @@ export default function MyPointsScreen() {
   });
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{error.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={error.message} onRetry={() => void refetch()} />;
   }
 
   return (
@@ -49,7 +40,7 @@ export default function MyPointsScreen() {
             <ThemedText type="linkPrimary">{strings.rankSystem.link}</ThemedText>
           </Link>
         }
-        ListEmptyComponent={<ThemedText style={styles.text}>{strings.points.empty}</ThemedText>}
+        ListEmptyComponent={<EmptyState inline message={strings.points.empty} />}
         onEndReached={() => hasNextPage && !isFetchingNextPage && void fetchNextPage()}
         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator /> : undefined}
         refreshing={isRefetching}
@@ -81,6 +72,4 @@ const styles = StyleSheet.create({
   list: { padding: Spacing.three, gap: Spacing.two, width: '100%', maxWidth: MaxContentWidth, alignSelf: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, borderRadius: Spacing.three, padding: Spacing.three },
   flex: { flex: 1, gap: Spacing.half },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
 });

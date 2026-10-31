@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Alert, Linking, StyleSheet, View } from 'react-native';
+import { Alert, Linking, StyleSheet, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 import { ApiError, apiFetch } from '@/api/client';
@@ -12,6 +12,7 @@ import { SavedCopyNote } from '@/components/saved-copy-note';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { LoadingState } from '@/components/states';
 import { Spacing } from '@/constants/theme';
 import { formatDay, formatMoment } from '@/format';
 import { QR_PREFIX } from '@/organizer/check-in-store';
@@ -53,11 +54,7 @@ export default function BookingScreen() {
     ]);
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error && !booking) {
@@ -88,7 +85,7 @@ export default function BookingScreen() {
         {booking.cancellation.reason ? <ThemedText themeColor="danger">{booking.cancellation.reason}</ThemedText> : null}
       </ThemedView>
 
-      {/* Organizers scan it at the meeting point (Organizer tab); it holds only the reference. */}
+      {/* Organizers scan it at the meeting point (Organizer screen in More); it holds only the reference. */}
       {booking.status.key === 'confirmed' ? (
         <ThemedView type="backgroundElement" style={[styles.card, styles.qrCard]}>
           <ThemedText type="smallBold">{strings.booking.qrTitle}</ThemedText>

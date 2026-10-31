@@ -1489,7 +1489,7 @@ export interface components {
                 x_events_approved: boolean;
             } | null;
             /**
-             * @description Staff who may see hike registrations get the app's Organizer tab (null for everyone else). Each
+             * @description Staff who may see hike registrations get the app's Organizer screen (null for everyone else). Each
              *     organizer endpoint checks its own permission again; these only decide what the app shows.
              */
             organizer: {

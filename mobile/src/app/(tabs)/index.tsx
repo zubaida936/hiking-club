@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { Link, router } from 'expo-router';
-import { ActivityIndicator, Linking, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { apiFetch } from '@/api/client';
@@ -12,6 +12,7 @@ import { SavedCopyNote } from '@/components/saved-copy-note';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ErrorState, LoadingState } from '@/components/states';
 import { Spacing } from '@/constants/theme';
 import { NewsletterSignup } from '@/components/newsletter-signup';
 import { appRouteFor } from '@/links';
@@ -25,20 +26,11 @@ export default function HomeScreen() {
   });
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error && !data) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{error.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={error.message} onRetry={() => void refetch()} />;
   }
 
   return (
@@ -112,8 +104,6 @@ function Slides({ slides }: { slides: Slide[] }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
   slides: { gap: Spacing.two },
   slide: { height: 260, borderRadius: Spacing.four, overflow: 'hidden', backgroundColor: '#1f3d2b', justifyContent: 'flex-end' },
   shade: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: 'rgba(0,0,0,0.35)' },

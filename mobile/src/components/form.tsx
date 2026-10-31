@@ -86,7 +86,7 @@ export function CheckboxField({ label, checked, onChange, error }: { label: stri
     <View style={styles.field}>
       <Pressable accessibilityRole="checkbox" accessibilityLabel={label} accessibilityState={{ checked }} onPress={() => onChange(!checked)} style={styles.checkRow}>
         <View style={[styles.box, { borderColor: error?.[0] ? theme.danger : theme.accent, backgroundColor: checked ? theme.accent : 'transparent' }]}>
-          {checked ? <ThemedText style={styles.tick}>✓</ThemedText> : null}
+          {checked ? <ThemedText style={[styles.tick, { color: theme.onAccent }]}>✓</ThemedText> : null}
         </View>
         <ThemedText style={styles.flex}>{label}</ThemedText>
       </Pressable>
@@ -121,9 +121,9 @@ export function Button({ title, onPress, loading = false, variant = 'primary' }:
         (pressed || loading) && styles.dimmed,
       ]}>
       {loading ? (
-        <ActivityIndicator color={filled ? '#ffffff' : theme.accent} />
+        <ActivityIndicator color={filled ? theme.onAccent : theme.accent} />
       ) : (
-        <ThemedText type="smallBold" style={{ color: filled ? '#ffffff' : theme.accent }}>
+        <ThemedText type="smallBold" style={{ color: filled ? theme.onAccent : theme.accent }}>
           {title}
         </ThemedText>
       )}
@@ -141,6 +141,6 @@ const styles = StyleSheet.create({
   dotInner: { width: 10, height: 10, borderRadius: 5 },
   checkRow: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.three },
   box: { width: 22, height: 22, borderRadius: 4, borderWidth: 2, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
-  tick: { color: '#ffffff', fontSize: 14, lineHeight: 16 },
+  tick: { fontSize: 14, lineHeight: 16 },
   flex: { flex: 1 },
 });

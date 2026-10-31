@@ -1,31 +1,52 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://unistyl.es/), etc.
+ * The app's design tokens. Every colour a screen uses comes from here (through `useTheme()`), so the branding
+ * decision is a change in this file only.
  */
 
 import { Platform } from 'react-native';
 
+/**
+ * The website's brand tokens (`resources/css/app.css` → `@theme`). PLACEHOLDERS like the website's until the
+ * branding decision (ClickUp "Decide tech stack, hosting & branding"): change both together.
+ */
+export const Brand = {
+  50: '#eef7f1',
+  100: '#d5ebdc',
+  500: '#2f7d52',
+  600: '#24653f',
+  700: '#1c4f32',
+  900: '#0f2a1b',
+  /** The website's orange accent (accent-500). */
+  highlight: '#ee8f12',
+} as const;
+
 export const Colors = {
   light: {
-    text: '#000000',
+    text: '#0f172a',
     background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
-    // Placeholder brand colours until the branding decision.
-    accent: '#1f6f43',
+    backgroundElement: '#f1f5f2',
+    backgroundSelected: '#e2e8e4',
+    textSecondary: '#5b6470',
+    /** Buttons, links, selected states. */
+    accent: Brand[600],
+    /** Text and icons on an accent background. */
+    onAccent: '#ffffff',
     danger: '#c0352b',
-    border: '#D0D2D7',
+    border: '#d0d6d2',
+    /** The header and tab bar. */
+    bar: '#ffffff',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-    accent: '#4fbf7f',
+    text: '#f1f5f2',
+    background: '#0b0f0d',
+    backgroundElement: '#1a201d',
+    backgroundSelected: '#27302b',
+    textSecondary: '#a9b2ad',
+    accent: '#5cc489',
+    onAccent: Brand[900],
     danger: '#ff6b5e',
-    border: '#3A3D42',
+    border: '#353d39',
+    bar: '#111714',
   },
 } as const;
 
@@ -33,22 +54,29 @@ export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
   default: {
     sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
     mono: 'monospace',
   },
 });
+
+/**
+ * Headings use Jost like the website (`--font-display`); body text stays the system font (Roboto on Android, like the
+ * website's `--font-sans`). Loaded in the root layout (`useFonts`); until then the system font is shown.
+ */
+export const DisplayFonts = {
+  semiBold: 'Jost_600SemiBold',
+  bold: 'Jost_700Bold',
+} as const;
+
+/**
+ * Text grows with the phone's font size setting. Headings stop at this multiple so a long title still fits;
+ * body text has no limit.
+ */
+export const HeadingMaxFontScale = 1.6;
 
 export const Spacing = {
   half: 2,

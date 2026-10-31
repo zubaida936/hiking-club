@@ -3,6 +3,7 @@ import { Link } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import type { Product } from '@/api/types';
+import { Card } from '@/components/card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
@@ -29,15 +30,15 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <Link href={`/shop/${product.slug}`} asChild>
       <Pressable accessibilityRole="link" accessibilityLabel={product.name} style={styles.flex}>
-        <ThemedView type="backgroundElement" style={styles.card}>
-          {product.images[0] ? <Image source={product.images[0]} style={styles.image} contentFit="cover" /> : <View style={[styles.image, styles.noImage]} />}
+        <Card flush style={styles.flex}>
+          {product.images[0] ? <Image source={product.images[0]} style={styles.image} contentFit="cover" /> : <ThemedView type="backgroundSelected" style={styles.image} />}
           <View style={styles.body}>
             <ThemedText type="small" themeColor="textSecondary">{product.category.name}</ThemedText>
             <ThemedText type="smallBold">{product.name}</ThemedText>
             <Price product={product} />
             {stock ? <ThemedText type="small" themeColor={product.stock.sold_out ? 'danger' : 'textSecondary'}>{stock}</ThemedText> : null}
           </View>
-        </ThemedView>
+        </Card>
       </Pressable>
     </Link>
   );
@@ -45,9 +46,7 @@ export function ProductCard({ product }: { product: Product }) {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  card: { borderRadius: Spacing.three, overflow: 'hidden', flex: 1 },
   image: { width: '100%', aspectRatio: 1 },
-  noImage: { backgroundColor: '#d9ded9' },
   body: { padding: Spacing.two, gap: Spacing.half },
   price: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.two },
   struck: { textDecorationLine: 'line-through' },

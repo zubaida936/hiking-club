@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { apiFetch } from '@/api/client';
 import type { Category, Product } from '@/api/types';
 import { Chip } from '@/components/chip';
 import { ProductCard } from '@/components/product-card';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
@@ -70,16 +71,11 @@ export default function ShopScreen() {
           contentContainerStyle={styles.list}
           ListEmptyComponent={
             isPending ? (
-              <ActivityIndicator style={styles.state} />
+              <LoadingState inline />
             ) : error ? (
-              <View style={styles.state}>
-                <ThemedText style={styles.center}>{error.message}</ThemedText>
-                <Pressable accessibilityRole="button" onPress={() => void refetch()}>
-                  <ThemedText type="linkPrimary">{strings.errors.retry}</ThemedText>
-                </Pressable>
-              </View>
+              <ErrorState inline message={error.message} onRetry={() => void refetch()} />
             ) : (
-              <ThemedText style={styles.center}>{strings.shop.empty}</ThemedText>
+              <EmptyState inline message={strings.shop.empty} />
             )
           }
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => void refetch()} />}
@@ -97,6 +93,4 @@ const styles = StyleSheet.create({
   chips: { gap: Spacing.two, paddingVertical: Spacing.half },
   list: { gap: Spacing.three, paddingBottom: BottomTabInset + Spacing.three },
   row: { gap: Spacing.three },
-  state: { alignItems: 'center', justifyContent: 'center', gap: Spacing.three, paddingVertical: Spacing.five },
-  center: { textAlign: 'center' },
 });

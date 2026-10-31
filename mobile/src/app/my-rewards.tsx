@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 import { apiFetch } from '@/api/client';
 import type { RewardState } from '@/api/types';
-import { Button } from '@/components/form';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ErrorState, LoadingState } from '@/components/states';
 import { Spacing } from '@/constants/theme';
 import { formatMoment } from '@/format';
 import { strings } from '@/strings';
@@ -23,20 +23,11 @@ export default function MyRewardsScreen() {
   });
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{error.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={error.message} onRetry={() => void refetch()} />;
   }
 
   // Grouped by rank, in the order the API sends them (lowest rank first).
@@ -78,7 +69,7 @@ function RewardCard({ reward }: { reward: RewardState }) {
           {use.event ? strings.rewards.usedOn(use.event.title, formatMoment(use.used_at)) : strings.rewards.usedAt(formatMoment(use.used_at))}
         </ThemedText>
       ))}
-      {/* A perk that can be handed over now: an organizer scans this (Organizer tab → "Scan a reward code"). */}
+      {/* A perk that can be handed over now: an organizer scans this (More → Organizer → "Scan a reward code"). */}
       {reward.perk_code ? (
         <View style={styles.qrBlock}>
           <ThemedText type="smallBold">{strings.rewards.perkQrTitle}</ThemedText>
@@ -99,6 +90,5 @@ const styles = StyleSheet.create({
   qrBlock: { alignItems: 'center', gap: Spacing.two, marginTop: Spacing.two },
   // White around the code so it scans in dark mode too.
   qr: { padding: Spacing.three, backgroundColor: '#ffffff', borderRadius: Spacing.two },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
   text: { textAlign: 'center' },
 });

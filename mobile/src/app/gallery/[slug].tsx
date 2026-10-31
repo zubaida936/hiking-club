@@ -1,12 +1,13 @@
 import { Image } from 'expo-image';
 import { Link, router, Stack, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ApiError } from '@/api/client';
 import { Button } from '@/components/form';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { LoadingState } from '@/components/states';
 import { Spacing } from '@/constants/theme';
 import { formatDay, paragraphs } from '@/format';
 import { useAlbum } from '@/gallery/use-album';
@@ -22,9 +23,7 @@ export default function AlbumScreen() {
     <>
       <Stack.Screen options={{ title: album?.title ?? '' }} />
       {isPending ? (
-        <ThemedView style={styles.center}>
-          <ActivityIndicator />
-        </ThemedView>
+        <LoadingState />
       ) : error ? (
         <ThemedView style={styles.center}>
           <ThemedText style={styles.text}>{notFound ? strings.gallery.notFound : error.message}</ThemedText>

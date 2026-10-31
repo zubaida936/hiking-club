@@ -51,7 +51,7 @@ it('checks in the hiker whose QR code is scanned, from the list saved on the pho
   await act(async () => scan?.({ type: 'qr', data: 'https://example.com' }));
   expect(screen.getByText("That's not a booking QR code.")).toBeOnTheScreen();
   await act(async () => scan?.({ type: 'qr', data: 'PERK-12-highlander_gift_card-0123456789abcdef' }));
-  expect(screen.getByText('That\'s a reward code: use "Scan a reward code" on the Organizer tab.')).toBeOnTheScreen();
+  expect(screen.getByText('That\'s a reward code: use "Scan a reward code" on the Organizer screen (More tab).')).toBeOnTheScreen();
 
   await act(async () => scan?.({ type: 'qr', data: 'hikingclub-booking:NOPE9999' }));
   expect(screen.getByText("This booking isn't on this hike's list.")).toBeOnTheScreen();

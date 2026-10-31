@@ -32,15 +32,17 @@ const list = [person(), person({ reference: 'ZIAD0002', name: 'Ziad Khoury', eme
 const listPath = '/organizer/events/horch-ehden/registrations';
 const routes = { ...appConfigRoute, ...quietTabs, 'GET /me': ok(guide), 'GET /organizer/events': ok([hike]) };
 
-it('opens a hike from the Organizer tab and checks a hiker in', async () => {
+it('opens a hike from the Organizer screen in More and checks a hiker in', async () => {
   const calls = fakeApi({ ...routes, [`GET ${listPath}`]: ok(list), 'PUT /organizer/registrations/MAYA0001/attendance': ok(person({ attendance: 'attended' })) });
-  // Like an organizer: the tab appears once their account has loaded, then they open it.
+  // Like an organizer: the More tab shows the Organizer row once their account has loaded.
   await renderRouter('./src/app', { initialUrl: '/' });
-  const hikeLink = await screen.findByRole('link', { name: /Horch Ehden Nature Reserve/ });
-  await act(() => router.navigate('/organizer'));
+  const organizerRow = await screen.findByRole('link', { name: 'Organizer: check-in and perks' });
+  await act(() => router.navigate('/more'));
+  await fireEvent.press(organizerRow);
+  expect(screen).toHavePathname('/organizer');
   // Guides may hand over perks too (rewards.hand_over).
-  expect(screen.getByRole('button', { name: 'Scan a reward code' })).toBeOnTheScreen();
-  await fireEvent.press(hikeLink);
+  expect(await screen.findByRole('button', { name: 'Scan a reward code' })).toBeOnTheScreen();
+  await fireEvent.press(await screen.findByRole('link', { name: /Horch Ehden Nature Reserve/ }));
   expect(screen).toHavePathname('/check-in/horch-ehden');
   expect(await screen.findByText('Maya Saad')).toBeOnTheScreen();
   expect(screen.getByText('To pay: $30 (Whish Money transfer)')).toBeOnTheScreen();

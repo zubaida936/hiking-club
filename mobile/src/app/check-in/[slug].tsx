@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Linking, Pressable, StyleSheet, View } from 'react-native';
+import { FlatList, Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { ApiError, apiFetch } from '@/api/client';
 import type { CheckIn, OrganizerHike } from '@/api/types';
@@ -10,6 +10,7 @@ import { Chip } from '@/components/chip';
 import { Button, FormField } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { formatMoment } from '@/format';
 import { useCheckIn, type AttendanceValue } from '@/organizer/check-in-store';
@@ -43,20 +44,11 @@ export default function CheckInScreen() {
   const offline = problem instanceof ApiError && problem.status === 0;
 
   if (isPending && !saved && !offline) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (!saved) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{offline ? strings.organizer.noList : error?.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={offline ? strings.organizer.noList : error?.message} onRetry={() => void refetch()} />;
   }
 
   const items = saved.items;
@@ -98,7 +90,7 @@ export default function CheckInScreen() {
             <FormField label={strings.organizer.search} value={search} onChangeText={setSearch} autoCapitalize="none" autoCorrect={false} />
           </View>
         }
-        ListEmptyComponent={<ThemedText style={styles.text}>{strings.organizer.noMatch}</ThemedText>}
+        ListEmptyComponent={<EmptyState inline message={strings.organizer.noMatch} />}
       />
     </ThemedView>
   );
@@ -154,6 +146,4 @@ const styles = StyleSheet.create({
   notice: { borderRadius: Spacing.three, padding: Spacing.three },
   card: { borderRadius: Spacing.three, padding: Spacing.three, gap: Spacing.half },
   buttons: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, marginTop: Spacing.one },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
 });

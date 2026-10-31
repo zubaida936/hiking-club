@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import type { CartCheck } from '@/api/types';
 import { Button } from '@/components/form';
@@ -8,6 +8,7 @@ import { QuantityStepper } from '@/components/quantity-stepper';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ErrorState, LoadingState } from '@/components/states';
 import { Spacing } from '@/constants/theme';
 import { MAX_QUANTITY, useCart } from '@/shop/cart';
 import { useCartCheck } from '@/shop/use-cart-check';
@@ -28,20 +29,11 @@ export default function CartScreen() {
   }
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error || !check) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{error?.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={error?.message} onRetry={() => void refetch()} />;
   }
 
   return (
@@ -69,7 +61,7 @@ export default function CartScreen() {
 function CartLine({ line, onQuantity, onRemove }: { line: CartCheck['lines'][number]; onQuantity: (quantity: number) => void; onRemove: () => void }) {
   return (
     <ThemedView type="backgroundElement" style={styles.line}>
-      {line.product.image ? <Image source={line.product.image} style={styles.image} contentFit="cover" /> : <View style={[styles.image, styles.noImage]} />}
+      {line.product.image ? <Image source={line.product.image} style={styles.image} contentFit="cover" /> : <ThemedView type="backgroundSelected" style={styles.image} />}
       <View style={styles.flex}>
         <ThemedText type="smallBold">{line.product.name}</ThemedText>
         {line.variant_name !== 'One size' ? <ThemedText type="small" themeColor="textSecondary">{line.variant_name}</ThemedText> : null}
@@ -94,7 +86,6 @@ const styles = StyleSheet.create({
   notice: { borderRadius: Spacing.three, padding: Spacing.three, gap: Spacing.two },
   line: { flexDirection: 'row', gap: Spacing.three, borderRadius: Spacing.three, padding: Spacing.two },
   image: { width: 72, height: 72, borderRadius: Spacing.two },
-  noImage: { backgroundColor: '#d9ded9' },
   flex: { flex: 1, gap: Spacing.half },
   actions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: Spacing.one },
   total: { flexDirection: 'row', justifyContent: 'space-between' },

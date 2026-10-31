@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Link } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { apiFetch } from '@/api/client';
@@ -9,6 +9,7 @@ import type { EventList, ResponseOf } from '@/api/types';
 import { Chip } from '@/components/chip';
 import { EventCard } from '@/components/event-card';
 import { SavedCopyNote } from '@/components/saved-copy-note';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
@@ -113,12 +114,7 @@ export default function HikesScreen() {
         {error && !data ? (
           <>
             {header}
-            <ThemedView style={styles.state}>
-              <ThemedText style={styles.center}>{error.message}</ThemedText>
-              <Pressable accessibilityRole="button" onPress={() => refetch()}>
-                <ThemedText type="linkPrimary">{strings.errors.retry}</ThemedText>
-              </Pressable>
-            </ThemedView>
+            <ErrorState inline message={error.message} onRetry={() => void refetch()} />
           </>
         ) : (
           <FlatList
@@ -130,16 +126,11 @@ export default function HikesScreen() {
             keyboardShouldPersistTaps="handled"
             ListEmptyComponent={
               isPending ? (
-                <ActivityIndicator style={styles.state} />
+                <LoadingState inline />
               ) : active ? (
-                <View style={styles.state}>
-                  <ThemedText style={styles.center}>{strings.hikes.noMatch}</ThemedText>
-                  <Pressable accessibilityRole="button" onPress={clear}>
-                    <ThemedText type="linkPrimary">{strings.hikes.clearFilters}</ThemedText>
-                  </Pressable>
-                </View>
+                <EmptyState inline message={strings.hikes.noMatch} action={{ title: strings.hikes.clearFilters, onPress: clear }} />
               ) : (
-                <ThemedText style={styles.center}>{strings.hikes.empty}</ThemedText>
+                <EmptyState inline message={strings.hikes.empty} />
               )
             }
             onEndReached={() => hasNextPage && !isFetchingNextPage && void fetchNextPage()}
@@ -160,6 +151,4 @@ const styles = StyleSheet.create({
   search: { borderWidth: 1, borderRadius: 999, paddingHorizontal: Spacing.three, paddingVertical: Spacing.two, fontSize: 16 },
   chips: { gap: Spacing.two, paddingVertical: Spacing.half },
   list: { gap: Spacing.three, paddingBottom: BottomTabInset + Spacing.three },
-  state: { alignItems: 'center', justifyContent: 'center', gap: Spacing.three, paddingVertical: Spacing.five },
-  center: { textAlign: 'center' },
 });

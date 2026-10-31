@@ -1,20 +1,22 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'expo-router';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/auth/auth-context';
 import { Button } from '@/components/form';
+import { ListRow, ListSection } from '@/components/list-row';
 import { LoginForm } from '@/components/login-form';
 import { MemberProfile } from '@/components/member-profile';
 import { MyUpcomingBookings, upcomingBookingsKey } from '@/components/my-upcoming-bookings';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { ErrorState, LoadingState } from '@/components/states';
 import { Spacing } from '@/constants/theme';
 import { strings } from '@/strings';
 
-/** Logged out: the login form. Logged in: rank and points, my upcoming hikes, and log out. */
+/** Logged out: the login form. Logged in: rank and points, my own screens, my upcoming hikes, and log out. The club's
+ * screens (guides, gallery, about…) are in More. */
 export default function AccountScreen() {
   const { status, member, memberError, reloadMember, signOut } = useAuth();
   const queryClient = useQueryClient();
@@ -24,20 +26,11 @@ export default function AccountScreen() {
   });
 
   if (status === 'signedIn' && !member && memberError) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{memberError.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={reloadMember} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={memberError.message} onRetry={reloadMember} />;
   }
 
   if (status === 'loading' || (status === 'signedIn' && !member)) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   return (
@@ -45,46 +38,16 @@ export default function AccountScreen() {
       {member ? (
         <ScreenScroll onRefresh={() => refresh.mutate()} refreshing={refresh.isPending}>
           <MemberProfile member={member} />
-          <Link href="/edit-profile">
-            <ThemedText type="linkPrimary">{strings.profile.link}</ThemedText>
-          </Link>
-          {member.hiker ? (
-            <View style={styles.links}>
-              <Link href="/my-points">
-                <ThemedText type="linkPrimary">{strings.points.link}</ThemedText>
-              </Link>
-              <Link href="/my-rewards">
-                <ThemedText type="linkPrimary">{strings.rewards.link}</ThemedText>
-              </Link>
-              <Link href="/my-orders">
-                <ThemedText type="linkPrimary">{strings.order.myOrders}</ThemedText>
-              </Link>
-              <Link href="/x-events">
-                <ThemedText type="linkPrimary">{strings.xEvents.link}</ThemedText>
-              </Link>
-              <Link href="/rank-system">
-                <ThemedText type="linkPrimary">{strings.rankSystem.link}</ThemedText>
-              </Link>
-              <Link href="/leaderboard">
-                <ThemedText type="linkPrimary">{strings.leaderboard.link}</ThemedText>
-              </Link>
-              <Link href="/guides">
-                <ThemedText type="linkPrimary">{strings.guides.link}</ThemedText>
-              </Link>
-              <Link href="/equipment">
-                <ThemedText type="linkPrimary">{strings.equipment.title}</ThemedText>
-              </Link>
-              <Link href="/gallery">
-                <ThemedText type="linkPrimary">{strings.gallery.link}</ThemedText>
-              </Link>
-              <Link href="/about">
-                <ThemedText type="linkPrimary">{strings.about.link}</ThemedText>
-              </Link>
-              <Link href="/contact">
-                <ThemedText type="linkPrimary">{strings.contact.link}</ThemedText>
-              </Link>
-            </View>
-          ) : null}
+          <ListSection title={strings.account.mine}>
+            <ListRow title={strings.profile.link} href="/edit-profile" />
+            {member.hiker ? (
+              <>
+                <ListRow title={strings.points.link} href="/my-points" />
+                <ListRow title={strings.rewards.link} href="/my-rewards" />
+                <ListRow title={strings.order.myOrders} href="/my-orders" />
+              </>
+            ) : null}
+          </ListSection>
           <MyUpcomingBookings />
           <Button title={strings.account.logout} onPress={() => logout.mutate()} loading={logout.isPending} variant="secondary" />
           <Link href="/delete-account" style={styles.deleteLink}>
@@ -94,24 +57,6 @@ export default function AccountScreen() {
       ) : (
         <ScreenScroll>
           <LoginForm />
-          <Link href="/rank-system">
-            <ThemedText type="linkPrimary">{strings.rankSystem.link}</ThemedText>
-          </Link>
-          <Link href="/guides">
-            <ThemedText type="linkPrimary">{strings.guides.link}</ThemedText>
-          </Link>
-          <Link href="/equipment">
-            <ThemedText type="linkPrimary">{strings.equipment.title}</ThemedText>
-          </Link>
-          <Link href="/gallery">
-            <ThemedText type="linkPrimary">{strings.gallery.link}</ThemedText>
-          </Link>
-          <Link href="/about">
-            <ThemedText type="linkPrimary">{strings.about.link}</ThemedText>
-          </Link>
-          <Link href="/contact">
-            <ThemedText type="linkPrimary">{strings.contact.link}</ThemedText>
-          </Link>
         </ScreenScroll>
       )}
     </SafeAreaView>
@@ -120,8 +65,5 @@ export default function AccountScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
-  links: { gap: Spacing.two },
   deleteLink: { alignSelf: 'center', marginTop: Spacing.four },
 });

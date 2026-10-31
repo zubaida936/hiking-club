@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { apiFetch } from '@/api/client';
 import { fieldErrors, formMessage } from '@/api/errors';
@@ -9,8 +9,7 @@ import type { CheckoutForm, Order } from '@/api/types';
 import { Button, CheckboxField, ChoiceField, FormError, FormField } from '@/components/form';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import { ErrorState, LoadingState } from '@/components/states';
 import { formatMoney } from '@/format';
 import { useCart } from '@/shop/cart';
 import { useCartCheck } from '@/shop/use-cart-check';
@@ -24,20 +23,11 @@ export default function CheckoutScreen() {
   });
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{error.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={error.message} onRetry={() => void refetch()} />;
   }
 
   return <CheckoutFields form={form} />;
@@ -133,7 +123,5 @@ function CheckoutFields({ form }: { form: CheckoutForm }) {
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
   total: { flexDirection: 'row', justifyContent: 'space-between' },
 });

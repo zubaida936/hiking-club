@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, router } from 'expo-router';
 import { useEffect } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 
 import { apiFetch } from '@/api/client';
 import type { OrganizerHike } from '@/api/types';
@@ -10,14 +9,15 @@ import { useAuth } from '@/auth/auth-context';
 import { Button } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { formatDay } from '@/format';
 import { useCheckIn } from '@/organizer/check-in-store';
 import { strings } from '@/strings';
 
-/** Organizer tab (staff only): the hikes around today (GET /organizer/events) and the marks still to send. */
+/** Organizer screen (staff only, opened from More): the hikes around today (GET /organizer/events) and the marks still to send. */
 export default function OrganizerScreen() {
-  const { member } = useAuth();
+  const { member, status } = useAuth();
   const { pending, send } = useCheckIn();
   const { data, error, isPending, refetch, isRefetching } = useQuery({
     queryKey: ['organizer', 'events'],
@@ -25,14 +25,13 @@ export default function OrganizerScreen() {
     enabled: Boolean(member?.organizer),
   });
 
-  // When the tab opens: try the waiting marks again (signal may be back). Nothing to do when none wait.
+  // When the screen opens: try the waiting marks again (signal may be back). Nothing to do when none wait.
   useEffect(() => {
     void send();
   }, [send]);
 
   const header = (
     <View style={styles.header}>
-      <ThemedText type="title">{strings.organizer.title}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">{strings.organizer.intro}</ThemedText>
       {member?.organizer?.can_hand_over_perks ? <Button title={strings.perks.scan} onPress={() => router.push('/perks/scan')} variant="secondary" /> : null}
       {pending.length > 0 ? (
@@ -44,41 +43,33 @@ export default function OrganizerScreen() {
     </View>
   );
 
+  // Opened by a link without a staff account: say so instead of waiting for a list that never loads.
+  if (status === 'signedOut' || (member && !member.organizer)) {
+    return <EmptyState message={strings.organizer.staffOnly} />;
+  }
+
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ThemedView style={styles.container}>
-        <FlatList
-          data={data ?? []}
-          keyExtractor={(item) => item.event.slug}
-          renderItem={({ item }) => <HikeRow hike={item} />}
-          ListHeaderComponent={header}
-          ListEmptyComponent={
-            error ? (
-              <View style={styles.center}>
-                <ThemedText style={styles.text}>{error.message}</ThemedText>
-                <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-              </View>
-            ) : (
-              <ThemedText style={styles.text}>{strings.organizer.empty}</ThemedText>
-            )
-          }
-          contentContainerStyle={styles.list}
-          refreshing={isRefetching}
-          onRefresh={() => {
-            void send();
-            void refetch();
-          }}
-        />
-      </ThemedView>
-    </SafeAreaView>
+    <ThemedView style={styles.container}>
+      <FlatList
+        data={data ?? []}
+        keyExtractor={(item) => item.event.slug}
+        renderItem={({ item }) => <HikeRow hike={item} />}
+        ListHeaderComponent={header}
+        ListEmptyComponent={
+          error ? <ErrorState inline message={error.message} onRetry={() => void refetch()} /> : <EmptyState inline message={strings.organizer.empty} />
+        }
+        contentContainerStyle={styles.list}
+        refreshing={isRefetching}
+        onRefresh={() => {
+          void send();
+          void refetch();
+        }}
+      />
+    </ThemedView>
   );
 }
 
@@ -102,9 +93,7 @@ function HikeRow({ hike }: { hike: OrganizerHike }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { gap: Spacing.two, paddingBottom: Spacing.two },
-  list: { padding: Spacing.three, gap: Spacing.three, paddingBottom: BottomTabInset + Spacing.three, width: '100%', maxWidth: MaxContentWidth, alignSelf: 'center' },
+  list: { padding: Spacing.three, gap: Spacing.three, width: '100%', maxWidth: MaxContentWidth, alignSelf: 'center' },
   waiting: { borderRadius: Spacing.three, padding: Spacing.three, gap: Spacing.two },
   card: { borderRadius: Spacing.three, padding: Spacing.three, gap: Spacing.half },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
 });

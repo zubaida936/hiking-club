@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'expo-router';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet } from 'react-native';
+import { FlatList, Pressable, StyleSheet } from 'react-native';
 
 import { apiFetch } from '@/api/client';
 import type { Order, OrderList } from '@/api/types';
-import { Button } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { formatMoment } from '@/format';
 import { strings } from '@/strings';
@@ -19,20 +19,11 @@ export default function MyOrdersScreen() {
   });
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{error.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={error.message} onRetry={() => void refetch()} />;
   }
 
   return (
@@ -42,7 +33,7 @@ export default function MyOrdersScreen() {
         keyExtractor={(order) => order.token}
         renderItem={({ item }) => <OrderCard order={item} />}
         contentContainerStyle={styles.list}
-        ListEmptyComponent={<ThemedText style={styles.text}>{strings.order.myOrdersEmpty}</ThemedText>}
+        ListEmptyComponent={<EmptyState inline message={strings.order.myOrdersEmpty} />}
         refreshing={isRefetching}
         onRefresh={() => void refetch()}
       />
@@ -75,6 +66,4 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   list: { padding: Spacing.three, gap: Spacing.three, width: '100%', maxWidth: MaxContentWidth, alignSelf: 'center' },
   card: { borderRadius: Spacing.three, padding: Spacing.three, gap: Spacing.half },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
 });

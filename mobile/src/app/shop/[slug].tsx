@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { ApiError, apiFetch } from '@/api/client';
 import type { Product } from '@/api/types';
@@ -12,6 +12,7 @@ import { QuantityStepper } from '@/components/quantity-stepper';
 import { ScreenScroll } from '@/components/screen-scroll';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { LoadingState } from '@/components/states';
 import { Spacing } from '@/constants/theme';
 import { paragraphs } from '@/format';
 import { MAX_QUANTITY, useCart } from '@/shop/cart';
@@ -26,11 +27,7 @@ export default function ProductScreen() {
   });
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error) {

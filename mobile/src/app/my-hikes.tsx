@@ -4,10 +4,9 @@ import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 import { apiFetch } from '@/api/client';
 import type { BookingList } from '@/api/types';
 import { BookingCard } from '@/components/booking-card';
-import { Button } from '@/components/form';
 import { SavedCopyNote } from '@/components/saved-copy-note';
-import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { strings } from '@/strings';
 
@@ -21,20 +20,11 @@ export default function MyHikesScreen() {
   });
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error && !data) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{error.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={error.message} onRetry={() => void refetch()} />;
   }
 
   return (
@@ -45,7 +35,7 @@ export default function MyHikesScreen() {
         renderItem={({ item }) => <BookingCard booking={item} />}
         contentContainerStyle={styles.list}
         ListHeaderComponent={<SavedCopyNote error={error} updatedAt={dataUpdatedAt} />}
-        ListEmptyComponent={<ThemedText style={styles.text}>{strings.myBookings.completedEmpty}</ThemedText>}
+        ListEmptyComponent={<EmptyState inline message={strings.myBookings.completedEmpty} />}
         onEndReached={() => hasNextPage && !isFetchingNextPage && void fetchNextPage()}
         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator /> : undefined}
         refreshing={isRefetching}
@@ -58,6 +48,4 @@ export default function MyHikesScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   list: { padding: Spacing.three, gap: Spacing.three, width: '100%', maxWidth: MaxContentWidth, alignSelf: 'center' },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
 });

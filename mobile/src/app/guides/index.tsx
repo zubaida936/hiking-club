@@ -5,9 +5,9 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-
 
 import { apiFetch } from '@/api/client';
 import type { ArticleCard, ArticleList } from '@/api/types';
-import { Button } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { formatDate } from '@/format';
 import { strings } from '@/strings';
@@ -22,20 +22,11 @@ export default function GuidesScreen() {
   });
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{error.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={error.message} onRetry={() => void refetch()} />;
   }
 
   return (
@@ -45,7 +36,7 @@ export default function GuidesScreen() {
         keyExtractor={(article) => article.slug}
         renderItem={({ item }) => <GuideCard article={item} />}
         ListHeaderComponent={<ThemedText themeColor="textSecondary">{strings.guides.intro}</ThemedText>}
-        ListEmptyComponent={<ThemedText style={styles.text}>{strings.guides.empty}</ThemedText>}
+        ListEmptyComponent={<EmptyState inline message={strings.guides.empty} />}
         contentContainerStyle={styles.list}
         onEndReached={() => hasNextPage && !isFetchingNextPage && void fetchNextPage()}
         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator /> : undefined}
@@ -83,6 +74,4 @@ const styles = StyleSheet.create({
   card: { borderRadius: Spacing.four, overflow: 'hidden' },
   cover: { width: '100%', height: 160 },
   body: { padding: Spacing.three, gap: Spacing.one },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
 });

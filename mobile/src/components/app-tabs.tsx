@@ -1,45 +1,44 @@
 import { NativeTabs } from 'expo-router/native-tabs';
-import { useColorScheme } from 'react-native';
 
-import { useAuth } from '@/auth/auth-context';
-import { Colors } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 import { strings } from '@/strings';
 
-// Placeholder tab icons from the Expo template, until the "App shell, navigation & design system" task.
+/**
+ * The 5 tabs (Android's tab bar holds 5 at most). Icons are system symbols: Material Symbols on Android, SF Symbols
+ * on iOS, so they follow the phone's style and need no image files. The Organizer screen lives in More.
+ */
 export default function AppTabs() {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
-  // Staff who may see hike registrations get the Organizer tab (the API decides who; it checks again on every call).
-  const { member } = useAuth();
+  const theme = useTheme();
 
   return (
     <NativeTabs
-      backgroundColor={colors.background}
-      indicatorColor={colors.backgroundElement}
-      labelStyle={{ selected: { color: colors.text } }}>
+      backgroundColor={theme.bar}
+      indicatorColor={theme.backgroundSelected}
+      iconColor={{ default: theme.textSecondary, selected: theme.accent }}
+      labelStyle={{ default: { color: theme.textSecondary }, selected: { color: theme.accent } }}>
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>{strings.tabs.home}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon src={require('@/assets/images/tabIcons/home.png')} renderingMode="template" />
+        <NativeTabs.Trigger.Icon md="home" sf={{ default: 'house', selected: 'house.fill' }} />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="hikes">
         <NativeTabs.Trigger.Label>{strings.tabs.hikes}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon src={require('@/assets/images/tabIcons/explore.png')} renderingMode="template" />
+        <NativeTabs.Trigger.Icon md="hiking" sf="figure.hiking" />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="shop">
         <NativeTabs.Trigger.Label>{strings.tabs.shop}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon src={require('@/assets/images/tabIcons/explore.png')} renderingMode="template" />
+        <NativeTabs.Trigger.Icon md="shopping_bag" sf={{ default: 'bag', selected: 'bag.fill' }} />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="organizer" hidden={!member?.organizer}>
-        <NativeTabs.Trigger.Label>{strings.tabs.organizer}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon src={require('@/assets/images/tabIcons/explore.png')} renderingMode="template" />
+      <NativeTabs.Trigger name="more">
+        <NativeTabs.Trigger.Label>{strings.tabs.more}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon md="menu" sf="line.3.horizontal" />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="account">
         <NativeTabs.Trigger.Label>{strings.tabs.account}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon src={require('@/assets/images/tabIcons/explore.png')} renderingMode="template" />
+        <NativeTabs.Trigger.Icon md="account_circle" sf={{ default: 'person.crop.circle', selected: 'person.crop.circle.fill' }} />
       </NativeTabs.Trigger>
     </NativeTabs>
   );

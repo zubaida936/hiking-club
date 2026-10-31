@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ActivityIndicator, FlatList, StyleSheet, Switch, View } from 'react-native';
+import { FlatList, StyleSheet, Switch, View } from 'react-native';
 
 import { apiFetch } from '@/api/client';
 import { formMessage } from '@/api/errors';
 import type { LeaderboardList, LeaderboardRow, Member } from '@/api/types';
 import { useAuth } from '@/auth/auth-context';
-import { Button, FormError } from '@/components/form';
+import { FormError } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { strings } from '@/strings';
@@ -27,20 +28,11 @@ export default function LeaderboardScreen() {
   });
 
   if (isPending) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <ThemedView style={styles.center}>
-        <ThemedText style={styles.text}>{error.message}</ThemedText>
-        <Button title={strings.errors.retry} onPress={() => void refetch()} variant="secondary" />
-      </ThemedView>
-    );
+    return <ErrorState message={error.message} onRetry={() => void refetch()} />;
   }
 
   return (
@@ -55,7 +47,7 @@ export default function LeaderboardScreen() {
             {member?.hiker ? <YourPlace hiker={member.hiker} position={data.my_position} /> : null}
           </View>
         }
-        ListEmptyComponent={<ThemedText style={styles.text}>{strings.leaderboard.empty}</ThemedText>}
+        ListEmptyComponent={<EmptyState inline message={strings.leaderboard.empty} />}
         contentContainerStyle={styles.list}
         refreshing={isRefetching}
         onRefresh={() => void refetch()}
@@ -127,6 +119,4 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, borderRadius: Spacing.three, padding: Spacing.three },
   position: { minWidth: 28, textAlign: 'center' },
   flex: { flex: 1, gap: Spacing.half },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
-  text: { textAlign: 'center' },
 });

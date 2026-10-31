@@ -8,7 +8,15 @@ export const strings = {
     hikes: 'Hikes',
     shop: 'Shop',
     account: 'Account',
-    organizer: 'Organizer',
+    more: 'More',
+  },
+  more: {
+    title: 'More',
+    staff: 'For organizers',
+    organizer: 'Organizer: check-in and perks',
+    club: 'The club',
+    plan: 'Plan your hike',
+    contact: 'About and contact',
   },
   home: {
     nextHike: 'Next hike',
@@ -123,6 +131,7 @@ export const strings = {
   },
   account: {
     title: 'My account',
+    mine: 'My hiking',
     points: (points: number) => `${points} points`,
     nextRank: (points: number, rank: string) => `${points} points to ${rank}`,
     topRank: 'You reached the top rank!',
@@ -349,6 +358,7 @@ export const strings = {
   },
   organizer: {
     title: 'Organizer',
+    staffOnly: 'This screen is for organizers. Log in with a staff account to see it.',
     intro: 'Hikes from a week ago to a week ahead. Check hikers in on the hike day; it works without signal too.',
     empty: 'No hikes this week or next.',
     counts: (checkedIn: number, confirmed: number) => `${checkedIn} / ${confirmed} checked in`,
@@ -380,7 +390,7 @@ export const strings = {
     notOnList: "This booking isn't on this hike's list.",
     notConfirmed: (name: string) => `${name}'s booking isn't confirmed: check with the organizers.`,
     notBookingQr: "That's not a booking QR code.",
-    perkOnBookingScan: 'That\'s a reward code: use "Scan a reward code" on the Organizer tab.',
+    perkOnBookingScan: 'That\'s a reward code: use "Scan a reward code" on the Organizer screen (More tab).',
     done: 'Done',
   },
   pastHikes: {
@@ -567,5 +577,8 @@ export const strings = {
     savedCopy: (time: string) => `Couldn't refresh: showing what was saved at ${time}.`,
     generic: 'Something went wrong. Please try again.',
     retry: 'Try again',
+  },
+  states: {
+    loading: 'Loading',
   },
 } as const;

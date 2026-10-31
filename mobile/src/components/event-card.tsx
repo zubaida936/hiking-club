@@ -3,9 +3,9 @@ import { Link } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import type { Event } from '@/api/types';
+import { Card } from '@/components/card';
 import { DifficultyBadge } from '@/components/difficulty-badge';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { formatDay } from '@/format';
 import { strings } from '@/strings';
@@ -27,7 +27,7 @@ export function EventCard({ event }: { event: Event }) {
   return (
     <Link href={`/events/${event.slug}`} asChild>
       <Pressable accessibilityRole="link" accessibilityLabel={`${event.title}, ${formatDay(event.starts_on)}`}>
-        <ThemedView type="backgroundElement" style={styles.card}>
+        <Card flush>
           {event.cover_image_url ? <Image source={event.cover_image_url} style={styles.cover} contentFit="cover" /> : null}
           <View style={styles.body}>
             <ThemedText type="small" themeColor="textSecondary">
@@ -40,14 +40,13 @@ export function EventCard({ event }: { event: Event }) {
             </View>
             <ThemedText type="smallBold">{seats}</ThemedText>
           </View>
-        </ThemedView>
+        </Card>
       </Pressable>
     </Link>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { borderRadius: Spacing.four, overflow: 'hidden' },
   cover: { width: '100%', height: 160 },
   body: { padding: Spacing.three, gap: Spacing.one },
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, flexWrap: 'wrap' },

@@ -1,10 +1,11 @@
 import { useCameraPermissions } from 'expo-camera';
 import type { ReactNode } from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { Button } from '@/components/form';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { LoadingState } from '@/components/states';
 import { Spacing } from '@/constants/theme';
 import { strings } from '@/strings';
 
@@ -13,11 +14,7 @@ export function CameraGate({ children, reason }: { children: ReactNode; reason: 
   const [permission, requestPermission] = useCameraPermissions();
 
   if (!permission) {
-    return (
-      <ThemedView style={styles.center}>
-        <ActivityIndicator />
-      </ThemedView>
-    );
+    return <LoadingState />;
   }
 
   if (!permission.granted) {
